@@ -2783,3 +2783,187 @@ body.light .side-menu-subitem.active{
   border-color:rgba(53,103,190,.1);
   color:#17202c;
 }
+
+
+/* Unified premium rankings */
+.premium-ranking-dialog{
+  width:min(720px,calc(100% - 1.2rem));
+  max-height:88svh;
+  margin:5vh auto 0;
+  padding:1rem;
+  border:1px solid rgba(104,146,214,.12);
+  border-radius:1.35rem;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(43,99,203,.09),transparent 28%),
+    linear-gradient(180deg,#0d1520,#09111a);
+  box-shadow:
+    0 34px 90px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.035);
+}
+.premium-ranking-top{
+  align-items:flex-start;
+}
+.premium-ranking-top h2{
+  font-size:clamp(1.6rem,4vw,2.4rem);
+  font-weight:760;
+  letter-spacing:-.045em;
+}
+.ranking-subtitle{
+  margin:.38rem 0 0;
+  color:#77879f;
+  font-size:.72rem;
+}
+.ranking-close-premium{
+  flex:0 0 auto;
+  width:2.5rem;
+  height:2.5rem;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:.82rem;
+  background:#121b27;
+  color:#eaf0f8;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+.ranking-tabs{
+  display:flex;
+  gap:.38rem;
+  overflow-x:auto;
+  margin-top:.9rem;
+  padding:.28rem;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:.9rem;
+  background:rgba(255,255,255,.018);
+  scrollbar-width:none;
+}
+.ranking-tabs::-webkit-scrollbar{
+  display:none;
+}
+.ranking-tab{
+  flex:1 0 auto;
+  min-height:2.45rem;
+  padding:0 .8rem;
+  border:1px solid transparent;
+  border-radius:.7rem;
+  background:transparent;
+  color:#78869a;
+  font-size:.68rem;
+  font-weight:720;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+.ranking-tab:hover{
+  color:#dce5f2;
+}
+.ranking-tab.active{
+  border-color:rgba(92,141,224,.13);
+  background:linear-gradient(180deg,#162233,#111a27);
+  color:#f2f6fb;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+.ranking-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin:.75rem .1rem .45rem;
+  color:#66758b;
+  font-size:.58rem;
+  font-weight:760;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+}
+.ranking-toolbar span:last-child{
+  color:#90a1ba;
+}
+.premium-ranking-list{
+  gap:.38rem;
+  margin-top:0;
+  padding-right:.1rem;
+}
+.premium-ranking-list .ranking-row{
+  min-height:3.9rem;
+  grid-template-columns:2rem 42px minmax(0,1fr) auto;
+  gap:.65rem;
+  padding:.55rem .65rem;
+  border-color:rgba(255,255,255,.05);
+  border-radius:.82rem;
+  background:#101822;
+  transition:transform .15s ease,border-color .15s ease,background .15s ease;
+}
+.premium-ranking-list .ranking-row:hover{
+  transform:translateY(-1px);
+  border-color:rgba(93,139,214,.12);
+  background:#121c29;
+}
+.premium-ranking-list .ranking-position{
+  color:#8290a4;
+  font-size:.82rem;
+  font-weight:780;
+}
+.premium-ranking-list .ranking-thumb{
+  width:42px;
+  border-radius:.5rem;
+}
+.premium-ranking-list .ranking-copy strong{
+  font-size:.78rem;
+  font-weight:720;
+}
+.premium-ranking-list .ranking-copy span{
+  margin-top:.05rem;
+  color:#6e7c90;
+  font-size:.61rem;
+}
+.premium-ranking-list .ranking-value{
+  color:#9fb0c8;
+  font-size:.66rem;
+  font-weight:700;
+}
+body.light .premium-ranking-dialog{
+  background:linear-gradient(180deg,#f7f9fc,#eef2f7);
+  border-color:rgba(0,0,0,.07);
+}
+body.light .ranking-close-premium,
+body.light .ranking-tabs,
+body.light .premium-ranking-list .ranking-row{
+  background:#fff;
+  color:#151b24;
+  border-color:rgba(0,0,0,.06);
+}
+body.light .ranking-tab.active{
+  background:#17202c;
+  color:#fff;
+  border-color:#17202c;
+}
+@media(max-width:620px){
+  .premium-ranking-dialog{
+    width:calc(100% - .7rem);
+    margin-top:3.5vh;
+    padding:.78rem;
+    border-radius:1.15rem;
+  }
+  .ranking-subtitle{
+    display:none;
+  }
+  .ranking-tab{
+    min-height:2.3rem;
+    padding:0 .65rem;
+    font-size:.64rem;
+  }
+  .premium-ranking-list .ranking-row{
+    grid-template-columns:1.7rem 38px minmax(0,1fr) auto;
+    min-height:3.6rem;
+    gap:.55rem;
+    padding:.5rem .55rem;
+  }
+  .premium-ranking-list .ranking-thumb{
+    width:38px;
+  }
+  .premium-ranking-list .ranking-value{
+    max-width:5.6rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
