@@ -271,3 +271,129 @@
     font-size:.76rem;
   }
 }
+
+/* Centered premium hero presentation */
+.hero-feature{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:1rem;
+  min-height:clamp(520px,64svh,690px);
+  padding:clamp(1.8rem,4vw,3.2rem) 1rem;
+}
+.hero-feature:before{
+  inset:1rem clamp(.8rem,4vw,3rem);
+}
+.featured-cover-wrap{
+  width:100%;
+  justify-content:center;
+}
+.featured-cover{
+  width:min(210px,48vw);
+  transform:none;
+  border-radius:1.15rem;
+  box-shadow:
+    0 26px 70px rgba(0,0,0,.46),
+    0 0 0 1px rgba(255,255,255,.04),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+.featured-content{
+  width:min(680px,100%);
+  max-width:680px;
+  margin:0 auto;
+}
+.featured-content .eyebrow{
+  margin-bottom:.45rem;
+}
+.featured-content h1{
+  font-size:clamp(2.2rem,5vw,4rem);
+}
+.featured-meta{
+  justify-content:center;
+  margin-top:.65rem;
+}
+.featured-description{
+  margin:.72rem auto 0;
+  max-width:38rem;
+}
+.featured-actions{
+  justify-content:center;
+  margin-top:.9rem;
+}
+.featured-actions .button{
+  min-width:9.5rem;
+}
+@media(max-width:620px){
+  .hero-feature{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:.8rem;
+    min-height:auto;
+    padding:1.2rem 1rem 1.45rem;
+  }
+  .hero-feature:before{
+    inset:.45rem;
+    border-radius:1.2rem;
+  }
+  .featured-cover-wrap{
+    justify-content:center;
+  }
+  .featured-cover{
+    width:min(170px,46vw);
+    padding:.72rem;
+    border-radius:.95rem;
+  }
+  .featured-cover-kicker{
+    top:.58rem;
+    left:.58rem;
+    font-size:.38rem;
+  }
+  .featured-cover strong{
+    font-size:1.45rem;
+  }
+  .featured-cover small{
+    font-size:.58rem;
+  }
+  .featured-content{
+    width:100%;
+    margin:0 auto;
+  }
+  .featured-content .eyebrow{
+    font-size:.56rem;
+    margin-bottom:.3rem;
+  }
+  .featured-content h1{
+    font-size:clamp(1.9rem,8.5vw,2.6rem);
+  }
+  .featured-meta{
+    justify-content:center;
+    gap:.55rem;
+    font-size:.74rem;
+    margin-top:.45rem;
+  }
+  .featured-description{
+    margin:.5rem auto 0;
+    max-width:27rem;
+    font-size:.82rem;
+    line-height:1.45;
+    -webkit-line-clamp:2;
+  }
+  .featured-actions{
+    display:flex;
+    justify-content:center;
+    gap:.5rem;
+    width:100%;
+    margin-top:.65rem;
+  }
+  .featured-actions .button{
+    flex:0 1 9.5rem;
+    min-width:0;
+    min-height:2.45rem;
+    font-size:.75rem;
+  }
+}
