@@ -7,22 +7,22 @@
   <meta name="description" content="Detalhes da obra no MangaMorph.">
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=017">
-  <link rel="stylesheet" href="assets/css/manga.css?v=006">
+  <link rel="stylesheet" href="assets/css/style.css?v=038">
+  <link rel="stylesheet" href="assets/css/manga.css?v=007">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="./" aria-label="MangaMorph — voltar ao início">
-      <span class="brand-mark" aria-hidden="true">M</span>
+  <header class="topbar manga-topbar">
+    <a class="brand brand-text-only" href="./" aria-label="MangaMorph — voltar ao início">
       <span class="brand-name">Manga<span>Morph</span></span>
     </a>
     <div class="topbar-actions">
-      <button class="icon-button" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
+      <a class="manga-header-back" href="./" aria-label="Voltar para a página inicial">←</a>
+      <button class="icon-button header-action-button manga-theme-toggle" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
     </div>
   </header>
 
   <main class="manga-page" id="mangaPage">
-    <a class="back-link" href="./">← Voltar</a>
+    <a class="back-link" href="./">← Voltar ao catálogo</a>
 
     <section class="manga-hero-premium">
       <div class="hero-glow" aria-hidden="true"></div>
@@ -31,32 +31,44 @@
         <div class="detail-cover compact-cover" id="detailCover">
           <span class="detail-cover-kicker">MANGAMORPH</span>
           <strong id="coverTitle">NEON<br>RONIN</strong>
-          <small>OBRA</small>
+          <small id="coverType">MANGÁ</small>
         </div>
 
         <div class="hero-primary">
-          <p class="eyebrow">DETALHES DA OBRA</p>
+          <p class="eyebrow">OBRA</p>
           <h1 id="mangaTitle">Neon Ronin</h1>
           <p class="detail-alt-title" id="mangaAltTitle"></p>
 
-          <div class="status-picker">
-            <button class="button premium-status-button" id="statusButton" type="button" aria-expanded="false">
-              <span class="status-plus" aria-hidden="true">＋</span>
-              <span id="statusLabel">Escolher status</span>
-              <span class="status-chevron" aria-hidden="true">⌄</span>
-            </button>
-            <div class="status-menu" id="statusMenu" hidden>
-              <button type="button" data-status="Quero ler">Quero ler</button>
-              <button type="button" data-status="Lendo">Lendo</button>
-              <button type="button" data-status="Concluído">Concluído</button>
-              <button type="button" data-status="Pausado">Pausado</button>
-            </div>
+          <div class="hero-badges">
+            <span class="origin-badge" id="mangaOriginBadge">🇯🇵 Mangá</span>
+            <span class="publication-badge"><span class="status-dot"></span> Em lançamento</span>
+            <span class="year-badge">2026</span>
           </div>
 
-          <div class="icon-actions">
-            <button class="mini-action" id="favoriteDetail" type="button" aria-label="Favoritar" title="Favoritar">☆</button>
-            <button class="mini-action" id="markDetail" type="button" aria-label="Marcar obra" title="Marcar obra">⚑</button>
-            <button class="mini-action" id="shareDetail" type="button" aria-label="Compartilhar" title="Compartilhar">↗</button>
+          <div class="detail-meta detail-meta-compact">
+            <span id="mangaRating">★ 9,2</span>
+            <span id="mangaReads">◉ 986 mil</span>
+            <span id="mangaFavorites">☆ 48,2 mil</span>
+          </div>
+
+          <p class="detail-description collapsed" id="mangaDescription"></p>
+          <button class="description-toggle" id="toggleDescription" type="button" aria-expanded="false">Ver descrição completa ↓</button>
+
+          <div class="hero-actions-premium">
+            <button class="detail-main-action" id="readLatest" type="button">
+              <span>▶</span>
+              <span><small>CONTINUAR</small><strong id="readLatestLabel">Ler capítulo 127</strong></span>
+            </button>
+
+            <button class="detail-secondary-action" id="favoriteDetail" type="button" aria-label="Favoritar obra">
+              <span class="action-glyph">☆</span><span>Favoritar</span>
+            </button>
+
+            <button class="detail-secondary-action" id="markDetail" type="button" aria-label="Adicionar à lista">
+              <span class="action-glyph">＋</span><span>Minha lista</span>
+            </button>
+
+            <button class="detail-icon-action" id="shareDetail" type="button" aria-label="Compartilhar" title="Compartilhar">↗</button>
           </div>
         </div>
       </div>
@@ -64,38 +76,34 @@
       <div class="hero-secondary">
         <div class="detail-tags" id="mangaTags"></div>
 
-        <div class="publication-line">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span id="mangaPublication">PUBLICAÇÃO: 2026, EM LANÇAMENTO</span>
-        </div>
-
-        <div class="detail-meta detail-meta-compact">
-          <span id="mangaRating">★ 9,2</span>
-          <span id="mangaFavorites">☆ 48,2 mil</span>
-          <span id="mangaReads">◉ 986 mil</span>
-          <span id="mangaComments">💬 0</span>
-        </div>
-
-        <div class="description-box">
-          <p class="detail-description collapsed" id="mangaDescription"></p>
-          <button class="description-toggle" id="toggleDescription" type="button" aria-expanded="false">
-            Ver mais ↓
+        <div class="status-picker">
+          <button class="status-inline-button" id="statusButton" type="button" aria-expanded="false">
+            <span class="status-inline-dot"></span>
+            <span>Status de leitura</span>
+            <strong id="statusLabel">Escolher</strong>
+            <span class="status-chevron">›</span>
           </button>
+          <div class="status-menu" id="statusMenu" hidden>
+            <button type="button" data-status="Quero ler">Quero ler</button>
+            <button type="button" data-status="Lendo">Lendo</button>
+            <button type="button" data-status="Concluído">Concluído</button>
+            <button type="button" data-status="Pausado">Pausado</button>
+          </div>
         </div>
       </div>
     </section>
 
     <dl class="detail-facts detail-facts-grid">
       <div><dt>Status</dt><dd>Em lançamento</dd></div>
-      <div><dt>Ano</dt><dd>2026</dd></div>
+      <div><dt>Tipo</dt><dd id="mangaTypeFact">Mangá</dd></div>
       <div><dt>Último capítulo</dt><dd id="latestChapter">127</dd></div>
-      <div><dt>Idioma</dt><dd>Português</dd></div>
+      <div><dt>Ano</dt><dd>2026</dd></div>
     </dl>
 
     <nav class="manga-tabs" role="tablist" aria-label="Conteúdo da obra">
-      <button class="manga-tab active" id="tabChapters" role="tab" aria-selected="true" aria-controls="panelChapters" data-tab="chapters">Capítulos</button>
-      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários</button>
+      <button class="manga-tab active" id="tabChapters" role="tab" aria-selected="true" aria-controls="panelChapters" data-tab="chapters">Capítulos <span id="tabChapterCount"></span></button>
       <button class="manga-tab" id="tabRelated" role="tab" aria-selected="false" aria-controls="panelRelated" data-tab="related">Relacionados</button>
+      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários</button>
     </nav>
 
     <section class="tab-panel active" id="panelChapters" role="tabpanel" aria-labelledby="tabChapters">
@@ -103,24 +111,21 @@
         <div class="chapters-heading">
           <div>
             <p class="eyebrow">CAPÍTULOS</p>
-            <h2>Capítulos recentes</h2>
+            <h2>Lista de capítulos</h2>
+            <p>Encontre rapidamente onde continuar sua leitura.</p>
           </div>
           <span id="chapterCount"></span>
         </div>
 
-        <div class="chapter-sort">
+        <div class="chapter-toolbar">
+          <label class="chapter-search" for="chapterSearch">
+            <span>⌕</span>
+            <input id="chapterSearch" type="search" inputmode="numeric" placeholder="Buscar capítulo..." autocomplete="off">
+          </label>
           <button class="sort-button active" id="sortToggle" type="button" aria-label="Alternar ordem dos capítulos" aria-pressed="true">Decrescente ↓</button>
         </div>
 
         <div class="chapter-list" id="chapterList"></div>
-      </div>
-    </section>
-
-    <section class="tab-panel" id="panelComments" role="tabpanel" aria-labelledby="tabComments" hidden>
-      <div class="empty-panel">
-        <span class="empty-icon">💬</span>
-        <h2>Comentários</h2>
-        <p>A área de comentários está preparada para uma integração futura com contas e banco de dados.</p>
       </div>
     </section>
 
@@ -130,18 +135,41 @@
           <div>
             <p class="eyebrow">RELACIONADOS</p>
             <h2>Você também pode gostar</h2>
+            <p>Obras próximas por gênero e temática.</p>
           </div>
         </div>
         <div class="related-grid" id="relatedGrid"></div>
       </div>
     </section>
+
+    <section class="tab-panel" id="panelComments" role="tabpanel" aria-labelledby="tabComments" hidden>
+      <div class="comments-panel">
+        <div class="comments-head">
+          <div>
+            <p class="eyebrow">COMUNIDADE</p>
+            <h2>Comentários</h2>
+          </div>
+          <span>0 comentários</span>
+        </div>
+        <div class="comment-composer">
+          <div class="comment-avatar">?</div>
+          <div>
+            <strong>Compartilhe sua opinião</strong>
+            <p>Os comentários serão liberados quando as contas do MangaMorph forem conectadas ao backend.</p>
+          </div>
+          <button type="button" disabled>Comentar</button>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <div class="manga-toast" id="mangaToast" role="status" aria-live="polite" hidden></div>
 
   <footer class="footer">
     <div><strong>MangaMorph</strong><span>v0.1</span></div>
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=005" defer></script>
+  <script src="assets/js/manga.js?v=006" defer></script>
 </body>
 </html>
