@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=028">
+  <link rel="stylesheet" href="assets/css/style.css?v=029">
   <link rel="stylesheet" href="assets/css/settings.css?v=001">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -173,50 +173,39 @@
 
   <div class="account-panel" id="accountPanel" hidden>
     <div class="account-backdrop" data-close-account></div>
-    <section class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
-      <div class="account-top">
-        <div class="account-avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M4.5 20c.9-4 3.4-6 7.5-6s6.6 2 7.5 6"></path>
-          </svg>
+    <section class="account-drawer" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+      <button class="account-drawer-close" id="accountClose" type="button" aria-label="Fechar perfil">×</button>
+
+      <div class="account-guest">
+        <div class="account-avatar-ring" aria-hidden="true">
+          <div class="account-avatar-core">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="3.4"></circle>
+              <path d="M5.4 19.2c.8-3.6 3-5.4 6.6-5.4s5.8 1.8 6.6 5.4"></path>
+            </svg>
+          </div>
         </div>
-        <div class="account-heading">
-          <span class="account-kicker">PERFIL</span>
-          <h2 id="accountTitle">Visitante</h2>
-          <p>Seu espaço no MangaMorph</p>
+
+        <h2 id="accountTitle">Convidado</h2>
+        <p class="account-status">Não conectado</p>
+
+        <div class="account-auth-actions">
+          <button class="account-auth-button primary" id="accountLogin" type="button">Entrar</button>
+          <button class="account-auth-button secondary" id="accountRegister" type="button">Cadastrar</button>
         </div>
-        <button class="account-close" id="accountClose" type="button" aria-label="Fechar perfil">×</button>
+        <p class="account-auth-message" id="accountAuthMessage" hidden>Login e cadastro serão conectados ao backend em uma próxima etapa.</p>
       </div>
 
-      <div class="account-stats">
-        <div class="account-stat">
-          <strong id="accountFavoriteCount">0</strong>
-          <span>Favoritos</span>
-        </div>
-        <div class="account-stat">
-          <strong id="accountThemeName">Escuro</strong>
-          <span>Tema</span>
-        </div>
-      </div>
+      <div class="account-divider"></div>
 
-      <div class="account-actions">
-        <button type="button" class="account-action primary" id="accountFavorites">
-          <span class="account-action-icon">☆</span>
-          <span><strong>Meus favoritos</strong><small>Ver obras marcadas</small></span>
-          <span class="account-action-chevron">›</span>
-        </button>
-        <button type="button" class="account-action" id="accountSettings">
-          <span class="account-action-icon">⚙</span>
-          <span><strong>Configurações</strong><small>Idioma, tema e filtros</small></span>
-          <span class="account-action-chevron">›</span>
-        </button>
-      </div>
+      <button class="account-theme-row" id="accountThemeRow" type="button">
+        <span class="account-theme-icon" aria-hidden="true">◐</span>
+        <span class="account-theme-label">Tema</span>
+        <span class="account-theme-value"><span class="account-theme-dot"></span><span id="accountThemeName">Escuro</span></span>
+        <span class="account-theme-chevron">›</span>
+      </button>
 
-      <div class="account-login-note">
-        <span class="account-note-dot"></span>
-        <p><strong>Conta MangaMorph</strong><br>Login e sincronização serão conectados ao backend em uma próxima etapa.</p>
-      </div>
+      <div class="account-drawer-footer">MangaMorph v0.1</div>
     </section>
   </div>
 
@@ -322,6 +311,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=019" defer></script>
+  <script src="assets/js/app.js?v=020" defer></script>
 </body>
 </html>
