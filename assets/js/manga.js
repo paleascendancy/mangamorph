@@ -117,22 +117,50 @@ const statusMenu = document.querySelector("#statusMenu");
 const statusLabel = document.querySelector("#statusLabel");
 const statusKey = "mangamorph:status:" + manga.id;
 
+const STATUS_CONFIG = {
+  "Quero ler": {color:"#64B5FF"},
+  "Lendo": {color:"#34D17B"},
+  "Concluído": {color:"#4FD1C5"},
+  "Pausado": {color:"#F5C451"},
+  "Abandonado": {color:"#FF6B6B"},
+  "Relendo": {color:"#B388FF"},
+  "Aguardando capítulos": {color:"#7DD3FC"},
+  "Favorito": {color:"#FFD166"}
+};
+
 function positionStatusMenu() {
   const rect = statusButton.getBoundingClientRect();
-  const width = Math.min(rect.width, 320);
+  const width = Math.min(Math.max(rect.width, 230), 320);
   statusMenu.style.width = width + "px";
   statusMenu.style.left = Math.max(10, Math.min(window.innerWidth - width - 10, rect.right - width)) + "px";
-  statusMenu.style.top = Math.min(window.innerHeight - statusMenu.offsetHeight - 10, rect.bottom + 8) + "px";
+
+  const menuHeight = statusMenu.offsetHeight;
+  const below = rect.bottom + 8;
+  const above = rect.top - menuHeight - 8;
+  statusMenu.style.top = (below + menuHeight <= window.innerHeight - 10 ? below : Math.max(10, above)) + "px";
+}
+
+function applyStatusColor(value) {
+  const config = STATUS_CONFIG[value];
+  statusButton.style.setProperty("--status-color", config ? config.color : "#66758b");
+
+  statusMenu.querySelectorAll("[data-status]").forEach(function(option) {
+    const optionConfig = STATUS_CONFIG[option.dataset.status];
+    option.style.setProperty("--status-color", optionConfig ? optionConfig.color : "#66758b");
+  });
 }
 
 function renderStatus(value) {
   statusLabel.textContent = value || "Escolher";
   statusButton.classList.toggle("has-status", Boolean(value));
+
   statusMenu.querySelectorAll("[data-status]").forEach(function(option) {
     const active = option.dataset.status === value;
     option.classList.toggle("active", active);
     option.setAttribute("aria-checked", active ? "true" : "false");
   });
+
+  applyStatusColor(value);
 }
 
 function closeStatusMenu() {
@@ -146,6 +174,7 @@ renderStatus(savedStatus);
 statusButton.addEventListener("click", function(event) {
   event.stopPropagation();
   const willOpen = statusMenu.hidden;
+
   if (willOpen) {
     statusMenu.hidden = false;
     statusButton.setAttribute("aria-expanded","true");
@@ -159,10 +188,12 @@ statusMenu.addEventListener("click", function(event) {
   event.stopPropagation();
   const option = event.target.closest("[data-status]");
   if (!option) return;
+
   const value = option.dataset.status;
   localStorage.setItem(statusKey, value);
   renderStatus(value);
   closeStatusMenu();
+  showToast("Status alterado para " + value + ".");
 });
 
 document.addEventListener("click", function(event) {
@@ -172,6 +203,7 @@ document.addEventListener("click", function(event) {
 window.addEventListener("resize", function() {
   if (!statusMenu.hidden) positionStatusMenu();
 });
+
 window.addEventListener("scroll", function() {
   if (!statusMenu.hidden) closeStatusMenu();
 }, {passive:true});
