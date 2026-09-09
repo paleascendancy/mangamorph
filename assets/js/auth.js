@@ -51,6 +51,7 @@ function mapError(error) {
   if (/email not confirmed/i.test(msg)) return "Confirme seu e-mail antes de entrar.";
   if (/user already registered/i.test(msg)) return "Já existe uma conta com este e-mail.";
   if (/password/i.test(msg) && /weak|short|least/i.test(msg)) return "Use uma senha mais forte, com pelo menos 8 caracteres.";
+  if (/duplicate key|23505/i.test(msg)) return "Esse @usuário já está em uso. Escolha outro.";
   if (/provider|oauth/i.test(msg)) return "Esse login social ainda precisa ser habilitado no provedor.";
   if (/redirect/i.test(msg)) return "O endereço de retorno ainda precisa ser autorizado no Supabase.";
   return msg || "Não foi possível concluir a operação.";
@@ -332,15 +333,15 @@ window.addEventListener("mangamorph:profile-save", async event => {
   window.dispatchEvent(new CustomEvent("mangamorph:auth-message",{detail:{message:"Perfil sincronizado com sua conta."}}));
 });
 
-supabase.auth.onAuthStateChange(async (event, session) => {
+supabase.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") {
-    openAuth("recovery");
+    setTimeout(() => openAuth("recovery"), 0);
     return;
   }
   if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-    await publishSession(session);
+    setTimeout(() => { publishSession(session); }, 0);
   } else if (event === "SIGNED_OUT") {
-    await publishSession(null);
+    setTimeout(() => { publishSession(null); }, 0);
   }
 });
 
