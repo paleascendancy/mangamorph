@@ -1,19 +1,19 @@
 const catalog = [
-  {id:1,title:"Neon Ronin",genre:"Ação",chapter:127,accent:"#3a4162",reads:986400,favorites:48210,newness:72},
-  {id:2,title:"Astral Bloom",genre:"Fantasia",chapter:91,accent:"#523b64",reads:941300,favorites:51740,newness:60},
-  {id:3,title:"Zero District",genre:"Mistério",chapter:68,accent:"#294b52",reads:889700,favorites:39420,newness:48},
-  {id:4,title:"Crimson Archive",genre:"Ação",chapter:143,accent:"#64363c",reads:842100,favorites:45880,newness:44},
-  {id:5,title:"Moon Relay",genre:"Fantasia",chapter:82,accent:"#354561",reads:796800,favorites:42110,newness:38},
-  {id:6,title:"Silent Frame",genre:"Mistério",chapter:74,accent:"#494b55",reads:741900,favorites:36520,newness:34},
-  {id:7,title:"Vector Hearts",genre:"Ação",chapter:112,accent:"#593c4f",reads:698500,favorites:33190,newness:31},
-  {id:8,title:"Glass Kingdom",genre:"Fantasia",chapter:105,accent:"#36545e",reads:655200,favorites:40570,newness:29},
-  {id:9,title:"Night Protocol",genre:"Suspense",chapter:57,accent:"#31384a",reads:612700,favorites:29410,newness:26},
-  {id:10,title:"Afterlight",genre:"Drama",chapter:49,accent:"#5a4650",reads:571300,favorites:31860,newness:22},
-  {id:11,title:"Morrow Gate",genre:"Fantasia",chapter:36,accent:"#3e4e66",reads:529800,favorites:27350,newness:95},
-  {id:12,title:"Black Signal",genre:"Ação",chapter:28,accent:"#52383d",reads:487600,favorites:24590,newness:92},
-  {id:13,title:"Lucid Crown",genre:"Mistério",chapter:19,accent:"#3a5661",reads:446200,favorites:22740,newness:89},
-  {id:14,title:"Echo Garden",genre:"Drama",chapter:16,accent:"#50455f",reads:404900,favorites:21580,newness:87},
-  {id:15,title:"Iron Chapel",genre:"Ação",chapter:11,accent:"#4c4b50",reads:365400,favorites:19860,newness:84}
+  {id:1,title:"Neon Ronin",genre:"Ação",type:"Mangá",chapter:127,accent:"#3a4162",reads:986400,favorites:48210,newness:72},
+  {id:2,title:"Astral Bloom",genre:"Fantasia",type:"Manhwa",chapter:91,accent:"#523b64",reads:941300,favorites:51740,newness:60},
+  {id:3,title:"Zero District",genre:"Mistério",type:"Manhua",chapter:68,accent:"#294b52",reads:889700,favorites:39420,newness:48},
+  {id:4,title:"Crimson Archive",genre:"Ação",type:"Mangá",chapter:143,accent:"#64363c",reads:842100,favorites:45880,newness:44},
+  {id:5,title:"Moon Relay",genre:"Fantasia",type:"Manhwa",chapter:82,accent:"#354561",reads:796800,favorites:42110,newness:38},
+  {id:6,title:"Silent Frame",genre:"Mistério",type:"Manhua",chapter:74,accent:"#494b55",reads:741900,favorites:36520,newness:34},
+  {id:7,title:"Vector Hearts",genre:"Ação",type:"Mangá",chapter:112,accent:"#593c4f",reads:698500,favorites:33190,newness:31},
+  {id:8,title:"Glass Kingdom",genre:"Fantasia",type:"Manhwa",chapter:105,accent:"#36545e",reads:655200,favorites:40570,newness:29},
+  {id:9,title:"Night Protocol",genre:"Suspense",type:"Manhua",chapter:57,accent:"#31384a",reads:612700,favorites:29410,newness:26},
+  {id:10,title:"Afterlight",genre:"Drama",type:"Mangá",chapter:49,accent:"#5a4650",reads:571300,favorites:31860,newness:22},
+  {id:11,title:"Morrow Gate",genre:"Fantasia",type:"Manhwa",chapter:36,accent:"#3e4e66",reads:529800,favorites:27350,newness:95},
+  {id:12,title:"Black Signal",genre:"Ação",type:"Manhua",chapter:28,accent:"#52383d",reads:487600,favorites:24590,newness:92},
+  {id:13,title:"Lucid Crown",genre:"Mistério",type:"Mangá",chapter:19,accent:"#3a5661",reads:446200,favorites:22740,newness:89},
+  {id:14,title:"Echo Garden",genre:"Drama",type:"Manhwa",chapter:16,accent:"#50455f",reads:404900,favorites:21580,newness:87},
+  {id:15,title:"Iron Chapel",genre:"Ação",type:"Manhua",chapter:11,accent:"#4c4b50",reads:365400,favorites:19860,newness:84}
 ];
 
 const state = {
@@ -21,10 +21,14 @@ const state = {
   pageSize: 30,
   totalPages: 5,
   favorites: new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]")),
-  filter: localStorage.getItem("mangamorph:filter") || "Todos",
+  filter: localStorage.getItem("mangamorph:filter") || "Padrão",
   notifications: localStorage.getItem("mangamorph:notifications") === "on",
   history: JSON.parse(localStorage.getItem("mangamorph:history") || "[]")
 };
+
+if (!["Padrão","Mangá","Manhwa","Manhua"].includes(state.filter)) {
+  state.filter = "Padrão";
+}
 
 const popularRail = document.querySelector("#popularRail");
 const favoriteRail = document.querySelector("#favoriteRail");
@@ -78,8 +82,8 @@ function openManga(id) {
 }
 
 function getFilteredCatalog() {
-  if (state.filter === "Todos") return catalog;
-  return catalog.filter(function(item){ return item.genre === state.filter; });
+  if (state.filter === "Padrão") return catalog;
+  return catalog.filter(function(item){ return item.type === state.filter; });
 }
 
 function cardTemplate(item, rank) {
@@ -170,7 +174,7 @@ function releaseTemplate(release) {
 }
 
 function renderReleases() {
-  const filteredReleases = state.filter === "Todos" ? releases : releases.filter(function(release){ return release.manga.genre === state.filter; });
+  const filteredReleases = state.filter === "Padrão" ? releases : releases.filter(function(release){ return release.manga.type === state.filter; });
   state.totalPages = Math.max(1, Math.ceil(filteredReleases.length / state.pageSize));
   if (state.currentPage > state.totalPages) state.currentPage = 1;
   const start = (state.currentPage - 1) * state.pageSize;
