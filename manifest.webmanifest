@@ -1,0 +1,11 @@
+{
+  "name": "MangaMorph",
+  "short_name": "MangaMorph",
+  "description": "Descubra, acompanhe e organize mangás em uma experiência moderna.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#090b10",
+  "lang": "pt-BR"
+}
