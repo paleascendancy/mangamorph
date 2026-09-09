@@ -161,11 +161,20 @@ let chapterQuery = "";
 chapterCount.textContent = chapters.length + " capítulos recentes";
 tabChapterCount.textContent = chapters.length;
 
-function chapterTime(chapter) {
+const chapterBaseDate = new Date("2026-09-09T12:00:00");
+
+function chapterDate(chapter) {
   const distanceFromLatest = manga.chapter - chapter;
-  if (distanceFromLatest === 0) return "mais recente";
-  if (distanceFromLatest < 4) return (distanceFromLatest * 3) + " h atrás";
-  return Math.ceil(distanceFromLatest / 3) + " dias atrás";
+  const date = new Date(chapterBaseDate);
+  date.setDate(date.getDate() - distanceFromLatest);
+  return new Intl.DateTimeFormat("pt-BR", {day:"2-digit", month:"short", year:"numeric"}).format(date).replace(".", "");
+}
+
+function chapterViews(chapter) {
+  const distanceFromLatest = manga.chapter - chapter;
+  const freshness = Math.max(.24, 1 - distanceFromLatest * .026);
+  const base = Math.max(1200, Math.round((manga.reads / Math.max(manga.chapter, 18)) * freshness));
+  return formatNumber(base) + " visualizações";
 }
 
 function renderChapters() {
@@ -182,17 +191,19 @@ function renderChapters() {
     const latest = chapter === manga.chapter;
     return '<article class="chapter-row ' + (latest ? 'latest' : '') + '" id="capitulo-' + chapter + '">' +
       '<div class="chapter-copy">' +
-        '<div class="chapter-number"><strong>Capítulo ' + chapter + '</strong><span>' + chapterTime(chapter) + '</span></div>' +
+        '<div class="chapter-number"><strong>Capítulo ' + chapter + '</strong>' +
+          '<span class="chapter-meta-line"><span>◷ ' + chapterDate(chapter) + '</span><span>◉ ' + chapterViews(chapter) + '</span></span>' +
+        '</div>' +
         (latest ? '<span class="chapter-badge">NOVO</span>' : '') +
       '</div>' +
-      '<button class="chapter-read" type="button" data-read-chapter="' + chapter + '">Ler</button>' +
+      '<button class="chapter-read" type="button" data-read-chapter="' + chapter + '">Ler <span>›</span></button>' +
     '</article>';
   }).join("");
 }
 
 function renderSortButton() {
   const descending = chapterOrder === "desc";
-  sortToggle.textContent = descending ? "Decrescente ↓" : "Crescente ↑";
+  sortToggle.innerHTML = '<span class="sort-label">Ordem</span><span class="sort-value">' + (descending ? 'Decrescente' : 'Crescente') + '</span><span class="sort-arrow">' + (descending ? '↓' : '↑') + '</span>';
   sortToggle.setAttribute("aria-pressed", descending ? "true" : "false");
 }
 
