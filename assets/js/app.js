@@ -376,8 +376,14 @@ function saveProfile(profile) {
 }
 
 function renderProfileUI() {
-  const profile = state.profile;
-  const active = Boolean(profile && state.profileSession);
+  const active = Boolean(state.profileSession);
+  const profile = state.profile || {
+    name:"Leitor",
+    username:"mangamorph",
+    bio:"",
+    accent:"#5b8def",
+    avatarUrl:null
+  };
   const readingList = getReadingList();
 
   accountAuthActions.hidden = active;
