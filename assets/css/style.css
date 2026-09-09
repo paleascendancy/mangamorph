@@ -2069,3 +2069,266 @@ body.light .account-auth-actions-redesign .account-auth-button.primary{
     height:3.25rem;
   }
 }
+
+
+/* Tech account + refined side menu v1 */
+.side-menu-item{
+  grid-template-columns:1.7rem minmax(0,1fr) auto;
+}
+.side-menu-item::after{
+  content:"›";
+  color:#66778f;
+  font-size:1.25rem;
+  line-height:1;
+}
+.side-menu-item:hover::after,
+.side-menu-item.active::after{
+  color:#dfe8f5;
+}
+
+.account-backdrop{
+  background:rgba(2,6,14,.8);
+  backdrop-filter:blur(12px) saturate(125%);
+  -webkit-backdrop-filter:blur(12px) saturate(125%);
+}
+.account-hub{
+  width:min(430px,94vw);
+  padding:1rem;
+  border-left:1px solid rgba(64,124,255,.18);
+  background:
+    radial-gradient(circle at 86% 7%,rgba(42,112,255,.17),transparent 24%),
+    radial-gradient(circle at 10% 0%,rgba(34,99,214,.08),transparent 30%),
+    linear-gradient(180deg,#07111d 0%,#07101a 100%);
+  box-shadow:
+    -28px 0 85px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.045);
+}
+.account-hub::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.16;
+  background:
+    linear-gradient(rgba(66,126,255,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(66,126,255,.09) 1px,transparent 1px);
+  background-size:24px 24px;
+  mask-image:linear-gradient(180deg,#000,transparent 72%);
+}
+.account-hub-header,
+.account-identity-card,
+.account-auth-actions-redesign,
+.account-hub-section-label,
+.account-hub-list,
+.account-hub-footer{
+  position:relative;
+  z-index:1;
+}
+.account-hub-kicker{
+  color:#6f91c7;
+  letter-spacing:.22em;
+}
+.account-hub-header h2{
+  font-size:2.25rem;
+  color:#f1f6fd;
+  text-shadow:0 0 22px rgba(72,137,255,.08);
+}
+.account-hub-subtitle{
+  color:#8da0bd;
+}
+.account-hub-close{
+  width:2.8rem;
+  height:2.8rem;
+  border-color:rgba(79,137,255,.18);
+  border-radius:.95rem;
+  background:linear-gradient(180deg,#102039,#0b1728);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 10px 24px rgba(0,0,0,.22);
+}
+.account-identity-card{
+  padding:1rem;
+  border-color:rgba(76,135,255,.17);
+  border-radius:1.15rem;
+  background:
+    radial-gradient(circle at 2% 0%,rgba(42,108,255,.09),transparent 28%),
+    linear-gradient(180deg,rgba(11,22,38,.94),rgba(8,17,29,.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 14px 36px rgba(0,0,0,.18);
+}
+.account-identity-avatar{
+  position:relative;
+  width:4.35rem;
+  height:4.35rem;
+  border-color:rgba(82,140,255,.18);
+  border-radius:1.05rem;
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.07),transparent 34%),
+    linear-gradient(145deg,#12253f,#0b1625);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 0 24px rgba(57,120,255,.08);
+}
+.account-identity-avatar::before{
+  content:"";
+  position:absolute;
+  inset:.42rem;
+  border-radius:50%;
+  border:3px solid #278dff;
+  border-left-color:rgba(39,141,255,.2);
+  border-bottom-color:rgba(39,141,255,.2);
+  box-shadow:0 0 16px rgba(39,141,255,.28);
+}
+.account-identity-avatar::after{
+  content:"";
+  position:absolute;
+  right:.42rem;
+  bottom:.42rem;
+  width:.56rem;
+  height:.56rem;
+  border-radius:50%;
+  background:#28dc6d;
+  box-shadow:0 0 0 3px #102038,0 0 12px rgba(40,220,109,.34);
+}
+.account-identity-avatar svg{
+  position:relative;
+  z-index:1;
+  stroke:#eef5ff;
+}
+.account-name-row strong{
+  color:#f2f7fd;
+  font-size:1.05rem;
+}
+.account-offline-badge{
+  min-height:1.65rem;
+  padding:0 .62rem;
+  border-color:rgba(255,255,255,.055);
+  background:rgba(255,255,255,.035);
+  color:#9badc8;
+}
+.account-identity-copy p{
+  color:#8ca0bd;
+}
+.account-auth-actions-redesign{
+  grid-template-columns:1.05fr .95fr;
+  gap:.65rem;
+  margin-top:.8rem;
+}
+.account-auth-actions-redesign .account-auth-button{
+  min-height:3.45rem;
+  border-radius:.95rem;
+  font-weight:850;
+}
+.account-auth-actions-redesign .account-auth-button.primary{
+  border-color:rgba(109,166,255,.42);
+  background:linear-gradient(180deg,#2e7cff,#1f5cff);
+  color:#fff;
+  box-shadow:
+    0 12px 28px rgba(31,92,255,.26),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+.account-auth-actions-redesign .account-auth-button.secondary{
+  border-color:rgba(82,139,255,.2);
+  background:linear-gradient(180deg,#0f1d30,#0b1524);
+  color:#eef5fd;
+}
+.account-hub-section-label{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  margin-top:1.2rem;
+  color:#69a0ff;
+  letter-spacing:.18em;
+}
+.account-hub-section-label::after{
+  content:"";
+  height:1px;
+  flex:1;
+  background:linear-gradient(90deg,rgba(66,129,255,.22),transparent);
+}
+.account-hub-list{
+  border-color:rgba(72,130,255,.14);
+  border-radius:1.05rem;
+  background:linear-gradient(180deg,rgba(10,20,34,.96),rgba(7,15,26,.99));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 10px 26px rgba(0,0,0,.14);
+}
+.account-hub-row{
+  min-height:4.65rem;
+  gap:.8rem;
+  padding:.72rem .78rem;
+}
+.account-hub-row + .account-hub-row{
+  border-top-color:rgba(71,124,225,.14);
+}
+.account-hub-row:hover{
+  background:rgba(49,102,210,.055);
+}
+.account-hub-icon{
+  width:2.8rem;
+  height:2.8rem;
+  border-color:rgba(81,138,255,.15);
+  border-radius:.9rem;
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.06),transparent 35%),
+    linear-gradient(145deg,#13263f,#0c1727);
+  color:#72a8ff;
+  font-size:1.15rem;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 0 18px rgba(58,119,255,.06);
+}
+.account-hub-copy strong{
+  color:#f1f6fc;
+  font-size:.88rem;
+}
+.account-hub-copy small{
+  color:#8196b4;
+  font-size:.68rem;
+}
+.account-hub-value{
+  color:#b8cae5;
+  font-size:.8rem;
+}
+.account-hub-chevron{
+  color:#4e9cff;
+  font-size:1.45rem;
+  text-shadow:0 0 10px rgba(78,156,255,.26);
+}
+.account-hub-footer{
+  margin-top:1rem;
+  padding-top:1rem;
+  border-top:1px solid rgba(72,128,255,.1);
+  color:#7f94b3;
+}
+body.light .account-hub{
+  background:
+    radial-gradient(circle at 86% 7%,rgba(48,105,220,.08),transparent 24%),
+    linear-gradient(180deg,#f5f8fc,#edf2f8);
+}
+body.light .account-identity-card,
+body.light .account-hub-list,
+body.light .account-auth-actions-redesign .account-auth-button.secondary{
+  background:#fff;
+  border-color:rgba(52,92,170,.1);
+}
+body.light .account-hub-header h2,
+body.light .account-name-row strong,
+body.light .account-hub-copy strong{
+  color:#121821;
+}
+body.light .account-hub-icon,
+body.light .account-identity-avatar{
+  background:#edf3fa;
+}
+@media(max-width:620px){
+  .account-hub{
+    width:calc(100% - .5rem);
+    padding:.85rem;
+  }
+  .account-hub-header h2{
+    font-size:2rem;
+  }
+  .account-identity-avatar{
+    width:4rem;
+    height:4rem;
+  }
+  .account-auth-actions-redesign .account-auth-button{
+    min-height:3.2rem;
+    font-size:.8rem;
+  }
+}
