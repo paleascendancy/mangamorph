@@ -2332,3 +2332,251 @@ body.light .account-identity-avatar{
     font-size:.8rem;
   }
 }
+
+
+/* Compact elegant account v2 */
+.account-hub{
+  width:min(390px,92vw);
+  padding:.82rem;
+  font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI Variable","Segoe UI","Inter",sans-serif;
+  font-feature-settings:"kern" 1,"liga" 1;
+  letter-spacing:-.01em;
+  background:
+    radial-gradient(circle at 88% 5%,rgba(47,104,220,.11),transparent 22%),
+    linear-gradient(180deg,#08111b 0%,#07101a 100%);
+  border-left-color:rgba(82,128,210,.12);
+  box-shadow:-22px 0 64px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.account-hub::before{
+  opacity:.08;
+  background-size:28px 28px;
+}
+
+.account-hub-header{
+  padding:.2rem .05rem .72rem;
+}
+.account-hub-kicker{
+  margin-bottom:.22rem;
+  color:#7185a6;
+  font-size:.52rem;
+  font-weight:780;
+  letter-spacing:.2em;
+}
+.account-hub-header h2{
+  font-size:1.85rem;
+  font-weight:760;
+  letter-spacing:-.045em;
+  text-shadow:none;
+}
+.account-hub-subtitle{
+  margin-top:.32rem;
+  color:#8090a8;
+  font-size:.72rem;
+  line-height:1.4;
+}
+.account-hub-close{
+  width:2.35rem;
+  height:2.35rem;
+  border-radius:.78rem;
+  font-size:1.08rem;
+  border-color:rgba(99,140,210,.12);
+  background:linear-gradient(180deg,#0f1a2a,#0b1420);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 18px rgba(0,0,0,.18);
+}
+
+.account-identity-card{
+  gap:.72rem;
+  padding:.76rem;
+  border-radius:.95rem;
+  border-color:rgba(87,130,204,.11);
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.018),transparent 50%),
+    #0d1724;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 8px 20px rgba(0,0,0,.12);
+}
+.account-identity-avatar{
+  width:3.45rem;
+  height:3.45rem;
+  border-radius:.86rem;
+  border-color:rgba(81,133,221,.12);
+  background:linear-gradient(145deg,#11223a,#0b1625);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.account-identity-avatar::before{
+  inset:.4rem;
+  border-width:2px;
+  border-color:#3b8cff;
+  border-left-color:rgba(59,140,255,.16);
+  border-bottom-color:rgba(59,140,255,.16);
+  box-shadow:0 0 10px rgba(59,140,255,.18);
+}
+.account-identity-avatar::after{
+  right:.35rem;
+  bottom:.35rem;
+  width:.46rem;
+  height:.46rem;
+  box-shadow:0 0 0 2px #102038,0 0 8px rgba(40,220,109,.22);
+}
+.account-identity-avatar svg{
+  width:1.35rem;
+  height:1.35rem;
+  stroke-width:1.45;
+}
+
+.account-name-row{
+  gap:.45rem;
+}
+.account-name-row strong{
+  font-size:.95rem;
+  font-weight:740;
+  letter-spacing:-.025em;
+}
+.account-offline-badge{
+  min-height:1.4rem;
+  padding:0 .5rem;
+  font-size:.58rem;
+  font-weight:700;
+  color:#8999b1;
+  background:rgba(255,255,255,.022);
+}
+.account-offline-badge span{
+  width:.36rem;
+  height:.36rem;
+}
+.account-identity-copy p{
+  margin-top:.22rem;
+  color:#7d8ea8;
+  font-size:.64rem;
+  line-height:1.38;
+}
+
+.account-auth-actions-redesign{
+  grid-template-columns:1fr 1fr;
+  gap:.5rem;
+  margin-top:.62rem;
+}
+.account-auth-actions-redesign .account-auth-button{
+  min-height:2.75rem;
+  border-radius:.78rem;
+  font-size:.76rem;
+  font-weight:760;
+  letter-spacing:-.01em;
+}
+.account-auth-actions-redesign .account-auth-button.primary{
+  border-color:rgba(102,154,242,.22);
+  background:linear-gradient(180deg,#3a78e9,#2c64ce);
+  box-shadow:0 8px 18px rgba(39,93,190,.18),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.account-auth-actions-redesign .account-auth-button.secondary{
+  border-color:rgba(94,132,196,.13);
+  background:linear-gradient(180deg,#0f1926,#0b1420);
+  color:#e6edf7;
+}
+
+.account-hub-section-label{
+  margin:1rem .08rem .4rem;
+  gap:.55rem;
+  color:#7298d7;
+  font-size:.52rem;
+  font-weight:760;
+  letter-spacing:.16em;
+}
+.account-hub-section-label::after{
+  background:linear-gradient(90deg,rgba(82,126,202,.14),transparent);
+}
+
+.account-hub-list{
+  border-radius:.95rem;
+  border-color:rgba(83,126,196,.1);
+  background:linear-gradient(180deg,#0d1723,#0a1320);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02),0 8px 18px rgba(0,0,0,.1);
+}
+.account-hub-row{
+  min-height:3.85rem;
+  gap:.65rem;
+  padding:.58rem .66rem;
+}
+.account-hub-row + .account-hub-row{
+  border-top-color:rgba(82,121,184,.1);
+}
+.account-hub-row:hover{
+  background:rgba(60,101,170,.04);
+}
+.account-hub-icon{
+  width:2.35rem;
+  height:2.35rem;
+  border-radius:.76rem;
+  border-color:rgba(88,134,214,.12);
+  background:linear-gradient(145deg,#12223a,#0d1828);
+  color:#77a7ef;
+  font-size:.98rem;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.account-hub-copy strong{
+  font-size:.79rem;
+  font-weight:720;
+  letter-spacing:-.015em;
+}
+.account-hub-copy small{
+  margin-top:.04rem;
+  color:#7487a3;
+  font-size:.6rem;
+}
+.account-hub-value{
+  font-size:.7rem;
+  font-weight:740;
+  color:#a9bddc;
+}
+.account-hub-chevron{
+  font-size:1.18rem;
+  color:#6b9be4;
+  text-shadow:none;
+}
+.account-hub-footer{
+  margin-top:.75rem;
+  padding-top:.75rem;
+  border-top-color:rgba(77,117,181,.08);
+  color:#70829e;
+  font-size:.6rem;
+}
+
+body.light .account-hub{
+  background:linear-gradient(180deg,#f6f8fb,#eef2f7);
+}
+body.light .account-identity-card,
+body.light .account-hub-list{
+  background:#fff;
+  border-color:rgba(40,61,94,.07);
+}
+body.light .account-hub-kicker,
+body.light .account-hub-subtitle,
+body.light .account-identity-copy p,
+body.light .account-hub-copy small,
+body.light .account-hub-footer{
+  color:#6f7b8c;
+}
+
+@media(max-width:620px){
+  .account-hub{
+    width:calc(100% - .5rem);
+    padding:.72rem;
+  }
+  .account-hub-header h2{
+    font-size:1.72rem;
+  }
+  .account-identity-avatar{
+    width:3.2rem;
+    height:3.2rem;
+  }
+  .account-auth-actions-redesign .account-auth-button{
+    min-height:2.6rem;
+    font-size:.72rem;
+  }
+  .account-hub-row{
+    min-height:3.65rem;
+  }
+  .account-hub-icon{
+    width:2.2rem;
+    height:2.2rem;
+  }
+}
