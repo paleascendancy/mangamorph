@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=030">
+  <link rel="stylesheet" href="assets/css/style.css?v=031">
   <link rel="stylesheet" href="assets/css/settings.css?v=001">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -275,16 +275,41 @@
 
   <div class="search-panel" id="searchPanel" hidden>
     <div class="search-backdrop" data-close-search></div>
-    <section class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
-      <div class="search-dialog-top">
-        <div>
-          <p class="eyebrow">BUSCA RÁPIDA</p>
-          <h2 id="searchTitle">Encontre uma obra</h2>
+    <section class="search-dialog premium-search-dialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+      <div class="search-dialog-top premium-search-top">
+        <div class="search-heading">
+          <span class="search-heading-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.25"></circle><path d="M15.7 15.7 20 20"></path></svg>
+          </span>
+          <div>
+            <p class="eyebrow">DESCOBRIR</p>
+            <h2 id="searchTitle">Buscar no MangaMorph</h2>
+            <p class="search-subtitle">Encontre títulos, gêneros e capítulos rapidamente.</p>
+          </div>
         </div>
-        <button class="icon-button" id="searchClose" aria-label="Fechar busca">×</button>
+        <button class="search-close-premium" id="searchClose" aria-label="Fechar busca">×</button>
       </div>
-      <input id="searchInput" class="search-input" type="search" placeholder="Digite título ou gênero..." autocomplete="off">
-      <div id="searchResults" class="search-results"></div>
+
+      <label class="premium-search-field" for="searchInput">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.25"></circle><path d="M15.7 15.7 20 20"></path></svg>
+        <input id="searchInput" class="search-input premium-search-input" type="search" placeholder="Pesquisar título ou gênero..." autocomplete="off">
+        <span class="search-key">ESC</span>
+      </label>
+
+      <div class="search-filter-row" aria-label="Filtros rápidos de busca">
+        <button class="search-filter active" type="button" data-search-filter="Todos">Todos</button>
+        <button class="search-filter" type="button" data-search-filter="Ação">Ação</button>
+        <button class="search-filter" type="button" data-search-filter="Fantasia">Fantasia</button>
+        <button class="search-filter" type="button" data-search-filter="Mistério">Mistério</button>
+        <button class="search-filter" type="button" data-search-filter="Drama">Drama</button>
+        <button class="search-filter" type="button" data-search-filter="Suspense">Suspense</button>
+      </div>
+
+      <div class="search-results-head">
+        <span>Resultados</span>
+        <span id="searchCount">0 obras</span>
+      </div>
+      <div id="searchResults" class="search-results premium-search-results"></div>
     </section>
   </div>
 
@@ -311,6 +336,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=020" defer></script>
+  <script src="assets/js/app.js?v=021" defer></script>
 </body>
 </html>
