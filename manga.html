@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=038">
-  <link rel="stylesheet" href="assets/css/manga.css?v=012">
+  <link rel="stylesheet" href="assets/css/manga.css?v=013">
 </head>
 <body>
   <header class="topbar manga-topbar">
@@ -112,7 +112,7 @@
     <nav class="manga-tabs" role="tablist" aria-label="Conteúdo da obra">
       <button class="manga-tab active" id="tabChapters" role="tab" aria-selected="true" aria-controls="panelChapters" data-tab="chapters">Capítulos <span id="tabChapterCount"></span></button>
       <button class="manga-tab" id="tabRelated" role="tab" aria-selected="false" aria-controls="panelRelated" data-tab="related">Relacionados</button>
-      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários</button>
+      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários <span id="tabCommentCount">0</span></button>
     </nav>
 
     <section class="tab-panel active" id="panelChapters" role="tabpanel" aria-labelledby="tabChapters">
@@ -140,33 +140,47 @@
 
     <section class="tab-panel" id="panelRelated" role="tabpanel" aria-labelledby="tabRelated" hidden>
       <div class="related-section">
-        <div class="chapters-heading">
+        <div class="chapters-heading related-heading">
           <div>
             <p class="eyebrow">RELACIONADOS</p>
             <h2>Você também pode gostar</h2>
             <p>Obras próximas por gênero e temática.</p>
           </div>
+          <span id="relatedCount">8 recomendações</span>
         </div>
-        <div class="related-grid" id="relatedGrid"></div>
+        <div class="related-grid related-grid-premium" id="relatedGrid"></div>
       </div>
     </section>
 
     <section class="tab-panel" id="panelComments" role="tabpanel" aria-labelledby="tabComments" hidden>
-      <div class="comments-panel">
+      <div class="comments-panel comments-panel-premium">
         <div class="comments-head">
           <div>
             <p class="eyebrow">COMUNIDADE</p>
             <h2>Comentários</h2>
+            <p>Converse sobre a obra sem sair da página.</p>
           </div>
-          <span>0 comentários</span>
+          <span id="commentCountLabel">0 comentários</span>
         </div>
-        <div class="comment-composer">
-          <div class="comment-avatar">?</div>
-          <div>
-            <strong>Compartilhe sua opinião</strong>
-            <p>Os comentários serão liberados quando as contas do MangaMorph forem conectadas ao backend.</p>
+
+        <form class="comment-composer comment-composer-live" id="commentForm">
+          <div class="comment-avatar">C</div>
+          <div class="comment-input-wrap">
+            <label for="commentInput">Comentar como Convidado</label>
+            <textarea id="commentInput" maxlength="280" rows="3" placeholder="O que você achou desta obra?"></textarea>
+            <div class="comment-composer-meta">
+              <span id="commentCharCount">0/280</span>
+              <span>Salvo apenas neste dispositivo</span>
+            </div>
           </div>
-          <button type="button" disabled>Comentar</button>
+          <button type="submit" id="commentSubmit">Publicar</button>
+        </form>
+
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-empty" id="commentEmpty">
+          <span>◌</span>
+          <strong>Ainda não há comentários</strong>
+          <p>Seja a primeira pessoa a comentar sobre esta obra.</p>
         </div>
       </div>
     </section>
@@ -179,6 +193,6 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=009" defer></script>
+  <script src="assets/js/manga.js?v=010" defer></script>
 </body>
 </html>
