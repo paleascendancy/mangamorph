@@ -554,3 +554,106 @@ body.light .status-menu button.active{
     font-size:.58rem;
   }
 }
+
+
+/* Colored reading statuses v5 */
+.status-inline-button{
+  --status-color:#66758b;
+}
+.status-inline-dot,
+.status-current-dot{
+  background:var(--status-color,#66758b);
+}
+.status-inline-dot{
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--status-color,#66758b) 18%,transparent);
+}
+.status-current{
+  border-color:color-mix(in srgb,var(--status-color,#66758b) 20%,rgba(255,255,255,.055));
+}
+.status-inline-button.has-status{
+  border-color:color-mix(in srgb,var(--status-color,#66758b) 28%,rgba(255,255,255,.08));
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.018),transparent),
+    color-mix(in srgb,var(--status-color,#66758b) 8%,#0d141d);
+}
+.status-inline-button.has-status .status-current{
+  border-color:color-mix(in srgb,var(--status-color,#66758b) 32%,rgba(255,255,255,.07));
+  background:color-mix(in srgb,var(--status-color,#66758b) 10%,rgba(255,255,255,.02));
+}
+.status-inline-button.has-status .status-current-dot{
+  box-shadow:0 0 10px color-mix(in srgb,var(--status-color,#66758b) 48%,transparent);
+}
+.status-menu{
+  max-height:min(22rem,70vh);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+}
+.status-menu::-webkit-scrollbar{
+  display:none;
+}
+.status-menu button{
+  --status-color:#66758b;
+}
+.status-menu button span{
+  display:flex;
+  align-items:center;
+  gap:.52rem;
+  min-width:0;
+}
+.status-menu button span b{
+  width:1rem;
+  height:1rem;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  border-radius:.34rem;
+  background:color-mix(in srgb,var(--status-color,#66758b) 12%,transparent);
+  color:var(--status-color,#66758b);
+  font-size:.58rem;
+  font-weight:850;
+  line-height:1;
+}
+.status-menu button i{
+  background:var(--status-color,#66758b);
+  opacity:.72;
+}
+.status-menu button:hover,
+.status-menu button.active{
+  border-color:color-mix(in srgb,var(--status-color,#66758b) 28%,rgba(255,255,255,.08));
+  background:color-mix(in srgb,var(--status-color,#66758b) 8%,#121b27);
+}
+.status-menu button.active i{
+  opacity:1;
+  box-shadow:0 0 10px color-mix(in srgb,var(--status-color,#66758b) 45%,transparent);
+}
+.status-menu button.active span{
+  color:#f3f6fb;
+}
+body.light .status-inline-button.has-status{
+  background:color-mix(in srgb,var(--status-color,#66758b) 8%,#fff);
+}
+body.light .status-inline-button.has-status .status-current{
+  background:color-mix(in srgb,var(--status-color,#66758b) 9%,#fff);
+}
+body.light .status-menu button:hover,
+body.light .status-menu button.active{
+  background:color-mix(in srgb,var(--status-color,#66758b) 9%,#fff);
+}
+@media(max-width:640px){
+  .status-menu{
+    max-height:17.5rem;
+  }
+  .status-menu button{
+    min-height:2.05rem;
+    padding:0 .58rem;
+  }
+  .status-menu button span{
+    gap:.44rem;
+  }
+  .status-menu button span b{
+    width:.9rem;
+    height:.9rem;
+    font-size:.52rem;
+  }
+}
