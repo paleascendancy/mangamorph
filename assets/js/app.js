@@ -397,6 +397,10 @@ document.addEventListener("click", function(event) {
 
   const menuTarget = event.target.closest("[data-menu-target]");
   if (menuTarget) {
+    document.querySelectorAll(".side-menu-item, .side-menu-subitem").forEach(function(item){
+      item.classList.remove("active");
+    });
+    menuTarget.classList.add("active");
     const target = document.querySelector(menuTarget.dataset.menuTarget);
     closeSideMenu();
     if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
