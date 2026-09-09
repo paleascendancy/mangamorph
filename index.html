@@ -13,9 +13,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=039">
+  <link rel="stylesheet" href="assets/css/style.css?v=040">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
-  <link rel="stylesheet" href="assets/css/auth.css?v=001">
+  <link rel="stylesheet" href="assets/css/auth.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
 <body>
@@ -53,6 +53,7 @@
         </svg>
       </button>
       <button class="icon-button header-action-button account-button" id="accountToggle" aria-label="Abrir conta" title="Conta">
+        <img class="header-profile-image" id="headerProfileImage" alt="" hidden>
         <span class="header-profile-initials" id="headerProfileInitials" hidden>MM</span>
         <svg id="headerGuestIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="12" cy="8" r="4"></circle>
@@ -203,9 +204,10 @@
       </header>
 
       <section class="account-identity-card">
-        <div class="account-identity-avatar profile-avatar-live" id="accountProfileAvatar" aria-hidden="true">
+        <div class="account-identity-avatar profile-avatar-live" id="accountProfileAvatar">
+          <img class="account-profile-image" id="accountProfileImage" alt="Foto do perfil" hidden>
           <span id="accountProfileInitials" hidden>MM</span>
-          <svg id="accountGuestAvatar" viewBox="0 0 24 24">
+          <svg id="accountGuestAvatar" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="8" r="3.4"></circle>
             <path d="M5.4 19.2c.8-3.6 3-5.4 6.6-5.4s5.8 1.8 6.6 5.4"></path>
           </svg>
@@ -233,16 +235,19 @@
       <button class="account-logout-button" id="accountLogout" type="button" hidden>Sair da conta</button>
       <p class="account-auth-message" id="accountAuthMessage" hidden>Sua conta é protegida pelo Supabase Auth.</p>
 
-      <div class="account-hub-section-label">Perfil</div>
-      <div class="account-hub-list account-profile-list">
-        <button class="account-hub-row" id="accountProfile" type="button">
-          <span class="account-hub-icon">◎</span>
-          <span class="account-hub-copy"><strong>Meu perfil</strong><small>Nome, usuário e biografia</small></span>
-          <span class="account-hub-chevron">›</span>
+      <div class="account-profile-actions" id="accountProfileActions" hidden>
+        <button class="account-profile-action primary" id="accountProfile" type="button">
+          <span>✎</span>
+          <span><strong>Editar perfil</strong><small>Nome, @usuário, bio e cor</small></span>
         </button>
+        <label class="account-profile-action" id="accountAvatarButton" for="accountAvatarInput">
+          <span>＋</span>
+          <span><strong id="accountAvatarButtonLabel">Adicionar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
+          <input id="accountAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+        </label>
       </div>
 
-      <div class="account-hub-section-label">Biblioteca</div>
+      <div class="account-hub-section-label" id="accountLibraryLabel">Biblioteca</div>
       <div class="account-hub-list">
         <button class="account-hub-row" id="accountFavorites" type="button">
           <span class="account-hub-icon">☆</span>
@@ -274,33 +279,28 @@
   </div>
 
 
-  <div class="auth-panel" id="authPanel" hidden>
-    <div class="auth-backdrop" data-close-auth></div>
-    <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-panel" id="loginPanel" hidden>
+    <div class="auth-backdrop" data-close-login></div>
+    <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <header class="auth-header">
         <div>
           <p class="auth-kicker">MANGAMORPH ID</p>
-          <h2 id="authTitle">Entrar</h2>
-          <p id="authSubtitle">Acesse sua biblioteca e perfil.</p>
+          <h2 id="loginTitle">Entrar</h2>
+          <p>Acesse sua conta e sua biblioteca.</p>
         </div>
-        <button class="auth-close" id="authClose" type="button" aria-label="Fechar">×</button>
+        <button class="auth-close" id="loginClose" type="button" aria-label="Fechar">×</button>
       </header>
 
-      <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Acesso à conta">
-        <button class="auth-tab active" type="button" data-auth-mode="login">Entrar</button>
-        <button class="auth-tab" type="button" data-auth-mode="register">Criar conta</button>
-      </div>
-
-      <div class="auth-social" id="authSocial">
-        <button class="auth-social-button google" id="authGoogle" type="button">
-          <span class="auth-social-icon">G</span><span>Continuar com Google</span>
+      <div class="auth-social">
+        <button class="auth-social-button google" id="authGoogleLogin" type="button">
+          <span class="auth-social-icon">G</span><span>Entrar com Google</span>
         </button>
-        <button class="auth-social-button github" id="authGithub" type="button">
-          <span class="auth-social-icon">⌂</span><span>Continuar com GitHub</span>
+        <button class="auth-social-button github" id="authGithubLogin" type="button">
+          <span class="auth-social-icon">⌂</span><span>Entrar com GitHub</span>
         </button>
       </div>
 
-      <div class="auth-divider" id="authDivider"><span>ou use seu e-mail</span></div>
+      <div class="auth-divider"><span>ou use seu e-mail</span></div>
 
       <form class="auth-form" id="authLoginForm">
         <label>
@@ -314,14 +314,71 @@
             <button type="button" data-toggle-password="authLoginPassword">Mostrar</button>
           </div>
         </label>
-        <button class="auth-primary" id="authLoginSubmit" type="submit">Entrar</button>
+        <button class="auth-primary" type="submit">Entrar</button>
         <div class="auth-inline-actions">
           <button type="button" id="authMagicLink">Entrar sem senha</button>
-          <button type="button" data-auth-mode="forgot">Esqueci minha senha</button>
+          <button type="button" id="openForgotPassword">Esqueci minha senha</button>
         </div>
       </form>
 
-      <form class="auth-form" id="authRegisterForm" hidden>
+      <form class="auth-form" id="authForgotForm" hidden>
+        <div class="auth-mode-copy">
+          <strong>Recuperar senha</strong>
+          <span>Enviaremos um link seguro para o seu e-mail.</span>
+        </div>
+        <label>
+          <span>E-mail</span>
+          <input id="authForgotEmail" type="email" autocomplete="email" placeholder="voce@email.com" required>
+        </label>
+        <button class="auth-primary" type="submit">Enviar link</button>
+        <button class="auth-secondary" id="backToLogin" type="button">Voltar para entrar</button>
+      </form>
+
+      <form class="auth-form" id="authRecoveryForm" hidden>
+        <div class="auth-mode-copy">
+          <strong>Nova senha</strong>
+          <span>Escolha uma nova senha para sua conta.</span>
+        </div>
+        <label>
+          <span>Nova senha</span>
+          <div class="auth-password-field">
+            <input id="authRecoveryPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required>
+            <button type="button" data-toggle-password="authRecoveryPassword">Mostrar</button>
+          </div>
+        </label>
+        <button class="auth-primary" type="submit">Atualizar senha</button>
+      </form>
+
+      <div class="auth-message" id="loginMessage" hidden></div>
+      <p class="auth-switch-copy">Ainda não tem uma conta? <button id="openRegisterFromLogin" type="button">Criar conta</button></p>
+      <p class="auth-security-note">Sua senha é processada pelo Supabase Auth e não fica salva no código do MangaMorph.</p>
+    </section>
+  </div>
+
+  <div class="auth-panel" id="registerPanel" hidden>
+    <div class="auth-backdrop" data-close-register></div>
+    <section class="auth-dialog register-dialog" role="dialog" aria-modal="true" aria-labelledby="registerTitle">
+      <header class="auth-header">
+        <div>
+          <p class="auth-kicker">NOVO MANGAMORPH ID</p>
+          <h2 id="registerTitle">Criar conta</h2>
+          <p>Cadastre seus dados para criar seu perfil.</p>
+        </div>
+        <button class="auth-close" id="registerClose" type="button" aria-label="Fechar">×</button>
+      </header>
+
+      <div class="auth-social">
+        <button class="auth-social-button google" id="authGoogleRegister" type="button">
+          <span class="auth-social-icon">G</span><span>Cadastrar com Google</span>
+        </button>
+        <button class="auth-social-button github" id="authGithubRegister" type="button">
+          <span class="auth-social-icon">⌂</span><span>Cadastrar com GitHub</span>
+        </button>
+      </div>
+
+      <div class="auth-divider"><span>ou cadastre com e-mail</span></div>
+
+      <form class="auth-form" id="authRegisterForm">
         <div class="auth-two-cols">
           <label>
             <span>Nome</span>
@@ -351,42 +408,15 @@
           </div>
         </label>
         <div class="auth-password-rules">
-          <span>• mínimo 8 caracteres</span>
+          <span>• mínimo de 8 caracteres</span>
           <span>• use uma senha exclusiva</span>
         </div>
-        <button class="auth-primary" id="authRegisterSubmit" type="submit">Criar conta</button>
+        <button class="auth-primary" type="submit">Criar conta</button>
       </form>
 
-      <form class="auth-form" id="authForgotForm" hidden>
-        <div class="auth-mode-copy">
-          <strong>Recuperar senha</strong>
-          <span>Enviaremos um link seguro para o seu e-mail.</span>
-        </div>
-        <label>
-          <span>E-mail</span>
-          <input id="authForgotEmail" type="email" autocomplete="email" placeholder="voce@email.com" required>
-        </label>
-        <button class="auth-primary" type="submit">Enviar link</button>
-        <button class="auth-secondary" type="button" data-auth-mode="login">Voltar para entrar</button>
-      </form>
-
-      <form class="auth-form" id="authRecoveryForm" hidden>
-        <div class="auth-mode-copy">
-          <strong>Nova senha</strong>
-          <span>Escolha uma nova senha para sua conta.</span>
-        </div>
-        <label>
-          <span>Nova senha</span>
-          <div class="auth-password-field">
-            <input id="authRecoveryPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required>
-            <button type="button" data-toggle-password="authRecoveryPassword">Mostrar</button>
-          </div>
-        </label>
-        <button class="auth-primary" type="submit">Atualizar senha</button>
-      </form>
-
-      <div class="auth-message" id="authMessage" hidden></div>
-      <p class="auth-security-note">A senha não é salva pelo MangaMorph. A autenticação é processada de forma segura pelo Supabase.</p>
+      <div class="auth-message" id="registerMessage" hidden></div>
+      <p class="auth-switch-copy">Já tem uma conta? <button id="openLoginFromRegister" type="button">Entrar</button></p>
+      <p class="auth-security-note">Depois do cadastro, seu perfil fica disponível no botão de conta.</p>
     </section>
   </div>
 
@@ -594,7 +624,7 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=034" defer></script>
-  <script type="module" src="assets/js/auth.js?v=001"></script>
+  <script src="assets/js/app.js?v=035" defer></script>
+  <script type="module" src="assets/js/auth.js?v=002"></script>
 </body>
 </html>
