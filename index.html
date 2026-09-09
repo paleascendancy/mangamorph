@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=034">
+  <link rel="stylesheet" href="assets/css/style.css?v=035">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -70,9 +70,21 @@
 
       <nav class="side-menu-nav" aria-label="Atalhos do MangaMorph">
         <button type="button" class="side-menu-item active" data-menu-target="#inicio"><span class="side-menu-icon">⌂</span><span>Início</span></button>
-        <button type="button" class="side-menu-item" data-menu-target="#favoritadas"><span class="side-menu-icon">☆</span><span>Mais favoritadas</span></button>
-        <button type="button" class="side-menu-item" data-menu-target="#populares"><span class="side-menu-icon">▥</span><span>Mais lidas</span></button>
-        <button type="button" class="side-menu-item" data-menu-target="#novas"><span class="side-menu-icon">◫</span><span>Novas obras + últimos capítulos</span></button>
+
+        <div class="side-menu-group">
+          <button type="button" class="side-menu-item side-menu-group-toggle" id="titlesMenuToggle" aria-expanded="false" aria-controls="titlesMenu">
+            <span class="side-menu-icon">▤</span>
+            <span>Títulos</span>
+            <span class="side-menu-group-chevron" aria-hidden="true">›</span>
+          </button>
+
+          <div class="side-menu-subnav" id="titlesMenu" hidden>
+            <button type="button" class="side-menu-subitem" data-menu-target="#favoritadas"><span>☆</span><span>Mais favoritadas</span></button>
+            <button type="button" class="side-menu-subitem" data-menu-target="#populares"><span>▥</span><span>Mais lidas</span></button>
+            <button type="button" class="side-menu-subitem" data-menu-target="#novas"><span>＋</span><span>Novas obras</span></button>
+            <button type="button" class="side-menu-subitem" data-menu-target="#recentes"><span>◷</span><span>Últimos capítulos</span></button>
+          </div>
+        </div>
       </nav>
 
       <div class="side-menu-footer">
@@ -359,6 +371,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=027" defer></script>
+  <script src="assets/js/app.js?v=028" defer></script>
 </body>
 </html>
