@@ -109,6 +109,9 @@ const profileNameInput = document.querySelector("#profileNameInput");
 const profileUsernameInput = document.querySelector("#profileUsernameInput");
 const profileBioInput = document.querySelector("#profileBioInput");
 const profileBioCount = document.querySelector("#profileBioCount");
+const profilePublicInput = document.querySelector("#profilePublicInput");
+const profileActivityInput = document.querySelector("#profileActivityInput");
+const profileFavoritesPrivacyInput = document.querySelector("#profileFavoritesPrivacyInput");
 const profilePreviewAvatar = document.querySelector("#profilePreviewAvatar");
 const profilePreviewName = document.querySelector("#profilePreviewName");
 const profilePreviewHandle = document.querySelector("#profilePreviewHandle");
@@ -467,6 +470,9 @@ function openProfileEditor(mode) {
   profileUsernameInput.value = existing ? existing.username : "";
   profileBioInput.value = existing ? (existing.bio || "") : "";
   profileAccent = existing ? (existing.accent || "#5b8def") : "#5b8def";
+  profilePublicInput.checked = existing ? existing.isPublic !== false : true;
+  profileActivityInput.checked = existing ? existing.showActivity !== false : true;
+  profileFavoritesPrivacyInput.checked = existing ? existing.showFavorites !== false : true;
   document.querySelectorAll("[data-profile-accent]").forEach(function(button){
     button.classList.toggle("active",button.dataset.profileAccent === profileAccent);
   });
@@ -731,6 +737,9 @@ profileForm.addEventListener("submit", function(event){
     username:username,
     bio:profileBioInput.value.trim().slice(0,120),
     accent:profileAccent,
+    isPublic:profilePublicInput.checked,
+    showActivity:profileActivityInput.checked,
+    showFavorites:profileFavoritesPrivacyInput.checked,
     createdAt:(state.profile && state.profile.createdAt) || Date.now()
   });
   closeProfileEditor();
