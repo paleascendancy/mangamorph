@@ -287,21 +287,13 @@ chapterSearch.addEventListener("input", function(event) {
 });
 
 document.querySelector("#readLatest").addEventListener("click", function() {
-  setTab("chapters");
-  chapterQuery = String(manga.chapter);
-  chapterSearch.value = chapterQuery;
-  renderChapters();
-  document.querySelector("#chapters").scrollIntoView({behavior:"smooth",block:"start"});
-  setTimeout(function() {
-    const row = document.querySelector("#capitulo-" + manga.chapter);
-    if (row) row.scrollIntoView({behavior:"smooth",block:"center"});
-  }, 220);
+  location.href = "reader.html?id=" + manga.id + "&chapter=" + manga.chapter;
 });
 
 chapterList.addEventListener("click", function(event) {
   const readButton = event.target.closest("[data-read-chapter]");
   if (!readButton) return;
-  showToast("Leitor do capítulo " + readButton.dataset.readChapter + " será conectado na próxima etapa.");
+  location.href = "reader.html?id=" + manga.id + "&chapter=" + readButton.dataset.readChapter;
 });
 
 function openManga(targetId) {
