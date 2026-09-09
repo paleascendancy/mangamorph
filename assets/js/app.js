@@ -51,6 +51,13 @@ const notificationSwitch = document.querySelector("#notificationSwitch");
 const sideMenu = document.querySelector("#sideMenu");
 const menuToggle = document.querySelector("#menuToggle");
 const sideMenuSettings = document.querySelector("#sideMenuSettings");
+const accountPanel = document.querySelector("#accountPanel");
+const accountToggle = document.querySelector("#accountToggle");
+const accountClose = document.querySelector("#accountClose");
+const accountFavoriteCount = document.querySelector("#accountFavoriteCount");
+const accountThemeName = document.querySelector("#accountThemeName");
+const accountFavorites = document.querySelector("#accountFavorites");
+const accountSettings = document.querySelector("#accountSettings");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -180,6 +187,7 @@ function toggleFavorite(id) {
   else state.favorites.add(id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(state.favorites)));
   renderCatalogs();
+  if (accountFavoriteCount) updateAccountPanel();
 }
 
 function openSearch() {
@@ -217,6 +225,22 @@ function closeSideMenu() {
   document.body.style.overflow = "";
 }
 
+function updateAccountPanel() {
+  accountFavoriteCount.textContent = String(state.favorites.size);
+  accountThemeName.textContent = document.body.classList.contains("light") ? "Claro" : "Escuro";
+}
+
+function openAccount() {
+  updateAccountPanel();
+  accountPanel.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeAccount() {
+  accountPanel.hidden = true;
+  document.body.style.overflow = "";
+}
+
 function openSettings() {
   settingsPanel.hidden = false;
   document.body.style.overflow = "hidden";
@@ -243,6 +267,7 @@ function applyTheme(theme) {
   document.querySelectorAll("[data-theme]").forEach(function(button){
     button.classList.toggle("active", button.dataset.theme === theme);
   });
+  if (accountThemeName) accountThemeName.textContent = theme === "light" ? "Claro" : "Escuro";
 }
 
 function applyLanguage(language) {
@@ -334,6 +359,7 @@ document.addEventListener("click", function(event) {
   if (event.target.matches("[data-close-search]")) closeSearch();
   if (event.target.matches("[data-close-ranking]")) closeRanking();
   if (event.target.matches("[data-close-settings]")) closeSettings();
+  if (event.target.matches("[data-close-account]")) closeAccount();
   if (event.target.closest("[data-close-menu]")) closeSideMenu();
 });
 
@@ -344,7 +370,8 @@ document.addEventListener("keydown", function(event) {
     return;
   }
 
-  if (event.key === "Escape" && !sideMenu.hidden) closeSideMenu();
+  if (event.key === "Escape" && !accountPanel.hidden) closeAccount();
+  else if (event.key === "Escape" && !sideMenu.hidden) closeSideMenu();
   else if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
   else if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
   else if (event.key === "Escape" && !searchPanel.hidden) closeSearch();
@@ -362,6 +389,16 @@ document.querySelector("#searchToggle").addEventListener("click", openSearch);
 document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
 settingsToggle.addEventListener("click", openSettings);
+accountToggle.addEventListener("click", openAccount);
+accountClose.addEventListener("click", closeAccount);
+accountFavorites.addEventListener("click", function(){
+  closeAccount();
+  document.querySelector("#favoritadas").scrollIntoView({behavior:"smooth", block:"start"});
+});
+accountSettings.addEventListener("click", function(){
+  closeAccount();
+  openSettings();
+});
 menuToggle.addEventListener("click", openSideMenu);
 sideMenuSettings.addEventListener("click", function(){
   closeSideMenu();
