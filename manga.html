@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=038">
-  <link rel="stylesheet" href="assets/css/manga.css?v=010">
+  <link rel="stylesheet" href="assets/css/manga.css?v=011">
 </head>
 <body>
   <header class="topbar manga-topbar">
@@ -89,10 +89,14 @@
             <span class="status-chevron" aria-hidden="true">⌄</span>
           </button>
           <div class="status-menu" id="statusMenu" hidden>
-            <button type="button" data-status="Quero ler"><span>Quero ler</span><i></i></button>
-            <button type="button" data-status="Lendo"><span>Lendo</span><i></i></button>
-            <button type="button" data-status="Concluído"><span>Concluído</span><i></i></button>
-            <button type="button" data-status="Pausado"><span>Pausado</span><i></i></button>
+            <button type="button" data-status="Quero ler"><span><b>○</b> Quero ler</span><i></i></button>
+            <button type="button" data-status="Lendo"><span><b>▶</b> Lendo</span><i></i></button>
+            <button type="button" data-status="Concluído"><span><b>✓</b> Concluído</span><i></i></button>
+            <button type="button" data-status="Pausado"><span><b>Ⅱ</b> Pausado</span><i></i></button>
+            <button type="button" data-status="Abandonado"><span><b>×</b> Abandonado</span><i></i></button>
+            <button type="button" data-status="Relendo"><span><b>↻</b> Relendo</span><i></i></button>
+            <button type="button" data-status="Aguardando capítulos"><span><b>…</b> Aguardando capítulos</span><i></i></button>
+            <button type="button" data-status="Favorito"><span><b>★</b> Favorito</span><i></i></button>
           </div>
         </div>
       </div>
@@ -175,6 +179,6 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=008" defer></script>
+  <script src="assets/js/manga.js?v=009" defer></script>
 </body>
 </html>
