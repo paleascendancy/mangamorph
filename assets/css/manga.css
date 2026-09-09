@@ -361,3 +361,196 @@ body.light .chapter-meta-line{
     font-size:.62rem;
   }
 }
+
+
+/* Reading status selector fix v4 */
+.status-picker{
+  position:relative;
+  min-width:0;
+}
+.status-inline-button{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:.5rem;
+  min-height:2.5rem;
+  padding:0 .62rem;
+  overflow:hidden;
+  border:1px solid rgba(91,132,196,.1);
+  border-radius:.72rem;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.018),transparent),
+    #0d141d;
+  color:#8794a7;
+  text-align:left;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+  transition:border-color .15s ease,background .15s ease;
+}
+.status-inline-button:hover,
+.status-inline-button[aria-expanded="true"]{
+  border-color:rgba(93,144,225,.18);
+  background:#101925;
+}
+.status-leading{
+  display:flex;
+  align-items:center;
+  gap:.46rem;
+  min-width:0;
+  font-size:.61rem;
+  font-weight:650;
+}
+.status-leading>span:last-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.status-inline-dot{
+  width:.4rem;
+  height:.4rem;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#66758b;
+  box-shadow:0 0 0 3px rgba(102,117,139,.07);
+}
+.status-current{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  min-height:1.6rem;
+  padding:0 .5rem;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:999px;
+  background:rgba(255,255,255,.022);
+  white-space:nowrap;
+}
+.status-current strong{
+  color:#dce5f1;
+  font-size:.58rem;
+  font-weight:760;
+}
+.status-current-dot{
+  width:.32rem;
+  height:.32rem;
+  border-radius:50%;
+  background:#657387;
+}
+.status-inline-button.has-status .status-current{
+  border-color:rgba(77,135,224,.16);
+  background:rgba(47,101,186,.08);
+}
+.status-inline-button.has-status .status-current-dot{
+  background:#4f8ff2;
+  box-shadow:0 0 8px rgba(79,143,242,.32);
+}
+.status-inline-button.has-status .status-inline-dot{
+  background:#4f8ff2;
+}
+.status-chevron{
+  color:#66758a;
+  font-size:.72rem;
+  transition:transform .16s ease,color .16s ease;
+}
+.status-inline-button[aria-expanded="true"] .status-chevron{
+  transform:rotate(180deg);
+  color:#9eb8de;
+}
+.status-menu{
+  position:fixed;
+  z-index:300;
+  display:grid;
+  gap:.22rem;
+  padding:.35rem;
+  border:1px solid rgba(94,137,205,.15);
+  border-radius:.78rem;
+  background:
+    radial-gradient(circle at 88% 0%,rgba(55,105,187,.09),transparent 28%),
+    #101721;
+  box-shadow:0 18px 44px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.03);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.status-menu[hidden]{
+  display:none;
+}
+.status-menu button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  min-height:2.35rem;
+  padding:0 .62rem;
+  border:1px solid transparent;
+  border-radius:.6rem;
+  background:transparent;
+  color:#a9b4c4;
+  text-align:left;
+  font-size:.62rem;
+  font-weight:680;
+  cursor:pointer;
+}
+.status-menu button i{
+  width:.38rem;
+  height:.38rem;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#58677c;
+}
+.status-menu button:hover,
+.status-menu button.active{
+  border-color:rgba(87,136,215,.13);
+  background:rgba(60,106,181,.09);
+  color:#f0f4f9;
+}
+.status-menu button.active i{
+  background:#4f8ff2;
+  box-shadow:0 0 9px rgba(79,143,242,.38);
+}
+body.light .status-inline-button,
+body.light .status-menu{
+  background:#fff;
+  border-color:rgba(0,0,0,.07);
+}
+body.light .status-current{
+  background:#f2f5f9;
+  border-color:rgba(0,0,0,.06);
+}
+body.light .status-current strong{
+  color:#263142;
+}
+body.light .status-menu button.active{
+  background:#eef4ff;
+  color:#17202c;
+}
+@media(max-width:640px){
+  .status-inline-button{
+    min-height:2.15rem;
+    padding:0 .48rem;
+    gap:.36rem;
+    border-radius:.62rem;
+  }
+  .status-leading{
+    gap:.36rem;
+    font-size:.54rem;
+  }
+  .status-current{
+    min-height:1.4rem;
+    padding:0 .4rem;
+    gap:.28rem;
+  }
+  .status-current strong{
+    font-size:.52rem;
+  }
+  .status-current-dot{
+    width:.28rem;
+    height:.28rem;
+  }
+  .status-chevron{
+    font-size:.64rem;
+  }
+  .status-menu button{
+    min-height:2.2rem;
+    font-size:.58rem;
+  }
+}
