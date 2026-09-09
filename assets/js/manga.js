@@ -18,7 +18,10 @@ const catalog = [
 
 const params = new URLSearchParams(location.search);
 const id = Number(params.get("id")) || 1;
-const manga = catalog.find(function(item){ return item.id === id; }) || catalog[0];
+const manga = catalog.find(function(item){ return item.id === id; }) || {
+  id:id,title:"Carregando...",type:"Mangá",genre:"Outros",chapter:1,accent:"#3a4162",
+  reads:0,favorites:0,rating:0,tags:[],description:""
+};
 
 const favorites = new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]"));
 const marked = new Set(JSON.parse(localStorage.getItem("mangamorph:marked") || "[]"));
