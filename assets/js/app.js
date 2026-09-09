@@ -774,6 +774,14 @@ applyTheme(savedTheme);
 applyFilter(state.filter);
 applyNotifications(state.notifications);
 
+window.addEventListener("mangamorph:library-loaded",function(event){
+  const rows=event.detail?.library||[];
+  state.favorites=new Set(rows.filter(row=>row.favorite).map(row=>Number(row.manga_id)));
+  state.history=(event.detail?.history||[]).map(row=>Number(row.manga_id));
+  renderCatalogs();
+  renderProfileUI();
+});
+
 window.addEventListener("mangamorph:catalog-loaded",function(event){
   if(!Array.isArray(event.detail)||!event.detail.length)return;
   catalog=event.detail;
