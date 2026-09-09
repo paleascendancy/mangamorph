@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=041">
+  <link rel="stylesheet" href="assets/css/style.css?v=042">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="stylesheet" href="assets/css/auth.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
@@ -44,6 +44,10 @@
           <circle cx="11" cy="11" r="6.25"></circle>
           <path d="M15.7 15.7 20 20"></path>
         </svg>
+      </button>
+      <button class="icon-button header-action-button notification-button" id="notificationsToggle" aria-label="Abrir notificações" title="Notificações">
+        <span class="notification-bell" aria-hidden="true">♢</span>
+        <span class="notification-badge" id="notificationsBadge" hidden>0</span>
       </button>
       <button class="icon-button header-action-button" id="settingsToggle" aria-label="Abrir configurações" title="Configurações">
         <svg class="action-icon settings-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -191,6 +195,18 @@
   </main>
 
 
+  <div class="notifications-panel" id="notificationsPanel" hidden>
+    <div class="notifications-backdrop" data-close-notifications></div>
+    <aside class="notifications-drawer" role="dialog" aria-modal="true" aria-labelledby="notificationsTitle">
+      <header class="notifications-head">
+        <div><span>MANGAMORPH</span><h2 id="notificationsTitle">Notificações</h2></div>
+        <div><button id="notificationsMarkAll" type="button">Marcar lidas</button><button type="button" data-close-notifications>×</button></div>
+      </header>
+      <div class="notifications-list" id="notificationsList"></div>
+      <div class="notifications-empty" id="notificationsEmpty"><span>◇</span><strong>Nenhuma notificação</strong><p>Novos capítulos e interações aparecerão aqui.</p></div>
+    </aside>
+  </div>
+
   <div class="account-panel" id="accountPanel" hidden>
     <div class="account-backdrop" data-close-account></div>
     <section class="account-hub" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
@@ -245,6 +261,14 @@
           <span><strong id="accountAvatarButtonLabel">Adicionar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
           <input id="accountAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
         </label>
+        <a class="account-profile-action" id="accountPublicProfile" href="profile.html">
+          <span>◎</span>
+          <span><strong>Perfil público</strong><small>Ver como outros leitores enxergam você</small></span>
+        </a>
+        <a class="account-profile-action admin-profile-link" id="accountAdminLink" href="admin.html" hidden>
+          <span>⌘</span>
+          <span><strong>Administração</strong><small>Obras, capítulos e moderação</small></span>
+        </a>
       </div>
 
       <div class="account-hub-section-label" id="accountLibraryLabel">Biblioteca</div>
@@ -272,8 +296,8 @@
       </div>
 
       <div class="account-hub-footer">
-        <span>MangaMorph</span>
-        <span>v0.1</span>
+        <span>MangaMorph · <a href="terms.html">Termos</a> · <a href="privacy.html">Privacidade</a></span>
+        <span>v0.15</span>
       </div>
     </section>
   </div>
@@ -624,9 +648,10 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=038" defer></script>
+  <script src="assets/js/app.js?v=039" defer></script>
   <script type="module" src="assets/js/catalog-runtime.js?v=001"></script>
   <script type="module" src="assets/js/account-sync.js?v=001"></script>
+  <script type="module" src="assets/js/notifications.js?v=001"></script>
   <script type="module" src="assets/js/auth.js?v=002"></script>
 </body>
 </html>
