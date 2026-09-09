@@ -54,10 +54,11 @@ const sideMenuSettings = document.querySelector("#sideMenuSettings");
 const accountPanel = document.querySelector("#accountPanel");
 const accountToggle = document.querySelector("#accountToggle");
 const accountClose = document.querySelector("#accountClose");
-const accountFavoriteCount = document.querySelector("#accountFavoriteCount");
 const accountThemeName = document.querySelector("#accountThemeName");
-const accountFavorites = document.querySelector("#accountFavorites");
-const accountSettings = document.querySelector("#accountSettings");
+const accountThemeRow = document.querySelector("#accountThemeRow");
+const accountLogin = document.querySelector("#accountLogin");
+const accountRegister = document.querySelector("#accountRegister");
+const accountAuthMessage = document.querySelector("#accountAuthMessage");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -187,7 +188,6 @@ function toggleFavorite(id) {
   else state.favorites.add(id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(state.favorites)));
   renderCatalogs();
-  if (accountFavoriteCount) updateAccountPanel();
 }
 
 function openSearch() {
@@ -226,7 +226,6 @@ function closeSideMenu() {
 }
 
 function updateAccountPanel() {
-  accountFavoriteCount.textContent = String(state.favorites.size);
   accountThemeName.textContent = document.body.classList.contains("light") ? "Claro" : "Escuro";
 }
 
@@ -391,13 +390,15 @@ searchInput.addEventListener("input", function(event){ renderSearch(event.target
 settingsToggle.addEventListener("click", openSettings);
 accountToggle.addEventListener("click", openAccount);
 accountClose.addEventListener("click", closeAccount);
-accountFavorites.addEventListener("click", function(){
-  closeAccount();
-  document.querySelector("#favoritadas").scrollIntoView({behavior:"smooth", block:"start"});
-});
-accountSettings.addEventListener("click", function(){
+accountThemeRow.addEventListener("click", function(){
   closeAccount();
   openSettings();
+  toggleSettingsSection("theme");
+});
+[accountLogin, accountRegister].forEach(function(button){
+  button.addEventListener("click", function(){
+    accountAuthMessage.hidden = false;
+  });
 });
 menuToggle.addEventListener("click", openSideMenu);
 sideMenuSettings.addEventListener("click", function(){
