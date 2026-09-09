@@ -126,8 +126,7 @@ toggleDescription.addEventListener("click", () => {
 const chapters = Array.from({length:Math.min(30,manga.chapter)},(_,i)=>manga.chapter-i);
 const chapterList = document.querySelector("#chapterList");
 const chapterCount = document.querySelector("#chapterCount");
-const sortDesc = document.querySelector("#sortDesc");
-const sortAsc = document.querySelector("#sortAsc");
+const sortToggle = document.querySelector("#sortToggle");
 let chapterOrder = "desc";
 
 chapterCount.textContent = chapters.length + " capítulos";
@@ -145,17 +144,19 @@ function renderChapters() {
   }).join("");
 }
 
-function setChapterOrder(order) {
-  chapterOrder = order;
-  const descending = order === "desc";
-  sortDesc.classList.toggle("active", descending);
-  sortAsc.classList.toggle("active", !descending);
-  sortDesc.setAttribute("aria-pressed", descending ? "true" : "false");
-  sortAsc.setAttribute("aria-pressed", descending ? "false" : "true");
-  renderChapters();
+function renderSortButton() {
+  const descending = chapterOrder === "desc";
+  sortToggle.textContent = descending ? "Decrescente ↓" : "Crescente ↑";
+  sortToggle.setAttribute("aria-pressed", descending ? "true" : "false");
 }
-sortDesc.addEventListener("click", () => setChapterOrder("desc"));
-sortAsc.addEventListener("click", () => setChapterOrder("asc"));
+
+sortToggle.addEventListener("click", () => {
+  chapterOrder = chapterOrder === "desc" ? "asc" : "desc";
+  renderSortButton();
+  renderChapters();
+});
+
+renderSortButton();
 renderChapters();
 
 const savedTheme = localStorage.getItem("mangamorph:theme");
