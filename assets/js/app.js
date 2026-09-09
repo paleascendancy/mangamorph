@@ -49,16 +49,18 @@ function openManga(id) {
 
 function cardTemplate(item, rank) {
   const active = state.favorites.has(item.id);
-  return '<article class="manga-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
+  return '<article class="manga-card premium-manga-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
     '<div class="manga-cover" style="--accent:' + item.accent + '">' +
       '<span class="manga-rank">#' + String(rank).padStart(2,"0") + '</span>' +
-      '<span class="manga-cover-title">' + item.title + '</span>' +
+      '<div class="manga-cover-copy"><span class="manga-cover-title">' + item.title + '</span><small>' + item.genre + '</small></div>' +
     '</div>' +
     '<div class="manga-info">' +
-      '<h3>' + item.title + '</h3>' +
       '<div class="manga-meta"><span>' + item.genre + '</span><span>Cap. ' + item.chapter + '</span></div>' +
-      '<div class="manga-stats"><span>◉ ' + formatNumber(item.reads) + '</span><span>★ ' + formatNumber(item.favorites) + '</span>' +
-      '<button class="favorite-button ' + (active ? 'active' : '') + '" data-favorite="' + item.id + '" aria-label="' + (active ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '">' + (active ? '★' : '☆') + '</button></div>' +
+      '<div class="manga-stats">' +
+        '<span class="manga-stat"><b>◉</b> ' + formatNumber(item.reads) + '</span>' +
+        '<span class="manga-stat"><b>★</b> ' + formatNumber(item.favorites) + '</span>' +
+        '<button class="favorite-button ' + (active ? 'active' : '') + '" data-favorite="' + item.id + '" aria-label="' + (active ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '">' + (active ? '★' : '☆') + '</button>' +
+      '</div>' +
     '</div>' +
   '</article>';
 }
