@@ -397,3 +397,13 @@
     font-size:.75rem;
   }
 }
+
+/* Ranking order + smaller section titles */
+.ranking-catalog .section-heading h2{
+  font-size:clamp(1.65rem,3.3vw,2.55rem);
+}
+@media(max-width:620px){
+  .ranking-catalog .section-heading h2{
+    font-size:1.72rem;
+  }
+}
