@@ -81,6 +81,7 @@ const accountAvatarButtonLabel = document.querySelector("#accountAvatarButtonLab
 const accountProfileImage = document.querySelector("#accountProfileImage");
 const headerProfileImage = document.querySelector("#headerProfileImage");
 const accountProfile = document.querySelector("#accountProfile");
+const accountPublicProfile = document.querySelector("#accountPublicProfile");
 const accountReadingList = document.querySelector("#accountReadingList");
 const accountReadingListCount = document.querySelector("#accountReadingListCount");
 const accountLogout = document.querySelector("#accountLogout");
@@ -411,6 +412,7 @@ function renderProfileUI() {
     accountProfileHandle.textContent = "@" + profile.username;
     accountProfileHandle.hidden = false;
     accountProfileBio.textContent = profile.bio || "Leitor do MangaMorph.";
+    if (accountPublicProfile) accountPublicProfile.href = "profile.html?user=" + encodeURIComponent(profile.username);
     accountSessionBadge.innerHTML = "<span></span> Online";
     accountSessionBadge.classList.add("online");
     accountProfileAvatar.style.setProperty("--profile-accent",profile.accent || "#5b8def");
@@ -539,6 +541,7 @@ function applyNotifications(enabled) {
   localStorage.setItem("mangamorph:notifications", enabled ? "on" : "off");
   notificationToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
   notificationSwitch.classList.toggle("active", enabled);
+  window.dispatchEvent(new CustomEvent("mangamorph:notifications-global",{detail:{enabled:enabled}}));
 }
 
 document.addEventListener("click", function(event) {
