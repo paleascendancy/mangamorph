@@ -67,6 +67,7 @@ document.querySelector("#readLatestLabel").textContent = "Ler capítulo " + mang
 
 const history = JSON.parse(localStorage.getItem("mangamorph:history") || "[]").filter(function(historyId){ return historyId !== manga.id; });
 localStorage.setItem("mangamorph:history", JSON.stringify([manga.id].concat(history).slice(0,20)));
+window.dispatchEvent(new CustomEvent("mangamorph:history-open",{detail:{mangaId:manga.id}}));
 
 const favoriteButton = document.querySelector("#favoriteDetail");
 function renderFavorite() {
@@ -80,6 +81,7 @@ favoriteButton.addEventListener("click", function() {
   if (favorites.has(manga.id)) favorites.delete(manga.id);
   else favorites.add(manga.id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(favorites)));
+  window.dispatchEvent(new CustomEvent("mangamorph:library-change",{detail:{mangaId:manga.id,favorite:favorites.has(manga.id)}}));
   renderFavorite();
 });
 renderFavorite();
@@ -96,6 +98,7 @@ markButton.addEventListener("click", function() {
   if (marked.has(manga.id)) marked.delete(manga.id);
   else marked.add(manga.id);
   localStorage.setItem("mangamorph:marked", JSON.stringify(Array.from(marked)));
+  window.dispatchEvent(new CustomEvent("mangamorph:library-change",{detail:{mangaId:manga.id,inList:marked.has(manga.id)}}));
   renderMarked();
 });
 renderMarked();
@@ -191,6 +194,7 @@ statusMenu.addEventListener("click", function(event) {
 
   const value = option.dataset.status;
   localStorage.setItem(statusKey, value);
+  window.dispatchEvent(new CustomEvent("mangamorph:library-change",{detail:{mangaId:manga.id,readingStatus:value}}));
   renderStatus(value);
   closeStatusMenu();
   showToast("Status alterado para " + value + ".");
