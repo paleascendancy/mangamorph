@@ -8,7 +8,7 @@
   <title>MangaMorph — Leitor</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=041">
-  <link rel="stylesheet" href="assets/css/reader.css?v=002">
+  <link rel="stylesheet" href="assets/css/reader.css?v=003">
 </head>
 <body class="reader-body">
   <header class="reader-header" id="readerHeader">
@@ -48,12 +48,14 @@
         <div>
           <span>COMUNIDADE DO CAPÍTULO</span>
           <h2 id="chapterCommunityTitle">Capítulo 127</h2>
-          <p>Reaja ao capítulo e converse com outros leitores.</p>
+          <p>Escolha quantas reações quiser e converse com outros leitores.</p>
         </div>
         <small id="chapterReactionTotal">0 reações</small>
       </div>
 
       <div class="chapter-reactions" id="chapterReactionButtons">
+        <button type="button" data-reaction="like" class="sentiment"><span>👍</span><strong>Curti</strong><small>0</small></button>
+        <button type="button" data-reaction="dislike" class="sentiment"><span>👎</span><strong>Não curti</strong><small>0</small></button>
         <button type="button" data-reaction="love"><span>❤️</span><strong>Amei</strong><small>0</small></button>
         <button type="button" data-reaction="fire"><span>🔥</span><strong>Insano</strong><small>0</small></button>
         <button type="button" data-reaction="wow"><span>😮</span><strong>Surpresa</strong><small>0</small></button>
@@ -148,7 +150,7 @@
 
   <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/js/reader.js?v=002" defer></script>
-  <script type="module" src="assets/js/reader-community.js?v=001"></script>
+  <script src="assets/js/reader.js?v=003" defer></script>
+  <script type="module" src="assets/js/reader-community.js?v=002"></script>
 </body>
 </html>
