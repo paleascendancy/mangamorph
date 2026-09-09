@@ -1,4 +1,4 @@
-const catalog = [
+let catalog = [
   {id:1,title:"Neon Ronin",genre:"Ação",type:"Mangá",chapter:127,accent:"#3a4162",reads:986400,favorites:48210,newness:72},
   {id:2,title:"Astral Bloom",genre:"Fantasia",type:"Manhwa",chapter:91,accent:"#523b64",reads:941300,favorites:51740,newness:60},
   {id:3,title:"Zero District",genre:"Mistério",type:"Manhua",chapter:68,accent:"#294b52",reads:889700,favorites:39420,newness:48},
@@ -267,6 +267,7 @@ function toggleFavorite(id) {
   if (state.favorites.has(id)) state.favorites.delete(id);
   else state.favorites.add(id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(state.favorites)));
+  window.dispatchEvent(new CustomEvent("mangamorph:library-change",{detail:{mangaId:id,favorite:state.favorites.has(id)}}));
   renderCatalogs();
   if (accountFavoritesCount) accountFavoritesCount.textContent = String(state.favorites.size);
 }
@@ -772,6 +773,16 @@ const savedTheme = localStorage.getItem("mangamorph:theme") || "dark";
 applyTheme(savedTheme);
 applyFilter(state.filter);
 applyNotifications(state.notifications);
+
+window.addEventListener("mangamorph:catalog-loaded",function(event){
+  if(!Array.isArray(event.detail)||!event.detail.length)return;
+  catalog=event.detail;
+  state.totalPages=Math.max(1,Math.ceil(catalog.length/state.pageSize));
+  state.currentPage=Math.min(state.currentPage,state.totalPages);
+  renderCatalogs();
+  renderReleases();
+  if(!searchPanel.hidden)renderSearch(searchInput.value||"");
+});
 
 const initialQuery = new URLSearchParams(location.search).get("q");
 if (initialQuery) {
