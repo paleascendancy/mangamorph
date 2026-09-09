@@ -343,8 +343,7 @@ document.querySelector("#relatedGrid").addEventListener("keydown", function(even
 const tabs = Array.from(document.querySelectorAll(".manga-tab"));
 const panels = {
   chapters: document.querySelector("#panelChapters"),
-  related: document.querySelector("#panelRelated"),
-  comments: document.querySelector("#panelComments")
+  related: document.querySelector("#panelRelated")
 };
 
 function setTab(name) {
