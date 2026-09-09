@@ -363,10 +363,9 @@ function getReadingList() {
 
 function saveProfile(profile) {
   state.profile = profile;
-  state.profileSession = true;
   localStorage.setItem("mangamorph:profile", JSON.stringify(profile));
-  localStorage.setItem("mangamorph:profile-session","on");
   renderProfileUI();
+  window.dispatchEvent(new CustomEvent("mangamorph:profile-save",{detail:profile}));
 }
 
 function renderProfileUI() {
@@ -396,7 +395,7 @@ function renderProfileUI() {
     accountProfileInitials.hidden = false;
     accountGuestAvatar.hidden = true;
     accountProfileAvatar.style.setProperty("--profile-accent",profile.accent || "#5b8def");
-    accountSessionBadge.innerHTML = "<span></span> Local";
+    accountSessionBadge.innerHTML = "<span></span> Online";
     accountSessionBadge.classList.add("online");
 
     headerProfileInitials.textContent = initials;
@@ -639,28 +638,19 @@ accountHistory.addEventListener("click", function(){
 });
 accountRegister.addEventListener("click", function(){
   closeAccount();
-  openProfileEditor("create");
+  window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"register"}}));
 });
 accountLogin.addEventListener("click", function(){
-  if (state.profile) {
-    state.profileSession = true;
-    localStorage.setItem("mangamorph:profile-session","on");
-    renderProfileUI();
-    accountAuthMessage.textContent = "Perfil local conectado neste dispositivo.";
-    accountAuthMessage.hidden = false;
-  } else {
-    closeAccount();
-    openProfileEditor("create");
-  }
+  closeAccount();
+  window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"login"}}));
 });
 accountLogout.addEventListener("click", function(){
-  state.profileSession = false;
-  localStorage.setItem("mangamorph:profile-session","off");
-  renderProfileUI();
+  window.dispatchEvent(new CustomEvent("mangamorph:sign-out"));
 });
 accountProfile.addEventListener("click", function(){
   closeAccount();
-  openProfileEditor(state.profile ? "edit" : "create");
+  if (state.profileSession) openProfileEditor("edit");
+  else window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"login"}}));
 });
 accountReadingList.addEventListener("click", function(){
   closeAccount();
@@ -696,7 +686,7 @@ profileForm.addEventListener("submit", function(event){
   const username = sanitizeUsername(profileUsernameInput.value);
   if (!name || username.length < 3) {
     accountAuthMessage.textContent = "Use um nome e um @usuário com pelo menos 3 caracteres.";
-    accountAuthMessage.textContent = "Confira o nome e o usuário.";
+    accountAuthMessage.hidden = false;
     return;
   }
   saveProfile({
@@ -708,8 +698,27 @@ profileForm.addEventListener("submit", function(event){
   });
   closeProfileEditor();
   openAccount();
-  accountAuthMessage.textContent = "Perfil salvo neste dispositivo.";
+  accountAuthMessage.textContent = state.profileSession ? "Perfil atualizado." : "Perfil salvo localmente.";
   accountAuthMessage.hidden = false;
+});
+
+window.addEventListener("mangamorph:auth-state", function(event){
+  const detail = event.detail || {};
+  state.profileSession = Boolean(detail.session);
+  localStorage.setItem("mangamorph:profile-session", state.profileSession ? "on" : "off");
+
+  if (detail.profile) {
+    state.profile = detail.profile;
+    localStorage.setItem("mangamorph:profile", JSON.stringify(detail.profile));
+  }
+
+  renderProfileUI();
+});
+
+window.addEventListener("mangamorph:auth-message", function(event){
+  const detail = event.detail || {};
+  accountAuthMessage.textContent = detail.message || "";
+  accountAuthMessage.hidden = !detail.message;
 });
 
 menuToggle.addEventListener("click", openSideMenu);
