@@ -14,7 +14,7 @@
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=032">
-  <link rel="stylesheet" href="assets/css/settings.css?v=001">
+  <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
 <body>
@@ -266,11 +266,27 @@
           <span class="settings-row-copy"><strong>Filtrar por tipo</strong><span>Escolha o tipo de obra exibido</span></span>
           <span class="settings-row-end"><span id="filterValue">Padrão</span><span class="settings-chevron">›</span></span>
         </button>
-        <div class="settings-submenu" id="filterMenu" hidden>
-          <button class="settings-option active" type="button" data-filter="Padrão">Padrão — Todas as obras</button>
-          <button class="settings-option" type="button" data-filter="Mangá">Mangá — Japão</button>
-          <button class="settings-option" type="button" data-filter="Manhwa">Manhwa — Coreia</button>
-          <button class="settings-option" type="button" data-filter="Manhua">Manhua — China</button>
+        <div class="settings-submenu type-filter-menu" id="filterMenu" hidden>
+          <button class="settings-option settings-type-option active" type="button" data-filter="Padrão">
+            <span class="settings-type-flag settings-type-globe" aria-hidden="true">◉</span>
+            <span class="settings-type-copy"><strong>Padrão</strong><small>Todas as obras</small></span>
+            <span class="settings-type-radio" aria-hidden="true"></span>
+          </button>
+          <button class="settings-option settings-type-option" type="button" data-filter="Mangá">
+            <span class="settings-type-flag" aria-hidden="true">🇯🇵</span>
+            <span class="settings-type-copy"><strong>Mangá</strong><small>Japão</small></span>
+            <span class="settings-type-radio" aria-hidden="true"></span>
+          </button>
+          <button class="settings-option settings-type-option" type="button" data-filter="Manhwa">
+            <span class="settings-type-flag" aria-hidden="true">🇰🇷</span>
+            <span class="settings-type-copy"><strong>Manhwa</strong><small>Coreia</small></span>
+            <span class="settings-type-radio" aria-hidden="true"></span>
+          </button>
+          <button class="settings-option settings-type-option" type="button" data-filter="Manhua">
+            <span class="settings-type-flag" aria-hidden="true">🇨🇳</span>
+            <span class="settings-type-copy"><strong>Manhua</strong><small>China</small></span>
+            <span class="settings-type-radio" aria-hidden="true"></span>
+          </button>
         </div>
 
         <button class="settings-row" id="notificationToggle" type="button" aria-pressed="false">
