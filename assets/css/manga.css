@@ -1722,3 +1722,13 @@ body.light #ratingSaveButton{
     min-width:0;
   }
 }
+
+
+/* Ratings stay on manga profile v10 */
+.ratings-only-section .reaction-section,
+.ratings-only-section .comments-panel{
+  display:none !important;
+}
+.ratings-only-section{
+  margin-bottom:1.2rem;
+}
