@@ -7,8 +7,8 @@
   <meta name="description" content="Leitor de capítulos do MangaMorph.">
   <title>MangaMorph — Leitor</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=038">
-  <link rel="stylesheet" href="assets/css/reader.css?v=001">
+  <link rel="stylesheet" href="assets/css/style.css?v=041">
+  <link rel="stylesheet" href="assets/css/reader.css?v=002">
 </head>
 <body class="reader-body">
   <header class="reader-header" id="readerHeader">
@@ -42,6 +42,56 @@
         <button type="button" id="finishNext">Próximo →</button>
       </div>
     </div>
+
+    <section class="chapter-community" id="chapterCommunity">
+      <div class="chapter-community-head">
+        <div>
+          <span>COMUNIDADE DO CAPÍTULO</span>
+          <h2 id="chapterCommunityTitle">Capítulo 127</h2>
+          <p>Reaja ao capítulo e converse com outros leitores.</p>
+        </div>
+        <small id="chapterReactionTotal">0 reações</small>
+      </div>
+
+      <div class="chapter-reactions" id="chapterReactionButtons">
+        <button type="button" data-reaction="love"><span>❤️</span><strong>Amei</strong><small>0</small></button>
+        <button type="button" data-reaction="fire"><span>🔥</span><strong>Insano</strong><small>0</small></button>
+        <button type="button" data-reaction="wow"><span>😮</span><strong>Surpresa</strong><small>0</small></button>
+        <button type="button" data-reaction="funny"><span>😂</span><strong>Engraçado</strong><small>0</small></button>
+        <button type="button" data-reaction="emotional"><span>🥹</span><strong>Emocionante</strong><small>0</small></button>
+        <button type="button" data-reaction="favorite"><span>⭐</span><strong>Favorito</strong><small>0</small></button>
+      </div>
+
+      <div class="chapter-comments">
+        <div class="chapter-comments-head">
+          <div>
+            <strong>Comentários</strong>
+            <span id="chapterCommentCount">0 comentários</span>
+          </div>
+          <p>Seu perfil e sua foto aparecem junto da mensagem.</p>
+        </div>
+
+        <form class="chapter-comment-composer" id="chapterCommentForm">
+          <div class="chapter-comment-avatar" id="chapterCommentAvatar">
+            <img id="chapterCommentImage" alt="" hidden>
+            <span id="chapterCommentInitials">?</span>
+          </div>
+          <div class="chapter-comment-input">
+            <label id="chapterCommentLabel" for="chapterCommentText">Entre para comentar</label>
+            <textarea id="chapterCommentText" maxlength="280" rows="3" placeholder="O que você achou deste capítulo?" disabled></textarea>
+            <div><span id="chapterCommentChars">0/280</span><span id="chapterCommentMeta">Conta MangaMorph</span></div>
+          </div>
+          <button type="submit" id="chapterCommentSubmit">Entrar</button>
+        </form>
+
+        <div class="chapter-comment-list" id="chapterCommentList"></div>
+        <div class="chapter-comment-empty" id="chapterCommentEmpty">
+          <span>◌</span>
+          <strong>Nenhum comentário neste capítulo</strong>
+          <p>Seja a primeira pessoa a comentar.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <nav class="reader-bottom-bar" aria-label="Controles do leitor">
@@ -98,6 +148,7 @@
 
   <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/js/reader.js?v=001" defer></script>
+  <script src="assets/js/reader.js?v=002" defer></script>
+  <script type="module" src="assets/js/reader-community.js?v=001"></script>
 </body>
 </html>
