@@ -119,9 +119,9 @@ function renderRail(element, items, moreType, moreLabel) {
 
 function renderCatalogs() {
   const filtered = getFilteredCatalog();
-  renderRail(popularRail, [...filtered].sort(function(a,b){return b.reads-a.reads;}).slice(0,10), "reads", "mais lidos");
-  renderRail(favoriteRail, [...filtered].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10), "favorites", "mais favoritados");
-  renderRail(newRail, [...filtered].sort(function(a,b){return b.newness-a.newness;}).slice(0,10), "newness", "novas obras");
+  renderRail(popularRail, [...filtered].sort(function(a,b){return b.reads-a.reads;}).slice(0,13), "reads", "mais lidos");
+  renderRail(favoriteRail, [...filtered].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,13), "favorites", "mais favoritados");
+  renderRail(newRail, [...filtered].sort(function(a,b){return b.newness-a.newness;}).slice(0,13), "newness", "novas obras");
 }
 
 function rankingRow(item, index, type) {
