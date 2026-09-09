@@ -147,16 +147,17 @@ function updateProgress(){
 }
 window.addEventListener("scroll",updateProgress,{passive:true});
 
-const savedReaderTheme = localStorage.getItem("mangamorph:reader-theme") || "dark";
-if(savedReaderTheme === "light"){
-  document.body.classList.add("light-reader");
-  readerThemeLabel.textContent = "Claro";
-}
+const savedReaderTheme = localStorage.getItem("mangamorph:theme") || localStorage.getItem("mangamorph:reader-theme") || "dark";
+document.body.classList.toggle("light-reader",savedReaderTheme === "light");
+readerThemeLabel.textContent = savedReaderTheme === "light" ? "Claro" : "Escuro";
+
 document.querySelector("#readerThemeToggle").addEventListener("click",function(){
   document.body.classList.toggle("light-reader");
   const light = document.body.classList.contains("light-reader");
-  localStorage.setItem("mangamorph:reader-theme",light?"light":"dark");
-  readerThemeLabel.textContent = light?"Claro":"Escuro";
+  const value = light ? "light" : "dark";
+  localStorage.setItem("mangamorph:theme",value);
+  localStorage.setItem("mangamorph:reader-theme",value);
+  readerThemeLabel.textContent = light ? "Claro" : "Escuro";
 });
 
 let controlsVisible = localStorage.getItem("mangamorph:reader-controls") !== "hidden";
