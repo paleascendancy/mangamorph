@@ -58,8 +58,6 @@ const sideMenuSettings = document.querySelector("#sideMenuSettings");
 const accountPanel = document.querySelector("#accountPanel");
 const accountToggle = document.querySelector("#accountToggle");
 const accountClose = document.querySelector("#accountClose");
-const accountThemeName = document.querySelector("#accountThemeName");
-const accountThemeRow = document.querySelector("#accountThemeRow");
 const accountFavorites = document.querySelector("#accountFavorites");
 const accountHistory = document.querySelector("#accountHistory");
 const accountFavoritesCount = document.querySelector("#accountFavoritesCount");
@@ -273,8 +271,6 @@ function closeSideMenu() {
 }
 
 function updateAccountPanel() {
-  accountThemeName.textContent = document.body.classList.contains("light") ? "Escuro" : "Escuro";
-  accountThemeName.textContent = document.body.classList.contains("light") ? "Claro" : "Escuro";
   accountFavoritesCount.textContent = String(state.favorites.size);
   accountHistoryCount.textContent = String(state.history.length);
 }
@@ -316,7 +312,6 @@ function applyTheme(theme) {
   document.querySelectorAll("[data-theme]").forEach(function(button){
     button.classList.toggle("active", button.dataset.theme === theme);
   });
-  if (accountThemeName) accountThemeName.textContent = theme === "light" ? "Claro" : "Escuro";
 }
 
 function applyLanguage(language) {
@@ -463,11 +458,6 @@ accountHistory.addEventListener("click", function(){
     button.classList.toggle("active", button.dataset.searchFilter === "Todos");
   });
   openSearch("history");
-});
-accountThemeRow.addEventListener("click", function(){
-  closeAccount();
-  openSettings();
-  toggleSettingsSection("theme");
 });
 [accountLogin, accountRegister].forEach(function(button){
   button.addEventListener("click", function(){
