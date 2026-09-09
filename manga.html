@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=017">
-  <link rel="stylesheet" href="assets/css/manga.css?v=003">
+  <link rel="stylesheet" href="assets/css/manga.css?v=004">
 </head>
 <body>
   <header class="topbar">
@@ -95,10 +95,8 @@
         <span id="chapterCount"></span>
       </div>
 
-      <div class="chapter-sort" role="group" aria-label="Ordenar capítulos">
-        <span>Ordenar</span>
-        <button class="sort-button active" id="sortDesc" type="button" aria-pressed="true">Decrescente ↓</button>
-        <button class="sort-button" id="sortAsc" type="button" aria-pressed="false">Crescente ↑</button>
+      <div class="chapter-sort">
+        <button class="sort-button active" id="sortToggle" type="button" aria-label="Alternar ordem dos capítulos" aria-pressed="true">Decrescente ↓</button>
       </div>
 
       <div class="chapter-list" id="chapterList"></div>
@@ -110,6 +108,6 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=003" defer></script>
+  <script src="assets/js/manga.js?v=004" defer></script>
 </body>
 </html>
