@@ -1216,3 +1216,115 @@ body.light .comment-actions button{
     display:none;
   }
 }
+
+
+/* Authenticated comments v8 */
+.comment-avatar,
+.comment-avatar.small{
+  position:relative;
+  overflow:hidden;
+  flex:0 0 auto;
+}
+.comment-avatar img,
+.comment-avatar.small img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.comment-avatar img[hidden],
+.comment-avatar.small img[hidden]{
+  display:none;
+}
+.comment-avatar span,
+.comment-avatar.small span{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+}
+.composer-avatar{
+  --avatar-accent:#5b8def;
+  background:
+    radial-gradient(circle at 32% 18%,rgba(255,255,255,.14),transparent 28%),
+    linear-gradient(145deg,var(--avatar-accent),#121b27);
+  color:#fff;
+}
+.comment-item{
+  position:relative;
+}
+.comment-avatar.small{
+  --avatar-accent:#5b8def;
+  background:
+    radial-gradient(circle at 32% 18%,rgba(255,255,255,.12),transparent 28%),
+    linear-gradient(145deg,var(--avatar-accent),#131c28);
+  color:#fff;
+  box-shadow:0 0 0 1px rgba(255,255,255,.04);
+}
+.comment-topline{
+  justify-content:flex-start;
+}
+.comment-author{
+  display:flex;
+  align-items:center;
+  gap:.34rem;
+  min-width:0;
+}
+.comment-author strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.comment-handle{
+  color:#7188aa !important;
+  font-size:.49rem !important;
+}
+.comment-you-badge{
+  padding:.12rem .3rem;
+  border:1px solid rgba(91,143,225,.13);
+  border-radius:999px;
+  background:rgba(63,111,190,.08);
+  color:#8eb8f0 !important;
+  font-size:.43rem !important;
+  font-weight:760;
+}
+.comment-composer.is-guest textarea{
+  cursor:not-allowed;
+  opacity:.64;
+}
+.comment-composer.is-guest>button{
+  background:#182231;
+  color:#a9c5eb;
+}
+.comment-composer-status{
+  color:#6f8098;
+}
+.comment-actions button[disabled]{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.comment-loading{
+  padding:1rem;
+  color:#718096;
+  font-size:.58rem;
+  text-align:center;
+}
+.comment-error{
+  margin-top:.7rem;
+  padding:.7rem;
+  border:1px solid rgba(225,102,118,.12);
+  border-radius:.7rem;
+  background:rgba(225,102,118,.05);
+  color:#e79aa6;
+  font-size:.58rem;
+  text-align:center;
+}
+@media(max-width:760px){
+  .comment-author{
+    flex-wrap:wrap;
+    gap:.2rem .3rem;
+  }
+  .comment-handle{
+    flex-basis:100%;
+  }
+}
