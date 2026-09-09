@@ -8,7 +8,7 @@
   <title>MangaMorph — Leitor</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=041">
-  <link rel="stylesheet" href="assets/css/reader.css?v=005">
+  <link rel="stylesheet" href="assets/css/reader.css?v=006">
 </head>
 <body class="reader-body">
   <header class="reader-header" id="readerHeader">
@@ -70,7 +70,10 @@
             <strong>Comentários</strong>
             <span id="chapterCommentCount">0 comentários</span>
           </div>
-          <p>Seu perfil e sua foto aparecem junto da mensagem.</p>
+          <select id="chapterCommentSort" aria-label="Ordenar comentários">
+            <option value="recent">Recentes</option>
+            <option value="top">Mais votados</option>
+          </select>
         </div>
 
         <form class="chapter-comment-composer" id="chapterCommentForm">
@@ -153,6 +156,6 @@
   <script src="assets/js/reader.js?v=005" defer></script>
   <script type="module" src="assets/js/reader-runtime.js?v=001"></script>
   <script type="module" src="assets/js/account-sync.js?v=001"></script>
-  <script type="module" src="assets/js/reader-community.js?v=002"></script>
+  <script type="module" src="assets/js/reader-community.js?v=003"></script>
 </body>
 </html>
