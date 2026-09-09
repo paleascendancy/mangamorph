@@ -316,7 +316,7 @@ function renderSearch(query) {
   }
   if (searchGenre !== "Todos") source = source.filter(function(item){ return item.genre === searchGenre; });
   const matches = normalized ? source.filter(function(item){
-    return (item.title + " " + item.genre).toLowerCase().includes(normalized);
+    return ([item.title,item.genre,item.type,item.author,item.artist,item.status,item.country].concat(item.tags||[]).join(" ")).toLowerCase().includes(normalized);
   }) : source.slice(0,8);
 
   searchCount.textContent = matches.length + (matches.length === 1 ? " obra" : " obras");
