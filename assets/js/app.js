@@ -298,6 +298,9 @@ function renderSearch(query) {
     source = source.filter(function(item){ return state.favorites.has(item.id); });
   } else if (searchMode === "history") {
     source = state.history.map(function(id){ return catalog.find(function(item){ return item.id === id; }); }).filter(Boolean);
+  } else if (searchMode === "reading-list") {
+    const readingIds = new Set(getReadingList());
+    source = source.filter(function(item){ return readingIds.has(item.id); });
   }
   if (searchGenre !== "Todos") source = source.filter(function(item){ return item.genre === searchGenre; });
   const matches = normalized ? source.filter(function(item){
@@ -663,21 +666,12 @@ accountReadingList.addEventListener("click", function(){
   closeAccount();
   searchInput.value = "";
   searchGenre = "Todos";
-  searchMode = "all";
-  const readingIds = new Set(getReadingList());
+  searchMode = "reading-list";
   searchPanel.hidden = false;
   document.body.style.overflow = "hidden";
   document.querySelector("#searchTitle").textContent = "Minha lista";
   document.querySelector(".search-subtitle").textContent = "Obras que você salvou para acompanhar.";
-  const items = catalog.filter(function(item){ return readingIds.has(item.id); });
-  searchCount.textContent = items.length + (items.length === 1 ? " obra" : " obras");
-  searchResults.innerHTML = items.length ? items.map(function(item){
-    return '<article class="search-result-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
-      '<div class="search-result-thumb" style="--accent:' + item.accent + '"></div>' +
-      '<div class="search-result-copy"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
-      '<span class="search-result-arrow">›</span>' +
-    '</article>';
-  }).join("") : '<div class="search-empty">Sua lista ainda está vazia.</div>';
+  renderSearch("");
 });
 profileClose.addEventListener("click", closeProfileEditor);
 profileCancel.addEventListener("click", closeProfileEditor);
@@ -702,7 +696,7 @@ profileForm.addEventListener("submit", function(event){
   const username = sanitizeUsername(profileUsernameInput.value);
   if (!name || username.length < 3) {
     accountAuthMessage.textContent = "Use um nome e um @usuário com pelo menos 3 caracteres.";
-    showToast && showToast("Confira o nome e o usuário.");
+    accountAuthMessage.textContent = "Confira o nome e o usuário.";
     return;
   }
   saveProfile({
