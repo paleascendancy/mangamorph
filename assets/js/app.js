@@ -23,7 +23,9 @@ const state = {
   favorites: new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]")),
   filter: localStorage.getItem("mangamorph:filter") || "Padrão",
   notifications: localStorage.getItem("mangamorph:notifications") === "on",
-  history: JSON.parse(localStorage.getItem("mangamorph:history") || "[]")
+  history: JSON.parse(localStorage.getItem("mangamorph:history") || "[]"),
+  profile: JSON.parse(localStorage.getItem("mangamorph:profile") || "null"),
+  profileSession: localStorage.getItem("mangamorph:profile-session") === "on"
 };
 
 if (!["Padrão","Mangá","Manhwa","Manhua"].includes(state.filter)) {
@@ -71,6 +73,39 @@ const accountHistoryCount = document.querySelector("#accountHistoryCount");
 const accountLogin = document.querySelector("#accountLogin");
 const accountRegister = document.querySelector("#accountRegister");
 const accountAuthMessage = document.querySelector("#accountAuthMessage");
+const accountProfile = document.querySelector("#accountProfile");
+const accountReadingList = document.querySelector("#accountReadingList");
+const accountReadingListCount = document.querySelector("#accountReadingListCount");
+const accountLogout = document.querySelector("#accountLogout");
+const accountAuthActions = document.querySelector("#accountAuthActions");
+const accountProfileName = document.querySelector("#accountProfileName");
+const accountProfileHandle = document.querySelector("#accountProfileHandle");
+const accountProfileBio = document.querySelector("#accountProfileBio");
+const accountProfileAvatar = document.querySelector("#accountProfileAvatar");
+const accountProfileInitials = document.querySelector("#accountProfileInitials");
+const accountGuestAvatar = document.querySelector("#accountGuestAvatar");
+const accountSessionBadge = document.querySelector("#accountSessionBadge");
+const accountProfileStats = document.querySelector("#accountProfileStats");
+const profileStatFavorites = document.querySelector("#profileStatFavorites");
+const profileStatHistory = document.querySelector("#profileStatHistory");
+const profileStatList = document.querySelector("#profileStatList");
+const headerProfileInitials = document.querySelector("#headerProfileInitials");
+const headerGuestIcon = document.querySelector("#headerGuestIcon");
+
+const profilePanel = document.querySelector("#profilePanel");
+const profileClose = document.querySelector("#profileClose");
+const profileCancel = document.querySelector("#profileCancel");
+const profileForm = document.querySelector("#profileForm");
+const profileTitle = document.querySelector("#profileTitle");
+const profileNameInput = document.querySelector("#profileNameInput");
+const profileUsernameInput = document.querySelector("#profileUsernameInput");
+const profileBioInput = document.querySelector("#profileBioInput");
+const profileBioCount = document.querySelector("#profileBioCount");
+const profilePreviewAvatar = document.querySelector("#profilePreviewAvatar");
+const profilePreviewName = document.querySelector("#profilePreviewName");
+const profilePreviewHandle = document.querySelector("#profilePreviewHandle");
+const profilePreviewBio = document.querySelector("#profilePreviewBio");
+let profileAccent = (state.profile && state.profile.accent) || "#5b8def";
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -305,9 +340,117 @@ function toggleTitlesMenu() {
   titlesMenuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
 }
 
-function updateAccountPanel() {
+function sanitizeUsername(value) {
+  return value.toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
+}
+
+function profileInitials(name) {
+  const parts = String(name || "Manga Morph").trim().split(/\s+/).filter(Boolean);
+  return (parts.slice(0,2).map(function(part){ return part[0]; }).join("") || "MM").toUpperCase();
+}
+
+function getReadingList() {
+  try {
+    const value = JSON.parse(localStorage.getItem("mangamorph:marked") || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveProfile(profile) {
+  state.profile = profile;
+  state.profileSession = true;
+  localStorage.setItem("mangamorph:profile", JSON.stringify(profile));
+  localStorage.setItem("mangamorph:profile-session","on");
+  renderProfileUI();
+}
+
+function renderProfileUI() {
+  const profile = state.profile;
+  const active = Boolean(profile && state.profileSession);
+  const readingList = getReadingList();
+
+  accountAuthActions.hidden = active;
+  accountLogout.hidden = !active;
+  accountProfileStats.hidden = !active;
+  accountAuthMessage.hidden = true;
+
   accountFavoritesCount.textContent = String(state.favorites.size);
   accountHistoryCount.textContent = String(state.history.length);
+  accountReadingListCount.textContent = String(readingList.length);
+  profileStatFavorites.textContent = String(state.favorites.size);
+  profileStatHistory.textContent = String(state.history.length);
+  profileStatList.textContent = String(readingList.length);
+
+  if (active) {
+    const initials = profileInitials(profile.name);
+    accountProfileName.textContent = profile.name;
+    accountProfileHandle.textContent = "@" + profile.username;
+    accountProfileHandle.hidden = false;
+    accountProfileBio.textContent = profile.bio || "Leitor do MangaMorph.";
+    accountProfileInitials.textContent = initials;
+    accountProfileInitials.hidden = false;
+    accountGuestAvatar.hidden = true;
+    accountProfileAvatar.style.setProperty("--profile-accent",profile.accent || "#5b8def");
+    accountSessionBadge.innerHTML = "<span></span> Local";
+    accountSessionBadge.classList.add("online");
+
+    headerProfileInitials.textContent = initials;
+    headerProfileInitials.hidden = false;
+    headerGuestIcon.hidden = true;
+    accountToggle.style.setProperty("--profile-accent",profile.accent || "#5b8def");
+  } else {
+    accountProfileName.textContent = "Convidado";
+    accountProfileHandle.hidden = true;
+    accountProfileBio.textContent = profile ? "Seu perfil está salvo neste dispositivo. Entre para continuar." : "Crie um perfil para organizar sua biblioteca pessoal.";
+    accountProfileInitials.hidden = true;
+    accountGuestAvatar.hidden = false;
+    accountProfileAvatar.style.removeProperty("--profile-accent");
+    accountSessionBadge.innerHTML = "<span></span> Offline";
+    accountSessionBadge.classList.remove("online");
+
+    headerProfileInitials.hidden = true;
+    headerGuestIcon.hidden = false;
+    accountToggle.style.removeProperty("--profile-accent");
+  }
+}
+
+function updateProfilePreview() {
+  const name = profileNameInput.value.trim() || "Seu nome";
+  const username = sanitizeUsername(profileUsernameInput.value) || "usuario";
+  const bio = profileBioInput.value.trim() || "Sua bio aparecerá aqui.";
+  profilePreviewAvatar.textContent = profileInitials(name);
+  profilePreviewAvatar.style.setProperty("--profile-accent",profileAccent);
+  profilePreviewName.textContent = name;
+  profilePreviewHandle.textContent = "@" + username;
+  profilePreviewBio.textContent = bio;
+  profileBioCount.textContent = profileBioInput.value.length + "/120";
+}
+
+function openProfileEditor(mode) {
+  const existing = state.profile;
+  profileTitle.textContent = existing ? "Editar perfil" : "Criar perfil";
+  profileNameInput.value = existing ? existing.name : "";
+  profileUsernameInput.value = existing ? existing.username : "";
+  profileBioInput.value = existing ? (existing.bio || "") : "";
+  profileAccent = existing ? (existing.accent || "#5b8def") : "#5b8def";
+  document.querySelectorAll("[data-profile-accent]").forEach(function(button){
+    button.classList.toggle("active",button.dataset.profileAccent === profileAccent);
+  });
+  updateProfilePreview();
+  profilePanel.hidden = false;
+  document.body.style.overflow = "hidden";
+  setTimeout(function(){ profileNameInput.focus(); },0);
+}
+
+function closeProfileEditor() {
+  profilePanel.hidden = true;
+  document.body.style.overflow = "";
+}
+
+function updateAccountPanel() {
+  renderProfileUI();
 }
 
 function openAccount() {
@@ -440,6 +583,7 @@ document.addEventListener("click", function(event) {
   if (event.target.matches("[data-close-ranking]")) closeRanking();
   if (event.target.matches("[data-close-settings]")) closeSettings();
   if (event.target.matches("[data-close-account]")) closeAccount();
+  if (event.target.matches("[data-close-profile]")) closeProfileEditor();
   if (event.target.closest("[data-close-menu]")) closeSideMenu();
 });
 
@@ -450,7 +594,8 @@ document.addEventListener("keydown", function(event) {
     return;
   }
 
-  if (event.key === "Escape" && !accountPanel.hidden) closeAccount();
+  if (event.key === "Escape" && !profilePanel.hidden) closeProfileEditor();
+  else if (event.key === "Escape" && !accountPanel.hidden) closeAccount();
   else if (event.key === "Escape" && !sideMenu.hidden) closeSideMenu();
   else if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
   else if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
@@ -489,11 +634,90 @@ accountHistory.addEventListener("click", function(){
   });
   openSearch("history");
 });
-[accountLogin, accountRegister].forEach(function(button){
-  button.addEventListener("click", function(){
+accountRegister.addEventListener("click", function(){
+  closeAccount();
+  openProfileEditor("create");
+});
+accountLogin.addEventListener("click", function(){
+  if (state.profile) {
+    state.profileSession = true;
+    localStorage.setItem("mangamorph:profile-session","on");
+    renderProfileUI();
+    accountAuthMessage.textContent = "Perfil local conectado neste dispositivo.";
     accountAuthMessage.hidden = false;
+  } else {
+    closeAccount();
+    openProfileEditor("create");
+  }
+});
+accountLogout.addEventListener("click", function(){
+  state.profileSession = false;
+  localStorage.setItem("mangamorph:profile-session","off");
+  renderProfileUI();
+});
+accountProfile.addEventListener("click", function(){
+  closeAccount();
+  openProfileEditor(state.profile ? "edit" : "create");
+});
+accountReadingList.addEventListener("click", function(){
+  closeAccount();
+  searchInput.value = "";
+  searchGenre = "Todos";
+  searchMode = "all";
+  const readingIds = new Set(getReadingList());
+  searchPanel.hidden = false;
+  document.body.style.overflow = "hidden";
+  document.querySelector("#searchTitle").textContent = "Minha lista";
+  document.querySelector(".search-subtitle").textContent = "Obras que você salvou para acompanhar.";
+  const items = catalog.filter(function(item){ return readingIds.has(item.id); });
+  searchCount.textContent = items.length + (items.length === 1 ? " obra" : " obras");
+  searchResults.innerHTML = items.length ? items.map(function(item){
+    return '<article class="search-result-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
+      '<div class="search-result-thumb" style="--accent:' + item.accent + '"></div>' +
+      '<div class="search-result-copy"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
+      '<span class="search-result-arrow">›</span>' +
+    '</article>';
+  }).join("") : '<div class="search-empty">Sua lista ainda está vazia.</div>';
+});
+profileClose.addEventListener("click", closeProfileEditor);
+profileCancel.addEventListener("click", closeProfileEditor);
+profileNameInput.addEventListener("input", updateProfilePreview);
+profileUsernameInput.addEventListener("input", function(){
+  const clean = sanitizeUsername(profileUsernameInput.value);
+  if (profileUsernameInput.value !== clean) profileUsernameInput.value = clean;
+  updateProfilePreview();
+});
+profileBioInput.addEventListener("input", updateProfilePreview);
+document.querySelectorAll("[data-profile-accent]").forEach(function(button){
+  button.addEventListener("click", function(){
+    profileAccent = button.dataset.profileAccent;
+    document.querySelectorAll("[data-profile-accent]").forEach(function(item){ item.classList.remove("active"); });
+    button.classList.add("active");
+    updateProfilePreview();
   });
 });
+profileForm.addEventListener("submit", function(event){
+  event.preventDefault();
+  const name = profileNameInput.value.trim();
+  const username = sanitizeUsername(profileUsernameInput.value);
+  if (!name || username.length < 3) {
+    accountAuthMessage.textContent = "Use um nome e um @usuário com pelo menos 3 caracteres.";
+    showToast && showToast("Confira o nome e o usuário.");
+    return;
+  }
+  saveProfile({
+    name:name.slice(0,32),
+    username:username,
+    bio:profileBioInput.value.trim().slice(0,120),
+    accent:profileAccent,
+    createdAt:(state.profile && state.profile.createdAt) || Date.now()
+  });
+  closeProfileEditor();
+  openAccount();
+  accountAuthMessage.textContent = "Perfil salvo neste dispositivo.";
+  accountAuthMessage.hidden = false;
+});
+
 menuToggle.addEventListener("click", openSideMenu);
 titlesMenuToggle.addEventListener("click", toggleTitlesMenu);
 sideMenuSettings.addEventListener("click", function(){
@@ -517,6 +741,7 @@ if (initialQuery) {
 
 renderCatalogs();
 renderReleases();
+renderProfileUI();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function(){
