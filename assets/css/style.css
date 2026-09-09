@@ -407,3 +407,10 @@
     font-size:1.72rem;
   }
 }
+
+/* Header account action */
+.account-button{border-radius:50%;background:linear-gradient(180deg,#17202d,#111821);}
+.account-button svg{width:1.55rem;height:1.55rem;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.account-button:hover{border-color:rgba(255,255,255,.22);background:#182130;}
+body.light .account-button{background:#fff;color:#11151d;border-color:rgba(0,0,0,.09);}
+@media(max-width:620px){.account-button svg{width:1.45rem;height:1.45rem}}
