@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=036">
+  <link rel="stylesheet" href="assets/css/style.css?v=037">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -356,15 +356,28 @@
 
   <div class="ranking-panel" id="rankingPanel" hidden>
     <div class="ranking-backdrop" data-close-ranking></div>
-    <section class="ranking-dialog" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
-      <div class="ranking-top">
+    <section class="ranking-dialog premium-ranking-dialog" role="dialog" aria-modal="true" aria-labelledby="rankingTitle">
+      <div class="ranking-top premium-ranking-top">
         <div>
-          <p class="eyebrow">RANKING COMPLETO</p>
+          <p class="eyebrow">RANKINGS</p>
           <h2 id="rankingTitle">Mais lidos</h2>
+          <p class="ranking-subtitle">Compare os destaques do catálogo sem sair desta tela.</p>
         </div>
-        <button class="icon-button" id="rankingClose" aria-label="Fechar ranking">×</button>
+        <button class="ranking-close-premium" id="rankingClose" aria-label="Fechar ranking">×</button>
       </div>
-      <div class="ranking-list" id="rankingList"></div>
+
+      <div class="ranking-tabs" role="tablist" aria-label="Tipos de ranking">
+        <button class="ranking-tab" type="button" role="tab" data-ranking-tab="favorites">Favoritadas</button>
+        <button class="ranking-tab active" type="button" role="tab" data-ranking-tab="reads">Mais lidas</button>
+        <button class="ranking-tab" type="button" role="tab" data-ranking-tab="newness">Novas obras</button>
+      </div>
+
+      <div class="ranking-toolbar">
+        <span>Classificação</span>
+        <span id="rankingFilterLabel">Padrão</span>
+      </div>
+
+      <div class="ranking-list premium-ranking-list" id="rankingList"></div>
     </section>
   </div>
 
@@ -377,6 +390,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=029" defer></script>
+  <script src="assets/js/app.js?v=030" defer></script>
 </body>
 </html>
