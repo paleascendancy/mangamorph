@@ -52,7 +52,6 @@ const settingsPanel = document.querySelector("#settingsPanel");
 const settingsClose = document.querySelector("#settingsClose");
 const settingsToggle = document.querySelector("#settingsToggle");
 const themeValue = document.querySelector("#themeValue");
-const languageValue = document.querySelector("#languageValue");
 const filterValue = document.querySelector("#filterValue");
 const notificationToggle = document.querySelector("#notificationToggle");
 const notificationSwitch = document.querySelector("#notificationSwitch");
@@ -318,15 +317,6 @@ function applyTheme(theme) {
   });
 }
 
-function applyLanguage(language) {
-  localStorage.setItem("mangamorph:language", language);
-  languageValue.textContent = language === "en" ? "English" : "Português";
-  document.documentElement.lang = language === "en" ? "en" : "pt-BR";
-  document.querySelectorAll("[data-language]").forEach(function(button){
-    button.classList.toggle("active", button.dataset.language === language);
-  });
-}
-
 function applyFilter(filter) {
   state.filter = filter;
   state.currentPage = 1;
@@ -375,12 +365,6 @@ document.addEventListener("click", function(event) {
   const themeButton = event.target.closest("[data-theme]");
   if (themeButton) {
     applyTheme(themeButton.dataset.theme);
-    return;
-  }
-
-  const languageButton = event.target.closest("[data-language]");
-  if (languageButton) {
-    applyLanguage(languageButton.dataset.language);
     return;
   }
 
@@ -477,9 +461,7 @@ settingsClose.addEventListener("click", closeSettings);
 notificationToggle.addEventListener("click", function(){ applyNotifications(!state.notifications); });
 
 const savedTheme = localStorage.getItem("mangamorph:theme") || "dark";
-const savedLanguage = localStorage.getItem("mangamorph:language") || "pt-BR";
 applyTheme(savedTheme);
-applyLanguage(savedLanguage);
 applyFilter(state.filter);
 applyNotifications(state.notifications);
 
