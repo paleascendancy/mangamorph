@@ -31,6 +31,23 @@ function baseRedirect(){
   return url.href;
 }
 
+function safeReturnTarget(value){
+  if (!value) return "";
+  try {
+    const decoded = decodeURIComponent(value);
+    if (/^(manga|reader)\.html(?:[?#].*)?$/.test(decoded)) return decoded;
+  } catch {}
+  return "";
+}
+
+function finishAuthDestination(){
+  const target = safeReturnTarget(localStorage.getItem("mangamorph:auth-return"));
+  if (!target) return false;
+  localStorage.removeItem("mangamorph:auth-return");
+  location.href = target;
+  return true;
+}
+
 function normalizeUsername(value){
   return String(value || "").toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
 }
@@ -172,6 +189,7 @@ loginForm.addEventListener("submit",async event => {
   if (error) return setMessage(loginMessage,mapError(error),true);
   await publishSession(data.session);
   closePanels();
+  if (finishAuthDestination()) return;
   window.dispatchEvent(new CustomEvent("mangamorph:auth-complete"));
   window.dispatchEvent(new CustomEvent("mangamorph:auth-message",{detail:{message:"Login realizado com sucesso."}}));
 });
@@ -211,6 +229,7 @@ registerForm.addEventListener("submit",async event => {
     await publishSession(data.session);
     localStorage.removeItem("mangamorph:open-profile-after-auth");
     closePanels();
+    if (finishAuthDestination()) return;
     window.dispatchEvent(new CustomEvent("mangamorph:auth-complete"));
     window.dispatchEvent(new CustomEvent("mangamorph:auth-message",{detail:{message:"Conta criada. Bem-vindo ao seu perfil."}}));
   } else {
@@ -371,6 +390,7 @@ supabase.auth.onAuthStateChange((event,session) => {
       if (session && localStorage.getItem("mangamorph:open-profile-after-auth") === "1") {
         localStorage.removeItem("mangamorph:open-profile-after-auth");
         closePanels();
+        if (finishAuthDestination()) return;
         window.dispatchEvent(new CustomEvent("mangamorph:auth-complete"));
       }
     },0);
@@ -386,3 +406,10 @@ document.addEventListener("keydown",event => {
 const { data:{session} } = await supabase.auth.getSession();
 await publishSession(session);
 if (new URLSearchParams(location.search).get("reset") === "1" && session) openLogin("recovery");
+
+
+const authParams = new URLSearchParams(location.search);
+const requestedReturn = safeReturnTarget(authParams.get("return"));
+if (requestedReturn) localStorage.setItem("mangamorph:auth-return", requestedReturn);
+if (authParams.get("auth") === "login") openLogin();
+if (authParams.get("auth") === "register") openRegister();
