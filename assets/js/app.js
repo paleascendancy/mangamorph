@@ -118,13 +118,15 @@ function renderCatalogs() {
   const filtered = getFilteredCatalog();
   renderRail(popularRail, [...filtered].sort(function(a,b){return b.reads-a.reads;}).slice(0,10), "reads", "mais lidos");
   renderRail(favoriteRail, [...filtered].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10), "favorites", "mais favoritados");
-  renderRail(newRail, [...filtered].sort(function(a,b){return b.newness-a.newness;}).slice(0,10));
+  renderRail(newRail, [...filtered].sort(function(a,b){return b.newness-a.newness;}).slice(0,10), "newness", "novas obras");
 }
 
 function rankingRow(item, index, type) {
   const value = type === "reads"
     ? formatNumber(item.reads) + " leituras"
-    : formatNumber(item.favorites) + " favoritos";
+    : type === "favorites"
+      ? formatNumber(item.favorites) + " favoritos"
+      : "Nova no catálogo";
 
   return '<article class="ranking-row" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
     '<span class="ranking-position">' + (index + 1) + '</span>' +
@@ -135,12 +137,17 @@ function rankingRow(item, index, type) {
 }
 
 function openRanking(type) {
-  const byReads = type === "reads";
   const items = [...getFilteredCatalog()].sort(function(a,b){
-    return byReads ? b.reads - a.reads : b.favorites - a.favorites;
+    if (type === "reads") return b.reads - a.reads;
+    if (type === "favorites") return b.favorites - a.favorites;
+    return b.newness - a.newness;
   });
 
-  rankingTitle.textContent = byReads ? "Ranking dos mais lidos" : "Ranking dos mais favoritados";
+  rankingTitle.textContent = type === "reads"
+    ? "Ranking dos mais lidos"
+    : type === "favorites"
+      ? "Ranking dos mais favoritados"
+      : "Ranking de novas obras";
   rankingList.innerHTML = items.map(function(item,index){ return rankingRow(item,index,type); }).join("");
   rankingPanel.hidden = false;
   document.body.style.overflow = "hidden";
