@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="Detalhes da obra no MangaMorph.">
+  <title>MangaMorph — Detalhes</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/style.css?v=016">
+  <link rel="stylesheet" href="assets/css/manga.css?v=001">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="MangaMorph — voltar ao início">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-name">Manga<span>Morph</span></span>
+    </a>
+    <div class="topbar-actions">
+      <button class="icon-button" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
+    </div>
+  </header>
+
+  <main class="manga-page" id="mangaPage">
+    <a class="back-link" href="./">← Voltar</a>
+
+    <section class="manga-detail">
+      <div class="detail-cover" id="detailCover">
+        <span class="detail-cover-kicker">MANGAMORPH</span>
+        <strong id="coverTitle">NEON<br>RONIN</strong>
+        <small>OBRA</small>
+      </div>
+
+      <div class="detail-content">
+        <p class="eyebrow">DETALHES DA OBRA</p>
+        <h1 id="mangaTitle">Neon Ronin</h1>
+        <div class="detail-meta">
+          <span id="mangaRating">★ 9,2</span>
+          <span id="mangaReads">◉ 986 mil leituras</span>
+          <span id="mangaFavorites">☆ 48,2 mil favoritos</span>
+        </div>
+        <div class="detail-tags" id="mangaTags"></div>
+        <p class="detail-description" id="mangaDescription"></p>
+
+        <div class="detail-actions">
+          <a class="button button-primary" id="readLatest" href="#chapters"><span aria-hidden="true">▶</span> Ler agora</a>
+          <button class="button button-secondary" id="favoriteDetail" type="button">☆ Favoritar</button>
+        </div>
+
+        <dl class="detail-facts">
+          <div><dt>Status</dt><dd>Em lançamento</dd></div>
+          <div><dt>Ano</dt><dd>2026</dd></div>
+          <div><dt>Último capítulo</dt><dd id="latestChapter">127</dd></div>
+          <div><dt>Idioma</dt><dd>Português</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="chapters-section" id="chapters">
+      <div class="chapters-heading">
+        <div>
+          <p class="eyebrow">CAPÍTULOS</p>
+          <h2>Capítulos recentes</h2>
+        </div>
+        <span id="chapterCount"></span>
+      </div>
+      <div class="chapter-list" id="chapterList"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div><strong>MangaMorph</strong><span>v0.1</span></div>
+    <p>Página de obra demonstrativa.</p>
+  </footer>
+
+  <script src="assets/js/manga.js?v=001" defer></script>
+</body>
+</html>
