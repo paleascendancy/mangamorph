@@ -1204,3 +1204,33 @@ body.reader-body{
     font-size:.5rem;
   }
 }
+
+
+/* Real chapter pages v1 */
+.reader-real-page{
+  width:100%;
+  margin:0;
+  background:#05070b;
+}
+.reader-real-page img{
+  display:block;
+  width:min(100%,920px);
+  height:auto;
+  margin:0 auto;
+  background:#05070b;
+}
+.light-reader .reader-real-page,
+.light-reader .reader-real-page img{
+  background:#eef1f5;
+}
+.reader-bottom-bar button:disabled,
+.reader-finish-actions button:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+}
+@media(max-width:760px){
+  .reader-real-page img{
+    width:100vw;
+    max-width:100vw;
+  }
+}
