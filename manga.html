@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=038">
-  <link rel="stylesheet" href="assets/css/manga.css?v=009">
+  <link rel="stylesheet" href="assets/css/manga.css?v=010">
 </head>
 <body>
   <header class="topbar manga-topbar">
@@ -78,16 +78,21 @@
 
         <div class="status-picker">
           <button class="status-inline-button" id="statusButton" type="button" aria-expanded="false">
-            <span class="status-inline-dot"></span>
-            <span>Status de leitura</span>
-            <strong id="statusLabel">Escolher</strong>
-            <span class="status-chevron">›</span>
+            <span class="status-leading">
+              <span class="status-inline-dot"></span>
+              <span>Status de leitura</span>
+            </span>
+            <span class="status-current">
+              <strong id="statusLabel">Escolher</strong>
+              <span class="status-current-dot" aria-hidden="true"></span>
+            </span>
+            <span class="status-chevron" aria-hidden="true">⌄</span>
           </button>
           <div class="status-menu" id="statusMenu" hidden>
-            <button type="button" data-status="Quero ler">Quero ler</button>
-            <button type="button" data-status="Lendo">Lendo</button>
-            <button type="button" data-status="Concluído">Concluído</button>
-            <button type="button" data-status="Pausado">Pausado</button>
+            <button type="button" data-status="Quero ler"><span>Quero ler</span><i></i></button>
+            <button type="button" data-status="Lendo"><span>Lendo</span><i></i></button>
+            <button type="button" data-status="Concluído"><span>Concluído</span><i></i></button>
+            <button type="button" data-status="Pausado"><span>Pausado</span><i></i></button>
           </div>
         </div>
       </div>
@@ -170,6 +175,6 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=007" defer></script>
+  <script src="assets/js/manga.js?v=008" defer></script>
 </body>
 </html>
