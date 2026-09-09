@@ -2967,3 +2967,201 @@ body.light .ranking-tab.active{
     text-overflow:ellipsis;
   }
 }
+
+
+/* Premium latest chapters feed */
+.releases-section{
+  background:
+    radial-gradient(circle at 92% 4%,rgba(52,94,166,.055),transparent 20%),
+    #0a0e14;
+}
+.releases-heading{
+  margin-bottom:.9rem;
+}
+.releases-heading h2{
+  font-size:clamp(1.8rem,4vw,3rem);
+  font-weight:760;
+  letter-spacing:-.045em;
+}
+.releases-heading .section-description{
+  max-width:32rem;
+  color:#78869a;
+  font-size:.82rem;
+}
+.page-indicator{
+  padding:.32rem .55rem;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:999px;
+  background:rgba(255,255,255,.018);
+  color:#7e8ba0;
+  font-size:.62rem;
+  font-weight:700;
+}
+.release-list{
+  gap:.42rem;
+}
+.premium-release-row{
+  grid-template-columns:44px minmax(0,1fr) auto auto;
+  gap:.72rem;
+  min-height:4.25rem;
+  padding:.52rem .62rem;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:.88rem;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.018),transparent 50%),
+    #0f151e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+  cursor:pointer;
+  transition:transform .15s ease,border-color .15s ease,background .15s ease;
+}
+.premium-release-row:hover{
+  transform:translateY(-1px);
+  border-color:rgba(95,139,208,.11);
+  background:#111924;
+}
+.premium-release-thumb{
+  width:44px;
+  border-radius:.55rem;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 5px 12px rgba(0,0,0,.16);
+}
+.premium-release-copy strong{
+  font-size:.8rem;
+  font-weight:720;
+  letter-spacing:-.015em;
+}
+.release-meta{
+  display:flex !important;
+  align-items:center;
+  gap:.42rem;
+  margin-top:.1rem;
+  color:#6e7b8e !important;
+  font-size:.58rem !important;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.release-meta span{
+  flex:0 0 auto;
+}
+.premium-release-chapter{
+  min-height:1.8rem;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 .62rem;
+  border:1px solid rgba(90,134,204,.11);
+  border-radius:.6rem;
+  background:#121c29;
+  color:#a8bad3;
+  font-size:.66rem;
+  font-weight:740;
+}
+.release-open-arrow{
+  display:grid;
+  place-items:center;
+  width:1.8rem;
+  height:1.8rem;
+  color:#6f8fbd;
+  font-size:1.12rem;
+  transition:transform .15s ease,color .15s ease;
+}
+.premium-release-row:hover .release-open-arrow{
+  transform:translateX(2px);
+  color:#a5c6f5;
+}
+.pagination-wrap{
+  gap:.5rem;
+  margin-top:1.35rem;
+}
+.pagination button,
+.pagination-arrow{
+  min-width:2.35rem;
+  height:2.35rem;
+  border-radius:.7rem;
+  border-color:rgba(255,255,255,.06);
+  background:#101720;
+  color:#7d899a;
+  font-size:.7rem;
+}
+.pagination button.active{
+  background:#e9eef5;
+  color:#111721;
+  box-shadow:0 7px 18px rgba(0,0,0,.18);
+}
+body.light .releases-section{
+  background:#e8edf3;
+}
+body.light .premium-release-row{
+  background:#fff;
+  border-color:rgba(0,0,0,.055);
+}
+body.light .premium-release-row:hover{
+  background:#f9fbfd;
+  border-color:rgba(39,77,135,.1);
+}
+body.light .premium-release-chapter{
+  background:#f2f5f9;
+  color:#43516a;
+  border-color:rgba(0,0,0,.06);
+}
+body.light .release-meta{
+  color:#758194 !important;
+}
+@media(max-width:620px){
+  .releases-section{
+    padding-top:2.4rem;
+    padding-bottom:2.4rem;
+  }
+  .releases-heading{
+    gap:.65rem;
+    align-items:flex-start;
+  }
+  .releases-heading h2{
+    font-size:1.75rem;
+    max-width:13ch;
+  }
+  .page-indicator{
+    margin-top:.08rem;
+    white-space:nowrap;
+  }
+  .premium-release-row{
+    grid-template-columns:38px minmax(0,1fr) auto auto;
+    gap:.55rem;
+    min-height:3.8rem;
+    padding:.46rem .52rem;
+    border-radius:.78rem;
+  }
+  .premium-release-thumb{
+    width:38px;
+  }
+  .premium-release-copy strong{
+    font-size:.75rem;
+  }
+  .release-meta{
+    gap:.32rem;
+    font-size:.54rem !important;
+  }
+  .release-meta span:nth-child(2){
+    display:none;
+  }
+  .premium-release-chapter{
+    min-height:1.65rem;
+    padding:0 .48rem;
+    font-size:.59rem;
+    border-radius:.52rem;
+  }
+  .release-open-arrow{
+    width:1.35rem;
+    font-size:1rem;
+  }
+  .pagination-wrap{
+    margin-top:1rem;
+  }
+  .pagination button,
+  .pagination-arrow{
+    min-width:2.15rem;
+    height:2.15rem;
+    font-size:.65rem;
+  }
+}
