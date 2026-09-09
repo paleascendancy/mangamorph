@@ -217,3 +217,57 @@
     font-size:.82rem;
   }
 }
+
+/* Slightly larger premium hero */
+.hero-feature{
+  min-height:clamp(495px,61svh,650px);
+}
+.featured-cover{
+  width:min(220px,55vw);
+}
+.featured-content h1{
+  font-size:clamp(2.35rem,5.2vw,4.55rem);
+}
+
+@media(max-width:620px){
+  .hero-feature{
+    grid-template-columns:124px minmax(0,1fr);
+    padding:1.45rem 1rem 1.7rem;
+    gap:1rem;
+  }
+  .featured-cover{
+    width:124px;
+    padding:.66rem;
+  }
+  .featured-cover-kicker{
+    top:.56rem;
+    left:.56rem;
+    font-size:.4rem;
+  }
+  .featured-cover strong{
+    font-size:1.34rem;
+  }
+  .featured-cover small{
+    font-size:.57rem;
+  }
+  .featured-content h1{
+    font-size:clamp(1.8rem,7.7vw,2.45rem);
+  }
+  .featured-meta{
+    font-size:.76rem;
+    gap:.56rem;
+    margin-top:.52rem;
+  }
+  .featured-description{
+    font-size:.84rem;
+    margin-top:.6rem;
+  }
+  .featured-actions{
+    margin-top:.72rem;
+    gap:.5rem;
+  }
+  .featured-actions .button{
+    min-height:2.5rem;
+    font-size:.76rem;
+  }
+}
