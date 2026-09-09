@@ -196,3 +196,12 @@ window.addEventListener("storage",function(event){
   document.body.classList.toggle("light-reader",light);
   readerThemeLabel.textContent = light ? "Claro" : "Escuro";
 });
+
+
+window.addEventListener("mangamorph:library-loaded",function(event){
+  const rows=event.detail?.progress||[];
+  const current=rows.find(row=>Number(row.manga_id)===manga.id&&Number(row.chapter_number)===chapter);
+  if(!current||!current.page_number)return;
+  const target=document.querySelector('[data-reader-page="'+Number(current.page_number)+'"]');
+  if(target)target.scrollIntoView({block:"start"});
+});
