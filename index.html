@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — catálogos e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=013">
+  <link rel="stylesheet" href="assets/css/style.css?v=014">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
 <body>
@@ -39,17 +39,40 @@
   </header>
 
   <main id="conteudo">
-    <section class="hero" id="inicio">
-      <div class="hero-copy">
-        <p class="eyebrow">MANGAMORPH · CATÁLOGOS</p>
-        <h1>Pelos catálogos <span>principais.</span></h1>
-        <p class="hero-description">Encontre rapidamente o que está em alta, o que os leitores mais favoritam, novas obras e os capítulos que acabaram de sair.</p>
-        <a class="button button-primary" href="#populares">Ver catálogos</a>
+    <section class="hero-feature" id="inicio" aria-labelledby="featuredTitle">
+      <div class="featured-cover-wrap">
+        <div class="featured-cover" aria-hidden="true">
+          <span class="featured-cover-kicker">MANGAMORPH ORIGINAL</span>
+          <strong>NEON<br>RONIN</strong>
+          <small>VOL. 01</small>
+        </div>
       </div>
-      <div class="hero-stats" aria-label="Resumo da página">
-        <div><strong>03</strong><span>catálogos principais</span></div>
-        <div><strong>30</strong><span>capítulos por página</span></div>
-        <div><strong>05</strong><span>páginas de lançamentos</span></div>
+
+      <div class="featured-content">
+        <p class="eyebrow">DESTAQUE</p>
+        <h1 id="featuredTitle">Neon Ronin</h1>
+
+        <div class="featured-meta" aria-label="Informações da obra">
+          <span>★ 9,2</span>
+          <span>☆ 48,2 mil</span>
+          <span>◷ 2026</span>
+        </div>
+
+        <p class="featured-description">
+          Em uma metrópole dividida entre tecnologia e antigas tradições, um jovem espadachim descobre uma rede capaz de alterar memórias e precisa decidir em quem confiar.
+        </p>
+
+        <div class="featured-actions">
+          <a class="button button-primary read-now" href="#recentes"><span aria-hidden="true">▶</span> Ler agora</a>
+          <button class="button button-secondary" id="featuredDetails" type="button">Mais detalhes</button>
+        </div>
+
+        <div class="featured-extra" id="featuredExtra" hidden>
+          <span>Ação</span>
+          <span>Ficção científica</span>
+          <span>Em lançamento</span>
+          <span>Cap. 127</span>
+        </div>
       </div>
     </section>
 
@@ -133,6 +156,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=012" defer></script>
+  <script src="assets/js/app.js?v=013" defer></script>
 </body>
 </html>
