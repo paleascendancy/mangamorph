@@ -44,6 +44,17 @@ if(manga){
     const read=$("#readLatest");read.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();location.href="reader.html?id="+id+"&chapter="+latest},true);
   }
 
+  const {data:{session}}=await db.auth.getSession();
+  if(session?.user){
+    const {data:progress}=await db.from("mangamorph_reading_progress").select("chapter_number,page_number,progress_percent").eq("user_id",session.user.id).eq("manga_id",id).maybeSingle();
+    if(progress?.chapter_number){
+      const read=$("#readLatest");
+      const targetChapter=Number(progress.chapter_number);
+      $("#readLatestLabel").textContent="Continuar capítulo "+targetChapter;
+      read.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();location.href="reader.html?id="+id+"&chapter="+targetChapter},true);
+    }
+  }
+
   const related=(catalog||[]).filter(x=>Number(x.id)!==id).slice(0,8);
   $("#relatedCount").textContent=related.length+" recomendações";
   $("#relatedGrid").innerHTML=related.map((r,index)=>'<article class="related-card related-card-premium" data-related="'+r.id+'" tabindex="0" role="link"><div class="related-cover" style="--accent:'+(r.accent||"#3a4162")+';'+(r.cover_url?'background-image:linear-gradient(180deg,transparent,rgba(4,7,12,.8)),url('+r.cover_url+');background-size:cover;background-position:center;':'')+'"><span class="related-rank">#'+String(index+1).padStart(2,"0")+'</span><span class="related-open">↗</span><strong class="related-cover-title">'+esc(r.title)+'</strong></div><div class="related-info"><strong>'+esc(r.title)+'</strong><span>'+flag(r.country,r.type)+' '+esc(r.type)+' · '+esc((r.genres||[])[0]||"Outros")+'</span><small><span>Cap. '+(Number(r.latest_chapter)||"—")+'</span><span>★ '+(Number(r.average_rating)||0).toFixed(1).replace(".",",")+'</span></small></div></article>').join("");
