@@ -1,13 +1,13 @@
-const CACHE = "mangamorph-v0.4.9";
+const CACHE = "mangamorph-v0.5.0";
 const ASSETS = [
   "./",
   "./index.html",
   "./manga.html",
   "./assets/css/style.css?v=038",
   "./assets/css/settings.css?v=002",
-  "./assets/css/manga.css?v=006",
+  "./assets/css/manga.css?v=007",
   "./assets/js/app.js?v=032",
-  "./assets/js/manga.js?v=005",
+  "./assets/js/manga.js?v=006",
   "./manifest.webmanifest"
 ];
 
