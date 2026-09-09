@@ -116,29 +116,65 @@ const statusButton = document.querySelector("#statusButton");
 const statusMenu = document.querySelector("#statusMenu");
 const statusLabel = document.querySelector("#statusLabel");
 const statusKey = "mangamorph:status:" + manga.id;
-const savedStatus = localStorage.getItem(statusKey);
-if (savedStatus) statusLabel.textContent = savedStatus;
 
-statusButton.addEventListener("click", function() {
-  const open = statusMenu.hidden;
-  statusMenu.hidden = !open;
-  statusButton.setAttribute("aria-expanded", open ? "true" : "false");
+function positionStatusMenu() {
+  const rect = statusButton.getBoundingClientRect();
+  const width = Math.min(rect.width, 320);
+  statusMenu.style.width = width + "px";
+  statusMenu.style.left = Math.max(10, Math.min(window.innerWidth - width - 10, rect.right - width)) + "px";
+  statusMenu.style.top = Math.min(window.innerHeight - statusMenu.offsetHeight - 10, rect.bottom + 8) + "px";
+}
+
+function renderStatus(value) {
+  statusLabel.textContent = value || "Escolher";
+  statusButton.classList.toggle("has-status", Boolean(value));
+  statusMenu.querySelectorAll("[data-status]").forEach(function(option) {
+    const active = option.dataset.status === value;
+    option.classList.toggle("active", active);
+    option.setAttribute("aria-checked", active ? "true" : "false");
+  });
+}
+
+function closeStatusMenu() {
+  statusMenu.hidden = true;
+  statusButton.setAttribute("aria-expanded","false");
+}
+
+const savedStatus = localStorage.getItem(statusKey);
+renderStatus(savedStatus);
+
+statusButton.addEventListener("click", function(event) {
+  event.stopPropagation();
+  const willOpen = statusMenu.hidden;
+  if (willOpen) {
+    statusMenu.hidden = false;
+    statusButton.setAttribute("aria-expanded","true");
+    requestAnimationFrame(positionStatusMenu);
+  } else {
+    closeStatusMenu();
+  }
 });
+
 statusMenu.addEventListener("click", function(event) {
+  event.stopPropagation();
   const option = event.target.closest("[data-status]");
   if (!option) return;
   const value = option.dataset.status;
   localStorage.setItem(statusKey, value);
-  statusLabel.textContent = value;
-  statusMenu.hidden = true;
-  statusButton.setAttribute("aria-expanded","false");
+  renderStatus(value);
+  closeStatusMenu();
 });
+
 document.addEventListener("click", function(event) {
-  if (!event.target.closest(".status-picker")) {
-    statusMenu.hidden = true;
-    statusButton.setAttribute("aria-expanded","false");
-  }
+  if (!event.target.closest(".status-picker") && !event.target.closest("#statusMenu")) closeStatusMenu();
 });
+
+window.addEventListener("resize", function() {
+  if (!statusMenu.hidden) positionStatusMenu();
+});
+window.addEventListener("scroll", function() {
+  if (!statusMenu.hidden) closeStatusMenu();
+}, {passive:true});
 
 const toggleDescription = document.querySelector("#toggleDescription");
 const description = document.querySelector("#mangaDescription");
