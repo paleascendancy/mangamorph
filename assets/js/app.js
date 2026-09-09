@@ -20,7 +20,9 @@ const state = {
   currentPage: 1,
   pageSize: 30,
   totalPages: 5,
-  favorites: new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]"))
+  favorites: new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]")),
+  filter: localStorage.getItem("mangamorph:filter") || "Todos",
+  notifications: localStorage.getItem("mangamorph:notifications") === "on"
 };
 
 const popularRail = document.querySelector("#popularRail");
@@ -38,6 +40,14 @@ const rankingPanel = document.querySelector("#rankingPanel");
 const rankingTitle = document.querySelector("#rankingTitle");
 const rankingList = document.querySelector("#rankingList");
 const rankingClose = document.querySelector("#rankingClose");
+const settingsPanel = document.querySelector("#settingsPanel");
+const settingsClose = document.querySelector("#settingsClose");
+const settingsToggle = document.querySelector("#settingsToggle");
+const themeValue = document.querySelector("#themeValue");
+const languageValue = document.querySelector("#languageValue");
+const filterValue = document.querySelector("#filterValue");
+const notificationToggle = document.querySelector("#notificationToggle");
+const notificationSwitch = document.querySelector("#notificationSwitch");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -45,6 +55,11 @@ function formatNumber(value) {
 
 function openManga(id) {
   location.href = "manga.html?id=" + id;
+}
+
+function getFilteredCatalog() {
+  if (state.filter === "Todos") return catalog;
+  return catalog.filter(function(item){ return item.genre === state.filter; });
 }
 
 function cardTemplate(item, rank) {
@@ -73,13 +88,14 @@ function seeMoreTemplate(type, label) {
 
 function renderRail(element, items, moreType, moreLabel) {
   const cards = items.map(function(item,index){ return cardTemplate(item,index+1); }).join("");
-  element.innerHTML = cards + (moreType ? seeMoreTemplate(moreType, moreLabel) : "");
+  element.innerHTML = cards + (moreType && items.length ? seeMoreTemplate(moreType, moreLabel) : "");
 }
 
 function renderCatalogs() {
-  renderRail(popularRail, [...catalog].sort(function(a,b){return b.reads-a.reads;}).slice(0,10), "reads", "mais lidos");
-  renderRail(favoriteRail, [...catalog].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10), "favorites", "mais favoritados");
-  renderRail(newRail, [...catalog].sort(function(a,b){return b.newness-a.newness;}).slice(0,10));
+  const filtered = getFilteredCatalog();
+  renderRail(popularRail, [...filtered].sort(function(a,b){return b.reads-a.reads;}).slice(0,10), "reads", "mais lidos");
+  renderRail(favoriteRail, [...filtered].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10), "favorites", "mais favoritados");
+  renderRail(newRail, [...filtered].sort(function(a,b){return b.newness-a.newness;}).slice(0,10));
 }
 
 function rankingRow(item, index, type) {
@@ -97,7 +113,7 @@ function rankingRow(item, index, type) {
 
 function openRanking(type) {
   const byReads = type === "reads";
-  const items = [...catalog].sort(function(a,b){
+  const items = [...getFilteredCatalog()].sort(function(a,b){
     return byReads ? b.reads - a.reads : b.favorites - a.favorites;
   });
 
@@ -134,8 +150,11 @@ function releaseTemplate(release) {
 }
 
 function renderReleases() {
+  const filteredReleases = state.filter === "Todos" ? releases : releases.filter(function(release){ return release.manga.genre === state.filter; });
+  state.totalPages = Math.max(1, Math.ceil(filteredReleases.length / state.pageSize));
+  if (state.currentPage > state.totalPages) state.currentPage = 1;
   const start = (state.currentPage - 1) * state.pageSize;
-  const pageItems = releases.slice(start, start + state.pageSize);
+  const pageItems = filteredReleases.slice(start, start + state.pageSize);
   releaseList.innerHTML = pageItems.map(releaseTemplate).join("");
   pageIndicator.textContent = "Página " + state.currentPage + " de " + state.totalPages;
   prevPage.disabled = state.currentPage === 1;
@@ -174,12 +193,69 @@ function closeSearch() {
 
 function renderSearch(query) {
   const normalized = query.trim().toLowerCase();
-  const matches = normalized ? catalog.filter(function(item){
+  const source = getFilteredCatalog();
+  const matches = normalized ? source.filter(function(item){
     return (item.title + " " + item.genre).toLowerCase().includes(normalized);
-  }) : catalog.slice(0,7);
+  }) : source.slice(0,7);
   searchResults.innerHTML = matches.length ? matches.map(function(item){
     return '<div class="search-result" data-manga="' + item.id + '" tabindex="0" role="link"><strong>' + item.title + '</strong><small>' + item.genre + ' · Capítulo ' + item.chapter + '</small></div>';
   }).join("") : '<div class="search-result">Nenhum resultado encontrado.</div>';
+}
+
+function openSettings() {
+  settingsPanel.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeSettings() {
+  settingsPanel.hidden = true;
+  document.body.style.overflow = "";
+  document.querySelectorAll(".settings-submenu").forEach(function(menu){ menu.hidden = true; });
+}
+
+function toggleSettingsSection(name) {
+  const target = document.querySelector("#" + name + "Menu");
+  if (!target) return;
+  const willOpen = target.hidden;
+  document.querySelectorAll(".settings-submenu").forEach(function(menu){ menu.hidden = true; });
+  target.hidden = !willOpen;
+}
+
+function applyTheme(theme) {
+  document.body.classList.toggle("light", theme === "light");
+  localStorage.setItem("mangamorph:theme", theme);
+  themeValue.textContent = theme === "light" ? "Claro" : "Escuro";
+  document.querySelectorAll("[data-theme]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.theme === theme);
+  });
+}
+
+function applyLanguage(language) {
+  localStorage.setItem("mangamorph:language", language);
+  languageValue.textContent = language === "en" ? "English" : "Português";
+  document.documentElement.lang = language === "en" ? "en" : "pt-BR";
+  document.querySelectorAll("[data-language]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.language === language);
+  });
+}
+
+function applyFilter(filter) {
+  state.filter = filter;
+  state.currentPage = 1;
+  localStorage.setItem("mangamorph:filter", filter);
+  filterValue.textContent = filter;
+  document.querySelectorAll("[data-filter]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.filter === filter);
+  });
+  renderCatalogs();
+  renderReleases();
+}
+
+function applyNotifications(enabled) {
+  state.notifications = enabled;
+  localStorage.setItem("mangamorph:notifications", enabled ? "on" : "off");
+  notificationToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+  notificationSwitch.classList.toggle("active", enabled);
 }
 
 document.addEventListener("click", function(event) {
@@ -202,6 +278,30 @@ document.addEventListener("click", function(event) {
     return;
   }
 
+  const sectionButton = event.target.closest("[data-settings-section]");
+  if (sectionButton) {
+    toggleSettingsSection(sectionButton.dataset.settingsSection);
+    return;
+  }
+
+  const themeButton = event.target.closest("[data-theme]");
+  if (themeButton) {
+    applyTheme(themeButton.dataset.theme);
+    return;
+  }
+
+  const languageButton = event.target.closest("[data-language]");
+  if (languageButton) {
+    applyLanguage(languageButton.dataset.language);
+    return;
+  }
+
+  const filterButton = event.target.closest("[data-filter]");
+  if (filterButton) {
+    applyFilter(filterButton.dataset.filter);
+    return;
+  }
+
   const mangaTarget = event.target.closest("[data-manga]");
   if (mangaTarget) {
     openManga(Number(mangaTarget.dataset.manga));
@@ -210,6 +310,7 @@ document.addEventListener("click", function(event) {
 
   if (event.target.matches("[data-close-search]")) closeSearch();
   if (event.target.matches("[data-close-ranking]")) closeRanking();
+  if (event.target.matches("[data-close-settings]")) closeSettings();
 });
 
 document.addEventListener("keydown", function(event) {
@@ -219,7 +320,8 @@ document.addEventListener("keydown", function(event) {
     return;
   }
 
-  if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
+  if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
+  else if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
   else if (event.key === "Escape" && !searchPanel.hidden) closeSearch();
 
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -234,14 +336,16 @@ nextPage.addEventListener("click", function(){ goToPage(state.currentPage + 1); 
 document.querySelector("#searchToggle").addEventListener("click", openSearch);
 document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
+settingsToggle.addEventListener("click", openSettings);
+settingsClose.addEventListener("click", closeSettings);
+notificationToggle.addEventListener("click", function(){ applyNotifications(!state.notifications); });
 
-const themeToggle = document.querySelector("#themeToggle");
-const savedTheme = localStorage.getItem("mangamorph:theme");
-if (savedTheme === "light") document.body.classList.add("light");
-themeToggle.addEventListener("click", function() {
-  document.body.classList.toggle("light");
-  localStorage.setItem("mangamorph:theme", document.body.classList.contains("light") ? "light" : "dark");
-});
+const savedTheme = localStorage.getItem("mangamorph:theme") || "dark";
+const savedLanguage = localStorage.getItem("mangamorph:language") || "pt-BR";
+applyTheme(savedTheme);
+applyLanguage(savedLanguage);
+applyFilter(state.filter);
+applyNotifications(state.notifications);
 
 const initialQuery = new URLSearchParams(location.search).get("q");
 if (initialQuery) {
