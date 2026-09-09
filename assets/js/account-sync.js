@@ -6,10 +6,11 @@ function arr(key){try{const v=JSON.parse(localStorage.getItem(key)||"[]");return
 
 async function init(){
   if(!session)return;
-  const [{data:works},{data:rows},{data:history}]=await Promise.all([
+  const [{data:works},{data:rows},{data:history},{data:progress}]=await Promise.all([
     db.from("mangamorph_mangas").select("id"),
     db.from("mangamorph_library").select("*").eq("user_id",session.user.id),
-    db.from("mangamorph_history").select("manga_id,last_opened_at").eq("user_id",session.user.id).order("last_opened_at",{ascending:false}).limit(30)
+    db.from("mangamorph_history").select("manga_id,last_opened_at").eq("user_id",session.user.id).order("last_opened_at",{ascending:false}).limit(30),
+    db.from("mangamorph_reading_progress").select("manga_id,chapter_number,page_number,progress_percent,last_read_at").eq("user_id",session.user.id)
   ]);
   valid=new Set((works||[]).map(x=>Number(x.id)));
   let library=rows||[];
@@ -28,8 +29,20 @@ async function init(){
     library.forEach(x=>{if(x.reading_status)localStorage.setItem("mangamorph:status:"+x.manga_id,x.reading_status)});
   }
 
-  if(history?.length)localStorage.setItem("mangamorph:history",JSON.stringify(history.map(x=>x.manga_id)));
-  window.dispatchEvent(new CustomEvent("mangamorph:library-loaded",{detail:{library,history:history||[]}}));
+  if(history?.length){
+    localStorage.setItem("mangamorph:history",JSON.stringify(history.map(x=>x.manga_id)));
+  }else{
+    const localHistory=arr("mangamorph:history").filter(id=>valid.has(id)).slice(0,30);
+    for(const id of localHistory){
+      await db.from("mangamorph_history").upsert({user_id:session.user.id,manga_id:id,last_opened_at:new Date().toISOString()},{onConflict:"user_id,manga_id"});
+    }
+  }
+  (progress||[]).forEach(row=>{
+    if(row.chapter_number&&row.page_number){
+      localStorage.setItem("mangamorph:reader:"+row.manga_id+":"+Number(row.chapter_number),String(row.page_number));
+    }
+  });
+  window.dispatchEvent(new CustomEvent("mangamorph:library-loaded",{detail:{library,history:history||[],progress:progress||[]}}));
 }
 
 window.addEventListener("mangamorph:library-change",async e=>{
