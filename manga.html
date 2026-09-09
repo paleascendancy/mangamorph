@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=017">
-  <link rel="stylesheet" href="assets/css/manga.css?v=004">
+  <link rel="stylesheet" href="assets/css/manga.css?v=005">
 </head>
 <body>
   <header class="topbar">
@@ -86,20 +86,48 @@
       <div><dt>Idioma</dt><dd>Português</dd></div>
     </dl>
 
-    <section class="chapters-section" id="chapters">
-      <div class="chapters-heading">
-        <div>
-          <p class="eyebrow">CAPÍTULOS</p>
-          <h2>Capítulos recentes</h2>
+    <nav class="manga-tabs" role="tablist" aria-label="Conteúdo da obra">
+      <button class="manga-tab active" id="tabChapters" role="tab" aria-selected="true" aria-controls="panelChapters" data-tab="chapters">Capítulos</button>
+      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários</button>
+      <button class="manga-tab" id="tabRelated" role="tab" aria-selected="false" aria-controls="panelRelated" data-tab="related">Relacionados</button>
+    </nav>
+
+    <section class="tab-panel active" id="panelChapters" role="tabpanel" aria-labelledby="tabChapters">
+      <div class="chapters-section" id="chapters">
+        <div class="chapters-heading">
+          <div>
+            <p class="eyebrow">CAPÍTULOS</p>
+            <h2>Capítulos recentes</h2>
+          </div>
+          <span id="chapterCount"></span>
         </div>
-        <span id="chapterCount"></span>
-      </div>
 
-      <div class="chapter-sort">
-        <button class="sort-button active" id="sortToggle" type="button" aria-label="Alternar ordem dos capítulos" aria-pressed="true">Decrescente ↓</button>
-      </div>
+        <div class="chapter-sort">
+          <button class="sort-button active" id="sortToggle" type="button" aria-label="Alternar ordem dos capítulos" aria-pressed="true">Decrescente ↓</button>
+        </div>
 
-      <div class="chapter-list" id="chapterList"></div>
+        <div class="chapter-list" id="chapterList"></div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panelComments" role="tabpanel" aria-labelledby="tabComments" hidden>
+      <div class="empty-panel">
+        <span class="empty-icon">💬</span>
+        <h2>Comentários</h2>
+        <p>A área de comentários está preparada para uma integração futura com contas e banco de dados.</p>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panelRelated" role="tabpanel" aria-labelledby="tabRelated" hidden>
+      <div class="related-section">
+        <div class="chapters-heading">
+          <div>
+            <p class="eyebrow">RELACIONADOS</p>
+            <h2>Você também pode gostar</h2>
+          </div>
+        </div>
+        <div class="related-grid" id="relatedGrid"></div>
+      </div>
     </section>
   </main>
 
@@ -108,6 +136,6 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=004" defer></script>
+  <script src="assets/js/manga.js?v=005" defer></script>
 </body>
 </html>
