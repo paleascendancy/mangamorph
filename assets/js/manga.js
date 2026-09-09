@@ -156,6 +156,60 @@ sortToggle.addEventListener("click", () => {
   renderChapters();
 });
 
+function openManga(targetId) {
+  location.href = "manga.html?id=" + targetId;
+}
+
+const related = catalog
+  .filter(item => item.id !== manga.id)
+  .sort((a,b) => {
+    const aScore = (a.genre === manga.genre ? 2 : 0) + a.tags.filter(tag => manga.tags.includes(tag)).length;
+    const bScore = (b.genre === manga.genre ? 2 : 0) + b.tags.filter(tag => manga.tags.includes(tag)).length;
+    return bScore - aScore || b.reads - a.reads;
+  })
+  .slice(0,6);
+
+document.querySelector("#relatedGrid").innerHTML = related.map(item => (
+  '<article class="related-card" data-related="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
+    '<div class="related-cover" style="--accent:' + item.accent + '"></div>' +
+    '<div class="related-info"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
+  '</article>'
+)).join("");
+
+document.querySelector("#relatedGrid").addEventListener("click", event => {
+  const card = event.target.closest("[data-related]");
+  if (card) openManga(Number(card.dataset.related));
+});
+
+document.querySelector("#relatedGrid").addEventListener("keydown", event => {
+  if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-related]")) {
+    event.preventDefault();
+    openManga(Number(event.target.dataset.related));
+  }
+});
+
+const tabs = [...document.querySelectorAll(".manga-tab")];
+const panels = {
+  chapters: document.querySelector("#panelChapters"),
+  comments: document.querySelector("#panelComments"),
+  related: document.querySelector("#panelRelated")
+};
+
+function setTab(name) {
+  tabs.forEach(tab => {
+    const active = tab.dataset.tab === name;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  Object.entries(panels).forEach(([key,panel]) => {
+    const active = key === name;
+    panel.hidden = !active;
+    panel.classList.toggle("active", active);
+  });
+}
+
+tabs.forEach(tab => tab.addEventListener("click", () => setTab(tab.dataset.tab)));
+
 renderSortButton();
 renderChapters();
 
