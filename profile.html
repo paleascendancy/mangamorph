@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0f17">
+  <meta name="description" content="Perfil público de leitor no MangaMorph.">
+  <title>MangaMorph — Perfil</title>
+  <link rel="stylesheet" href="assets/css/public-profile.css?v=001">
+</head>
+<body>
+  <header class="public-topbar">
+    <a href="index.html" class="public-brand">Manga<span>Morph</span></a>
+    <a href="index.html" class="public-back">← Catálogo</a>
+  </header>
+  <main class="public-profile-page">
+    <section class="public-profile-card" id="publicProfileCard">
+      <div class="public-avatar" id="publicAvatar"><img id="publicAvatarImage" alt="" hidden><span id="publicAvatarInitials">MM</span></div>
+      <div class="public-profile-copy">
+        <span class="public-kicker">PERFIL MANGAMORPH</span>
+        <h1 id="publicDisplayName">Carregando...</h1>
+        <strong id="publicUsername">@usuario</strong>
+        <p id="publicBio">Buscando perfil.</p>
+      </div>
+    </section>
+    <section class="public-stats">
+      <article><strong id="publicRatingCount">0</strong><span>Avaliações</span></article>
+      <article><strong id="publicCommentCount">0</strong><span>Comentários</span></article>
+      <article><strong id="publicReactionCount">0</strong><span>Reações</span></article>
+    </section>
+    <section class="public-section">
+      <div class="public-section-head"><div><span>ATIVIDADE PÚBLICA</span><h2>Avaliações recentes</h2></div></div>
+      <div class="public-activity" id="publicActivity"></div>
+    </section>
+    <div class="public-error" id="publicError" hidden>Este perfil não existe ou está privado.</div>
+  </main>
+  <script type="module" src="assets/js/public-profile.js?v=001"></script>
+</body>
+</html>
