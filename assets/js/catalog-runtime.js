@@ -15,7 +15,11 @@ if(data?.length){
     newness:Math.max(1,100-i),
     coverUrl:m.cover_url||null,
     description:m.synopsis||"",
-    tags:[...(m.genres||[]),...(m.tags||[])]
+    tags:[...(m.genres||[]),...(m.tags||[])],
+    author:m.author||"",
+    artist:m.artist||"",
+    status:m.publication_status||"",
+    country:m.country||""
   }));
   window.dispatchEvent(new CustomEvent("mangamorph:catalog-loaded",{detail:catalog}));
 }
