@@ -18,8 +18,11 @@ const catalog = [
 
 const params = new URLSearchParams(location.search);
 const mangaId = Number(params.get("id")) || 1;
-const manga = catalog.find(function(item){ return item.id === mangaId; }) || catalog[0];
-let chapter = Math.max(1, Math.min(Number(params.get("chapter")) || manga.chapter, manga.chapter));
+const requestedChapter = Math.max(1,Number(params.get("chapter")) || 1);
+const manga = catalog.find(function(item){ return item.id === mangaId; }) || {
+  id:mangaId,title:"Carregando...",chapter:requestedChapter,accent:"#3a4162"
+};
+let chapter = Math.max(1, Math.min(requestedChapter, manga.chapter));
 
 const readerTitle = document.querySelector("#readerTitle");
 const readerChapterLabel = document.querySelector("#readerChapterLabel");
