@@ -144,6 +144,7 @@ function updateProgress(){
   progressPercent.textContent = percent + "%";
   progressBar.style.width = percent + "%";
   localStorage.setItem("mangamorph:reader:" + manga.id + ":" + chapter, String(current));
+  window.dispatchEvent(new CustomEvent("mangamorph:progress",{detail:{mangaId:manga.id,chapterNumber:chapter,pageNumber:current,percent:percent}}));
 }
 window.addEventListener("scroll",updateProgress,{passive:true});
 
