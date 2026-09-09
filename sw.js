@@ -1,5 +1,5 @@
-const CACHE = "mangamorph-v0.1.4";
-const ASSETS = ["./", "./index.html", "./assets/css/style.css?v=014", "./assets/js/app.js?v=013", "./manifest.webmanifest"];
+const CACHE = "mangamorph-v0.1.5";
+const ASSETS = ["./", "./index.html", "./assets/css/style.css?v=015", "./assets/js/app.js?v=014", "./manifest.webmanifest"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
