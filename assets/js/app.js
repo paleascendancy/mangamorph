@@ -48,6 +48,9 @@ const languageValue = document.querySelector("#languageValue");
 const filterValue = document.querySelector("#filterValue");
 const notificationToggle = document.querySelector("#notificationToggle");
 const notificationSwitch = document.querySelector("#notificationSwitch");
+const sideMenu = document.querySelector("#sideMenu");
+const menuToggle = document.querySelector("#menuToggle");
+const sideMenuSettings = document.querySelector("#sideMenuSettings");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -202,6 +205,18 @@ function renderSearch(query) {
   }).join("") : '<div class="search-result">Nenhum resultado encontrado.</div>';
 }
 
+function openSideMenu() {
+  sideMenu.hidden = false;
+  menuToggle.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSideMenu() {
+  sideMenu.hidden = true;
+  menuToggle.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+}
+
 function openSettings() {
   settingsPanel.hidden = false;
   document.body.style.overflow = "hidden";
@@ -302,6 +317,14 @@ document.addEventListener("click", function(event) {
     return;
   }
 
+  const menuTarget = event.target.closest("[data-menu-target]");
+  if (menuTarget) {
+    const target = document.querySelector(menuTarget.dataset.menuTarget);
+    closeSideMenu();
+    if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    return;
+  }
+
   const mangaTarget = event.target.closest("[data-manga]");
   if (mangaTarget) {
     openManga(Number(mangaTarget.dataset.manga));
@@ -311,6 +334,7 @@ document.addEventListener("click", function(event) {
   if (event.target.matches("[data-close-search]")) closeSearch();
   if (event.target.matches("[data-close-ranking]")) closeRanking();
   if (event.target.matches("[data-close-settings]")) closeSettings();
+  if (event.target.closest("[data-close-menu]")) closeSideMenu();
 });
 
 document.addEventListener("keydown", function(event) {
@@ -320,7 +344,8 @@ document.addEventListener("keydown", function(event) {
     return;
   }
 
-  if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
+  if (event.key === "Escape" && !sideMenu.hidden) closeSideMenu();
+  else if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
   else if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
   else if (event.key === "Escape" && !searchPanel.hidden) closeSearch();
 
@@ -337,6 +362,11 @@ document.querySelector("#searchToggle").addEventListener("click", openSearch);
 document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
 settingsToggle.addEventListener("click", openSettings);
+menuToggle.addEventListener("click", openSideMenu);
+sideMenuSettings.addEventListener("click", function(){
+  closeSideMenu();
+  openSettings();
+});
 settingsClose.addEventListener("click", closeSettings);
 notificationToggle.addEventListener("click", function(){ applyNotifications(!state.notifications); });
 
