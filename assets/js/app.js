@@ -36,6 +36,8 @@ const nextPage = document.querySelector("#nextPage");
 const searchPanel = document.querySelector("#searchPanel");
 const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
+const searchCount = document.querySelector("#searchCount");
+let searchGenre = "Todos";
 const rankingPanel = document.querySelector("#rankingPanel");
 const rankingTitle = document.querySelector("#rankingTitle");
 const rankingList = document.querySelector("#rankingList");
@@ -194,7 +196,7 @@ function openSearch() {
   searchPanel.hidden = false;
   document.body.style.overflow = "hidden";
   setTimeout(function(){searchInput.focus();},0);
-  renderSearch("");
+  renderSearch(searchInput.value || "");
 }
 
 function closeSearch() {
@@ -204,13 +206,28 @@ function closeSearch() {
 
 function renderSearch(query) {
   const normalized = query.trim().toLowerCase();
-  const source = getFilteredCatalog();
+  let source = getFilteredCatalog();
+  if (searchGenre !== "Todos") source = source.filter(function(item){ return item.genre === searchGenre; });
   const matches = normalized ? source.filter(function(item){
     return (item.title + " " + item.genre).toLowerCase().includes(normalized);
-  }) : source.slice(0,7);
+  }) : source.slice(0,8);
+
+  searchCount.textContent = matches.length + (matches.length === 1 ? " obra" : " obras");
   searchResults.innerHTML = matches.length ? matches.map(function(item){
-    return '<div class="search-result" data-manga="' + item.id + '" tabindex="0" role="link"><strong>' + item.title + '</strong><small>' + item.genre + ' · Capítulo ' + item.chapter + '</small></div>';
-  }).join("") : '<div class="search-result">Nenhum resultado encontrado.</div>';
+    return '<article class="search-result-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
+      '<div class="search-result-thumb" style="--accent:' + item.accent + '"></div>' +
+      '<div class="search-result-copy"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
+      '<span class="search-result-arrow">›</span>' +
+    '</article>';
+  }).join("") : '<div class="search-empty">Nenhuma obra encontrada com esses filtros.</div>';
+}
+
+function setSearchGenre(genre) {
+  searchGenre = genre;
+  document.querySelectorAll("[data-search-filter]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.searchFilter === genre);
+  });
+  renderSearch(searchInput.value);
 }
 
 function openSideMenu() {
@@ -338,6 +355,12 @@ document.addEventListener("click", function(event) {
   const filterButton = event.target.closest("[data-filter]");
   if (filterButton) {
     applyFilter(filterButton.dataset.filter);
+    return;
+  }
+
+  const searchFilter = event.target.closest("[data-search-filter]");
+  if (searchFilter) {
+    setSearchGenre(searchFilter.dataset.searchFilter);
     return;
   }
 
