@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="MangaMorph — descubra, acompanhe e organize seus mangás em uma experiência rápida, moderna e responsiva.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MangaMorph — sua próxima leitura começa aqui">
+  <meta property="og:description" content="Descubra mangás, acompanhe atualizações e organize sua biblioteca no MangaMorph.">
+  <meta property="og:url" content="https://paleascendancy.github.io/mangamorph/">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>MangaMorph — sua próxima leitura começa aqui</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "MangaMorph",
+    "url": "https://paleascendancy.github.io/mangamorph/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://paleascendancy.github.io/mangamorph/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="MangaMorph — início">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-name">Manga<span>Morph</span></span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Navegação principal">
+      <a href="#inicio">Início</a>
+      <a href="#catalogo">Catálogo</a>
+      <a href="#recentes">Recentes</a>
+      <a href="#biblioteca">Biblioteca</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="icon-button" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
+      <button class="icon-button search-button" id="searchToggle" aria-label="Abrir busca" title="Buscar">⌕</button>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" id="inicio">
+      <div class="hero-noise" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="eyebrow">MANGAMORPH · V0.1</p>
+        <h1>Histórias mudam.<br><span>Sua biblioteca também.</span></h1>
+        <p class="hero-description">
+          Descubra novas obras, acompanhe capítulos e monte uma biblioteca que evolui com o que você gosta de ler.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#catalogo">Explorar catálogo</a>
+          <button class="button button-secondary" id="surpriseButton">Me surpreenda</button>
+        </div>
+        <div class="hero-meta">
+          <span><strong id="catalogCount">0</strong> títulos demo</span>
+          <span><strong>100%</strong> responsivo</span>
+          <span><strong>PWA</strong> preparado</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="morph-orbit orbit-one"></div>
+        <div class="morph-orbit orbit-two"></div>
+        <div class="morph-core">
+          <span>MM</span>
+          <small>MORPH</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="catalogo">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">DESCOBRIR</p>
+          <h2>Em destaque</h2>
+        </div>
+        <div class="filter-pills" role="group" aria-label="Filtrar catálogo">
+          <button class="pill active" data-filter="Todos">Todos</button>
+          <button class="pill" data-filter="Ação">Ação</button>
+          <button class="pill" data-filter="Fantasia">Fantasia</button>
+          <button class="pill" data-filter="Mistério">Mistério</button>
+        </div>
+      </div>
+      <div class="manga-grid" id="featuredGrid" aria-live="polite"></div>
+    </section>
+
+    <section class="section section-surface" id="recentes">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">AGORA</p>
+          <h2>Atualizações recentes</h2>
+        </div>
+        <span class="section-note">Dados demonstrativos da v0.1</span>
+      </div>
+      <div class="updates-list" id="updatesList"></div>
+    </section>
+
+    <section class="section" id="biblioteca">
+      <div class="library-card">
+        <div>
+          <p class="eyebrow">SUA BIBLIOTECA</p>
+          <h2>Salve o que quer acompanhar.</h2>
+          <p>Na v0.1, seus favoritos ficam salvos no próprio navegador. Conta e sincronização entram em uma versão futura.</p>
+        </div>
+        <div class="library-stat">
+          <strong id="favoriteCount">0</strong>
+          <span>favoritos</span>
+        </div>
+      </div>
+      <div class="favorite-grid" id="favoriteGrid"></div>
+    </section>
+  </main>
+
+  <div class="search-panel" id="searchPanel" hidden>
+    <div class="search-backdrop" data-close-search></div>
+    <section class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+      <div class="search-dialog-top">
+        <div>
+          <p class="eyebrow">BUSCA RÁPIDA</p>
+          <h2 id="searchTitle">Encontre uma obra</h2>
+        </div>
+        <button class="icon-button" id="searchClose" aria-label="Fechar busca">×</button>
+      </div>
+      <input id="searchInput" class="search-input" type="search" placeholder="Digite título ou gênero..." autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </section>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Navegação móvel">
+    <a href="#inicio">Início</a>
+    <a href="#catalogo">Catálogo</a>
+    <button id="mobileSearch">Buscar</button>
+    <a href="#recentes">Recentes</a>
+    <a href="#biblioteca">Biblioteca</a>
+  </nav>
+
+  <footer class="footer">
+    <div>
+      <strong>MangaMorph</strong>
+      <span>v0.1 · protótipo inicial</span>
+    </div>
+    <p>Interface demonstrativa. Nenhum mangá comercial é hospedado nesta versão.</p>
+  </footer>
+
+  <noscript>
+    <div class="noscript">Ative o JavaScript para usar busca, filtros e favoritos.</div>
+  </noscript>
+
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
