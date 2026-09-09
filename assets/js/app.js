@@ -134,10 +134,17 @@ function getFilteredCatalog() {
   return catalog.filter(function(item){ return item.type === state.filter; });
 }
 
+function coverStyle(item) {
+  const base = "--accent:" + (item.accent || "#3a4162") + ";";
+  if (!item.coverUrl) return base;
+  const safe = String(item.coverUrl).replace(/["'()]/g,"");
+  return base + "background-image:linear-gradient(180deg,transparent 38%,rgba(5,8,13,.78)),url(" + safe + ");background-size:cover;background-position:center;";
+}
+
 function cardTemplate(item, rank) {
   const active = state.favorites.has(item.id);
   return '<article class="manga-card premium-manga-card" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
-    '<div class="manga-cover" style="--accent:' + item.accent + '">' +
+    '<div class="manga-cover" style="' + coverStyle(item) + '">' +
       '<span class="manga-rank">#' + String(rank).padStart(2,"0") + '</span>' +
       '<div class="manga-cover-copy"><span class="manga-cover-title">' + item.title + '</span><small>' + item.genre + '</small></div>' +
     '</div>' +
@@ -179,7 +186,7 @@ function rankingRow(item, index, type) {
 
   return '<article class="ranking-row" data-manga="' + item.id + '" tabindex="0" role="link" aria-label="Abrir ' + item.title + '">' +
     '<span class="ranking-position">' + (index + 1) + '</span>' +
-    '<div class="ranking-thumb" style="--accent:' + item.accent + '"></div>' +
+    '<div class="ranking-thumb" style="' + coverStyle(item) + '"></div>' +
     '<div class="ranking-copy"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
     '<span class="ranking-value">' + value + '</span>' +
   '</article>';
@@ -219,7 +226,7 @@ function closeRanking() {
   document.body.style.overflow = "";
 }
 
-const releases = Array.from({length:150}, function(_,index) {
+let releases = Array.from({length:150}, function(_,index) {
   const item = catalog[index % catalog.length];
   const cycle = Math.floor(index / catalog.length);
   const chapter = Math.max(1, item.chapter - cycle);
@@ -233,8 +240,8 @@ const releases = Array.from({length:150}, function(_,index) {
 
 function releaseTemplate(release) {
   const flag = release.manga.type === "Mangá" ? "🇯🇵" : release.manga.type === "Manhwa" ? "🇰🇷" : "🇨🇳";
-  return '<article class="release-row premium-release-row" data-manga="' + release.manga.id + '" tabindex="0" role="link" aria-label="Abrir ' + release.manga.title + ' capítulo ' + release.chapter + '">' +
-    '<div class="release-thumb premium-release-thumb" style="--accent:' + release.manga.accent + '"></div>' +
+  return '<article class="release-row premium-release-row" data-manga="' + release.manga.id + '" data-release-chapter="' + release.chapter + '" tabindex="0" role="link" aria-label="Abrir ' + release.manga.title + ' capítulo ' + release.chapter + '">' +
+    '<div class="release-thumb premium-release-thumb" style="' + coverStyle(release.manga) + '"></div>' +
     '<div class="release-copy premium-release-copy">' +
       '<strong>' + release.manga.title + '</strong>' +
       '<span class="release-meta"><span>' + flag + ' ' + release.manga.type + '</span><span>' + release.manga.genre + '</span><span>• ' + release.updated + '</span></span>' +
@@ -612,6 +619,12 @@ document.addEventListener("click", function(event) {
     return;
   }
 
+  const releaseTarget = event.target.closest("[data-release-chapter]");
+  if (releaseTarget) {
+    location.href = "reader.html?id=" + releaseTarget.dataset.manga + "&chapter=" + releaseTarget.dataset.releaseChapter;
+    return;
+  }
+
   const mangaTarget = event.target.closest("[data-manga]");
   if (mangaTarget) {
     openManga(Number(mangaTarget.dataset.manga));
@@ -799,9 +812,35 @@ window.addEventListener("mangamorph:catalog-loaded",function(event){
   catalog=event.detail;
   state.totalPages=Math.max(1,Math.ceil(catalog.length/state.pageSize));
   state.currentPage=Math.min(state.currentPage,state.totalPages);
+
+  const featured=catalog[0];
+  const hero=document.querySelector(".hero-feature");
+  const cover=document.querySelector(".featured-cover");
+  const title=document.querySelector("#featuredTitle");
+  if(featured&&hero&&cover&&title){
+    title.textContent=featured.title;
+    const coverTitle=cover.querySelector("strong");
+    if(coverTitle)coverTitle.innerHTML=featured.title.toUpperCase().split(" ").join("<br>");
+    cover.setAttribute("style",coverStyle(featured));
+    const meta=document.querySelector(".featured-meta");
+    if(meta)meta.innerHTML="<span>★ "+Number(featured.rating||0).toFixed(1).replace(".",",")+"</span><span>☆ "+formatNumber(featured.favorites||0)+"</span><span>◷ "+(featured.status||featured.country||"Atual")+"</span>";
+    const desc=document.querySelector(".featured-description");
+    if(desc)desc.textContent=featured.description||"";
+    const links=hero.querySelectorAll(".featured-actions a");
+    if(links[0])links[0].href="reader.html?id="+featured.id+"&chapter="+featured.chapter;
+    if(links[1])links[1].href="manga.html?id="+featured.id;
+  }
+
   renderCatalogs();
   renderReleases();
   if(!searchPanel.hidden)renderSearch(searchInput.value||"");
+});
+
+window.addEventListener("mangamorph:releases-loaded",function(event){
+  if(!Array.isArray(event.detail))return;
+  releases=event.detail;
+  state.currentPage=1;
+  renderReleases();
 });
 
 const initialQuery = new URLSearchParams(location.search).get("q");
