@@ -42,8 +42,17 @@ window.addEventListener("mangamorph:library-change",async e=>{
     favorite:d.favorite===undefined?row.favorite:!!d.favorite,
     in_list:d.inList===undefined?row.in_list:!!d.inList,
     reading_status:d.readingStatus===undefined?row.reading_status:(d.readingStatus||null),
-    notifications_enabled:d.notificationsEnabled===undefined?row.notifications_enabled:!!d.notificationsEnabled
+    notifications_enabled:d.notificationsEnabled===undefined?(d.favorite===true ? localStorage.getItem("mangamorph:notifications")==="on" : row.notifications_enabled):!!d.notificationsEnabled
   },{onConflict:"user_id,manga_id"});
+});
+
+window.addEventListener("mangamorph:notifications-global",async e=>{
+  if(!session)return;
+  const enabled=!!e.detail?.enabled;
+  const {data:rows}=await db.from("mangamorph_library").select("manga_id,favorite").eq("user_id",session.user.id);
+  for(const row of (rows||[]).filter(x=>x.favorite)){
+    await db.from("mangamorph_library").update({notifications_enabled:enabled}).eq("user_id",session.user.id).eq("manga_id",row.manga_id);
+  }
 });
 
 window.addEventListener("mangamorph:history-open",async e=>{
