@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=038">
+  <link rel="stylesheet" href="assets/css/style.css?v=039">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -52,7 +52,8 @@
         </svg>
       </button>
       <button class="icon-button header-action-button account-button" id="accountToggle" aria-label="Abrir conta" title="Conta">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <span class="header-profile-initials" id="headerProfileInitials" hidden>MM</span>
+        <svg id="headerGuestIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="12" cy="8" r="4"></circle>
           <path d="M4.5 20c.9-4 3.4-6 7.5-6s6.6 2 7.5 6"></path>
         </svg>
@@ -201,26 +202,44 @@
       </header>
 
       <section class="account-identity-card">
-        <div class="account-identity-avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
+        <div class="account-identity-avatar profile-avatar-live" id="accountProfileAvatar" aria-hidden="true">
+          <span id="accountProfileInitials" hidden>MM</span>
+          <svg id="accountGuestAvatar" viewBox="0 0 24 24">
             <circle cx="12" cy="8" r="3.4"></circle>
             <path d="M5.4 19.2c.8-3.6 3-5.4 6.6-5.4s5.8 1.8 6.6 5.4"></path>
           </svg>
         </div>
         <div class="account-identity-copy">
           <div class="account-name-row">
-            <strong>Convidado</strong>
-            <span class="account-offline-badge"><span></span> Offline</span>
+            <strong id="accountProfileName">Convidado</strong>
+            <span class="account-offline-badge" id="accountSessionBadge"><span></span> Offline</span>
           </div>
-          <p>Entre para sincronizar favoritos e histórico entre dispositivos.</p>
+          <span class="account-profile-handle" id="accountProfileHandle" hidden>@mangamorph</span>
+          <p id="accountProfileBio">Crie um perfil para organizar sua biblioteca pessoal.</p>
         </div>
       </section>
 
-      <div class="account-auth-actions account-auth-actions-redesign">
-        <button class="account-auth-button primary" id="accountLogin" type="button">Entrar</button>
-        <button class="account-auth-button secondary" id="accountRegister" type="button">Criar conta</button>
+      <div class="account-profile-stats" id="accountProfileStats" hidden>
+        <div><strong id="profileStatFavorites">0</strong><span>Favoritos</span></div>
+        <div><strong id="profileStatHistory">0</strong><span>Histórico</span></div>
+        <div><strong id="profileStatList">0</strong><span>Na lista</span></div>
       </div>
-      <p class="account-auth-message" id="accountAuthMessage" hidden>Login e cadastro serão conectados ao backend em uma próxima etapa.</p>
+
+      <div class="account-auth-actions account-auth-actions-redesign" id="accountAuthActions">
+        <button class="account-auth-button primary" id="accountLogin" type="button">Entrar</button>
+        <button class="account-auth-button secondary" id="accountRegister" type="button">Criar perfil</button>
+      </div>
+      <button class="account-logout-button" id="accountLogout" type="button" hidden>Sair da conta</button>
+      <p class="account-auth-message" id="accountAuthMessage" hidden>Este perfil é salvo apenas neste dispositivo por enquanto.</p>
+
+      <div class="account-hub-section-label">Perfil</div>
+      <div class="account-hub-list account-profile-list">
+        <button class="account-hub-row" id="accountProfile" type="button">
+          <span class="account-hub-icon">◎</span>
+          <span class="account-hub-copy"><strong>Meu perfil</strong><small>Nome, usuário e biografia</small></span>
+          <span class="account-hub-chevron">›</span>
+        </button>
+      </div>
 
       <div class="account-hub-section-label">Biblioteca</div>
       <div class="account-hub-list">
@@ -237,12 +256,79 @@
           <span class="account-hub-value" id="accountHistoryCount">0</span>
           <span class="account-hub-chevron">›</span>
         </button>
+
+        <button class="account-hub-row" id="accountReadingList" type="button">
+          <span class="account-hub-icon">＋</span>
+          <span class="account-hub-copy"><strong>Minha lista</strong><small>Obras salvas para acompanhar</small></span>
+          <span class="account-hub-value" id="accountReadingListCount">0</span>
+          <span class="account-hub-chevron">›</span>
+        </button>
       </div>
 
       <div class="account-hub-footer">
         <span>MangaMorph</span>
         <span>v0.1</span>
       </div>
+    </section>
+  </div>
+
+  <div class="profile-panel" id="profilePanel" hidden>
+    <div class="profile-backdrop" data-close-profile></div>
+    <section class="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <header class="profile-dialog-header">
+        <div>
+          <p class="profile-kicker">MANGAMORPH ID</p>
+          <h2 id="profileTitle">Criar perfil</h2>
+          <p>Personalize como você aparece no MangaMorph.</p>
+        </div>
+        <button class="profile-close" id="profileClose" type="button" aria-label="Fechar perfil">×</button>
+      </header>
+
+      <div class="profile-preview-card">
+        <div class="profile-preview-avatar" id="profilePreviewAvatar">MM</div>
+        <div>
+          <strong id="profilePreviewName">Seu nome</strong>
+          <span id="profilePreviewHandle">@usuario</span>
+          <small id="profilePreviewBio">Sua bio aparecerá aqui.</small>
+        </div>
+      </div>
+
+      <form class="profile-form" id="profileForm">
+        <label>
+          <span>Nome de exibição</span>
+          <input id="profileNameInput" type="text" maxlength="32" placeholder="Ex.: Caleb" autocomplete="name" required>
+        </label>
+
+        <label>
+          <span>Nome de usuário</span>
+          <div class="profile-handle-input"><b>@</b><input id="profileUsernameInput" type="text" maxlength="20" placeholder="caleb" autocomplete="username" required></div>
+          <small>Use letras, números e _</small>
+        </label>
+
+        <label>
+          <span>Biografia</span>
+          <textarea id="profileBioInput" maxlength="120" rows="3" placeholder="Conte um pouco sobre você..."></textarea>
+          <small class="profile-bio-count" id="profileBioCount">0/120</small>
+        </label>
+
+        <div class="profile-accent-section">
+          <span>Cor do perfil</span>
+          <div class="profile-accent-options" role="radiogroup" aria-label="Cor do perfil">
+            <button type="button" class="profile-accent active" data-profile-accent="#5b8def" aria-label="Azul"></button>
+            <button type="button" class="profile-accent" data-profile-accent="#8b6cf0" aria-label="Roxo"></button>
+            <button type="button" class="profile-accent" data-profile-accent="#2fc985" aria-label="Verde"></button>
+            <button type="button" class="profile-accent" data-profile-accent="#e7a84b" aria-label="Dourado"></button>
+            <button type="button" class="profile-accent" data-profile-accent="#e76878" aria-label="Rosa"></button>
+          </div>
+        </div>
+
+        <div class="profile-form-actions">
+          <button class="profile-save" type="submit">Salvar perfil</button>
+          <button class="profile-cancel" id="profileCancel" type="button">Cancelar</button>
+        </div>
+      </form>
+
+      <p class="profile-local-note">Perfil local: seus dados ficam somente neste dispositivo até conectarmos o backend.</p>
     </section>
   </div>
 
@@ -390,6 +476,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=032" defer></script>
+  <script src="assets/js/app.js?v=033" defer></script>
 </body>
 </html>
