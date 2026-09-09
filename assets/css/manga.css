@@ -657,3 +657,252 @@ body.light .status-menu button.active{
     font-size:.52rem;
   }
 }
+
+
+/* Mobile stacked detail layout v6 */
+@media(max-width:760px){
+  .manga-topbar{
+    min-height:4rem;
+    padding:.55rem .8rem;
+  }
+  .manga-topbar .brand-name{
+    font-size:1rem;
+  }
+  .manga-header-back,
+  .manga-theme-toggle{
+    width:2.35rem;
+    height:2.35rem;
+    border-radius:.72rem;
+  }
+
+  .manga-page{
+    padding:.65rem .8rem 4.25rem;
+  }
+  .back-link{
+    display:none;
+  }
+
+  .manga-hero-premium{
+    padding:.95rem;
+    border-radius:1.08rem;
+    background:
+      radial-gradient(circle at 50% 0%,rgba(98,79,132,.13),transparent 26%),
+      linear-gradient(160deg,#101722,#0a1018 68%,#080d14);
+  }
+
+  .hero-top{
+    grid-template-columns:1fr;
+    gap:.92rem;
+  }
+
+  .compact-cover{
+    width:138px;
+    min-height:190px;
+    margin:0 auto;
+    padding:.68rem;
+    border-radius:.95rem;
+    box-shadow:
+      0 18px 38px rgba(0,0,0,.34),
+      0 0 0 1px rgba(255,255,255,.05),
+      inset 0 1px 0 rgba(255,255,255,.09);
+  }
+  .detail-cover-kicker{
+    top:.56rem;
+    left:.58rem;
+    font-size:.4rem;
+  }
+  .compact-cover strong{
+    font-size:1.42rem;
+    line-height:.9;
+  }
+  .compact-cover small{
+    margin-top:.34rem;
+    font-size:.5rem;
+  }
+
+  .hero-primary{
+    width:100%;
+  }
+  .hero-primary .eyebrow{
+    margin-bottom:.22rem;
+    font-size:.56rem;
+    letter-spacing:.15em;
+  }
+  .hero-primary h1{
+    font-size:2.18rem;
+    line-height:.95;
+    letter-spacing:-.05em;
+  }
+  .detail-alt-title{
+    margin-top:.26rem;
+    font-size:.76rem;
+    line-height:1.42;
+  }
+
+  .hero-badges{
+    gap:.35rem;
+    margin-top:.64rem;
+  }
+  .hero-badges>span{
+    min-height:1.72rem;
+    padding:0 .52rem;
+    font-size:.58rem;
+  }
+
+  .detail-meta-compact{
+    gap:.34rem;
+    margin-top:.58rem;
+  }
+  .detail-meta-compact span{
+    min-width:auto;
+    padding:.45rem .54rem;
+    font-size:.61rem;
+    border-radius:.62rem;
+  }
+
+  .detail-description{
+    margin-top:.65rem;
+    font-size:.79rem;
+    line-height:1.5;
+  }
+  .description-toggle{
+    margin-top:.18rem;
+    font-size:.64rem;
+  }
+
+  .hero-actions-premium{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:.42rem;
+    margin-top:.74rem;
+  }
+  .detail-main-action{
+    grid-column:1/-1;
+    justify-self:start;
+    width:auto;
+    max-width:205px;
+    min-height:2.7rem;
+    padding:.42rem .62rem;
+    border-radius:.78rem;
+  }
+  .detail-main-action>span:first-child{
+    font-size:.74rem;
+  }
+  .detail-main-action small{
+    font-size:.38rem;
+  }
+  .detail-main-action strong{
+    font-size:.64rem;
+  }
+
+  .detail-secondary-action{
+    min-height:2.45rem;
+    padding:0 .58rem;
+    border-radius:.72rem;
+    font-size:.61rem;
+  }
+  .action-glyph{
+    font-size:.8rem;
+  }
+  .detail-icon-action{
+    width:2.45rem;
+    min-height:2.45rem;
+    border-radius:.72rem;
+    font-size:.85rem;
+  }
+
+  .hero-secondary{
+    grid-template-columns:1fr;
+    gap:.58rem;
+    margin-top:.72rem;
+    padding-top:.68rem;
+  }
+  .detail-tags{
+    gap:.3rem;
+  }
+  .detail-tags span{
+    padding:.3rem .44rem;
+    font-size:.56rem;
+    border-radius:.54rem;
+  }
+
+  .status-inline-button{
+    min-height:2.48rem;
+    padding:0 .58rem;
+    border-radius:.74rem;
+  }
+  .status-leading{
+    font-size:.58rem;
+  }
+  .status-current strong{
+    font-size:.57rem;
+  }
+
+  .detail-facts-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:.45rem;
+    margin:.75rem 0 1rem;
+  }
+  .detail-facts-grid div{
+    padding:.66rem .7rem;
+    border-radius:.78rem;
+  }
+  .detail-facts-grid dt{
+    font-size:.5rem;
+  }
+  .detail-facts-grid dd{
+    margin-top:.14rem;
+    font-size:.74rem;
+  }
+
+  .manga-tabs{
+    gap:.3rem;
+    padding:.28rem;
+    margin-bottom:.9rem;
+    border-radius:.9rem;
+  }
+  .manga-tab{
+    min-width:0;
+    min-height:2.55rem;
+    padding:.58rem .5rem;
+    border-radius:.7rem;
+    font-size:.66rem;
+  }
+
+  .chapters-heading h2{
+    font-size:1.55rem;
+  }
+}
+
+@media(max-width:430px){
+  .manga-page{
+    padding-left:.7rem;
+    padding-right:.7rem;
+  }
+  .manga-hero-premium{
+    padding:.82rem;
+  }
+  .compact-cover{
+    width:130px;
+    min-height:178px;
+  }
+  .hero-primary h1{
+    font-size:2rem;
+  }
+  .detail-alt-title{
+    font-size:.72rem;
+  }
+  .hero-actions-premium{
+    grid-template-columns:1fr 1fr auto;
+  }
+  .detail-main-action{
+    max-width:190px;
+    min-height:2.58rem;
+  }
+  .detail-facts-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  .manga-tab{
+    font-size:.62rem;
+  }
+}
