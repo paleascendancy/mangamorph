@@ -4,32 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#090b10">
-  <meta name="description" content="MangaMorph — descubra, acompanhe e organize seus mangás em uma experiência rápida, moderna e responsiva.">
+  <meta name="description" content="MangaMorph — descubra mangás populares, obras em alta, favoritas, novidades e os capítulos mais recentes.">
   <meta name="robots" content="index,follow">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="MangaMorph — sua próxima leitura começa aqui">
-  <meta property="og:description" content="Descubra mangás, acompanhe atualizações e organize sua biblioteca no MangaMorph.">
+  <meta property="og:title" content="MangaMorph — catálogos, novidades e capítulos recentes">
+  <meta property="og:description" content="Mais populares, mais favoritadas, novas obras e os últimos capítulos em um só lugar.">
   <meta property="og:url" content="https://paleascendancy.github.io/mangamorph/">
   <meta name="twitter:card" content="summary_large_image">
-  <title>MangaMorph — sua próxima leitura começa aqui</title>
+  <title>MangaMorph — catálogos e capítulos recentes</title>
 
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=011">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "MangaMorph",
-    "url": "https://paleascendancy.github.io/mangamorph/",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://paleascendancy.github.io/mangamorph/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -41,88 +27,101 @@
     </a>
 
     <nav class="desktop-nav" aria-label="Navegação principal">
-      <a href="#inicio">Início</a>
-      <a href="#catalogo">Catálogo</a>
-      <a href="#recentes">Recentes</a>
-      <a href="#biblioteca">Biblioteca</a>
+      <a href="#populares">Populares</a>
+      <a href="#favoritadas">Favoritadas</a>
+      <a href="#novas">Novas obras</a>
+      <a href="#recentes">Últimos capítulos</a>
     </nav>
 
     <div class="topbar-actions">
       <button class="icon-button" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
-      <button class="icon-button search-button" id="searchToggle" aria-label="Abrir busca" title="Buscar">⌕</button>
+      <button class="icon-button" id="searchToggle" aria-label="Abrir busca" title="Buscar">⌕</button>
     </div>
   </header>
 
   <main id="conteudo">
     <section class="hero" id="inicio">
-      <div class="hero-noise" aria-hidden="true"></div>
       <div class="hero-copy">
-        <p class="eyebrow">MANGAMORPH · V0.1</p>
-        <h1>Histórias mudam.<br><span>Sua biblioteca também.</span></h1>
-        <p class="hero-description">
-          Descubra novas obras, acompanhe capítulos e monte uma biblioteca que evolui com o que você gosta de ler.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#catalogo">Explorar catálogo</a>
-          <button class="button button-secondary" id="surpriseButton">Me surpreenda</button>
-        </div>
-        <div class="hero-meta">
-          <span><strong id="catalogCount">0</strong> títulos demo</span>
-          <span><strong>100%</strong> responsivo</span>
-          <span><strong>PWA</strong> preparado</span>
-        </div>
+        <p class="eyebrow">MANGAMORPH · CATÁLOGOS</p>
+        <h1>Pelos catálogos <span>principais.</span></h1>
+        <p class="hero-description">Encontre rapidamente o que está em alta, o que os leitores mais favoritam, novas obras e os capítulos que acabaram de sair.</p>
+        <a class="button button-primary" href="#populares">Ver catálogos</a>
       </div>
-
-      <div class="hero-visual" aria-hidden="true">
-        <div class="morph-orbit orbit-one"></div>
-        <div class="morph-orbit orbit-two"></div>
-        <div class="morph-core">
-          <span>MM</span>
-          <small>MORPH</small>
-        </div>
+      <div class="hero-stats" aria-label="Resumo da página">
+        <div><strong>03</strong><span>catálogos principais</span></div>
+        <div><strong>30</strong><span>capítulos por página</span></div>
+        <div><strong>05</strong><span>páginas de lançamentos</span></div>
       </div>
     </section>
 
-    <section class="section" id="catalogo">
+    <section class="catalog-section" id="populares">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">DESCOBRIR</p>
-          <h2>Em destaque</h2>
+          <p class="eyebrow">EM ALTA</p>
+          <h2>Mais populares</h2>
+          <p class="section-description">Os mangás que mais estão chamando atenção agora.</p>
         </div>
-        <div class="filter-pills" role="group" aria-label="Filtrar catálogo">
-          <button class="pill active" data-filter="Todos">Todos</button>
-          <button class="pill" data-filter="Ação">Ação</button>
-          <button class="pill" data-filter="Fantasia">Fantasia</button>
-          <button class="pill" data-filter="Mistério">Mistério</button>
-        </div>
+        <span class="swipe-hint">deslize →</span>
       </div>
-      <div class="manga-grid" id="featuredGrid" aria-live="polite"></div>
+      <div class="horizontal-rail" id="popularRail" aria-label="Mangás mais populares"></div>
     </section>
 
-    <section class="section section-surface" id="recentes">
+    <section class="catalog-section" id="favoritadas">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">AGORA</p>
-          <h2>Atualizações recentes</h2>
+          <p class="eyebrow">PREFERIDOS</p>
+          <h2>Mais favoritadas</h2>
+          <p class="section-description">As obras mais marcadas como favoritas pelos leitores.</p>
         </div>
-        <span class="section-note">Dados demonstrativos da v0.1</span>
+        <span class="swipe-hint">deslize →</span>
       </div>
-      <div class="updates-list" id="updatesList"></div>
+      <div class="horizontal-rail" id="favoriteRail" aria-label="Mangás mais favoritados"></div>
     </section>
 
-    <section class="section" id="biblioteca">
+    <section class="catalog-section" id="novas">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CHEGANDO AGORA</p>
+          <h2>Novas obras</h2>
+          <p class="section-description">Obras recém-adicionadas ao catálogo.</p>
+        </div>
+        <span class="swipe-hint">deslize →</span>
+      </div>
+      <div class="horizontal-rail" id="newRail" aria-label="Novas obras"></div>
+    </section>
+
+    <section class="releases-section" id="recentes">
+      <div class="section-heading releases-heading">
+        <div>
+          <p class="eyebrow">ÚLTIMAS ATUALIZAÇÕES</p>
+          <h2>Lançamento dos últimos capítulos</h2>
+          <p class="section-description">30 lançamentos por página, do mais recente ao mais antigo.</p>
+        </div>
+        <span class="page-indicator" id="pageIndicator">Página 1 de 5</span>
+      </div>
+
+      <div class="release-list" id="releaseList" aria-live="polite"></div>
+
+      <nav class="pagination-wrap" aria-label="Paginação dos capítulos">
+        <button class="pagination-arrow" id="prevPage" aria-label="Página anterior">←</button>
+        <div class="pagination" id="pagination"></div>
+        <button class="pagination-arrow" id="nextPage" aria-label="Próxima página">→</button>
+      </nav>
+    </section>
+
+    <section class="library-section" id="biblioteca">
       <div class="library-card">
         <div>
           <p class="eyebrow">SUA BIBLIOTECA</p>
-          <h2>Salve o que quer acompanhar.</h2>
-          <p>Na v0.1, seus favoritos ficam salvos no próprio navegador. Conta e sincronização entram em uma versão futura.</p>
+          <h2>Seus favoritos ficam aqui.</h2>
+          <p>Marque uma obra com a estrela para guardar no navegador.</p>
         </div>
         <div class="library-stat">
           <strong id="favoriteCount">0</strong>
           <span>favoritos</span>
         </div>
       </div>
-      <div class="favorite-grid" id="favoriteGrid"></div>
+      <div class="horizontal-rail favorite-library" id="favoriteGrid"></div>
     </section>
   </main>
 
@@ -143,7 +142,7 @@
 
   <nav class="mobile-nav" aria-label="Navegação móvel">
     <a href="#inicio">Início</a>
-    <a href="#catalogo">Catálogo</a>
+    <a href="#populares">Catálogo</a>
     <button id="mobileSearch">Buscar</button>
     <a href="#recentes">Recentes</a>
     <a href="#biblioteca">Biblioteca</a>
@@ -152,15 +151,12 @@
   <footer class="footer">
     <div>
       <strong>MangaMorph</strong>
-      <span>v0.1 · protótipo inicial</span>
+      <span>v0.1</span>
     </div>
-    <p>Interface demonstrativa. Nenhum mangá comercial é hospedado nesta versão.</p>
+    <p>Dados demonstrativos nesta etapa. A estrutura já está pronta para receber uma fonte real de mangás.</p>
   </footer>
 
-  <noscript>
-    <div class="noscript">Ative o JavaScript para usar busca, filtros e favoritos.</div>
-  </noscript>
-
-  <script src="assets/js/app.js" defer></script>
+  <noscript><div class="noscript">Ative o JavaScript para usar busca, paginação e favoritos.</div></noscript>
+  <script src="assets/js/app.js?v=011" defer></script>
 </body>
 </html>
