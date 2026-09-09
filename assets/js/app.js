@@ -58,6 +58,8 @@ const notificationSwitch = document.querySelector("#notificationSwitch");
 const sideMenu = document.querySelector("#sideMenu");
 const menuToggle = document.querySelector("#menuToggle");
 const sideMenuSettings = document.querySelector("#sideMenuSettings");
+const titlesMenuToggle = document.querySelector("#titlesMenuToggle");
+const titlesMenu = document.querySelector("#titlesMenu");
 const accountPanel = document.querySelector("#accountPanel");
 const accountToggle = document.querySelector("#accountToggle");
 const accountClose = document.querySelector("#accountClose");
@@ -280,6 +282,12 @@ function closeSideMenu() {
   document.body.style.overflow = "";
 }
 
+function toggleTitlesMenu() {
+  const willOpen = titlesMenu.hidden;
+  titlesMenu.hidden = !willOpen;
+  titlesMenuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+}
+
 function updateAccountPanel() {
   accountFavoritesCount.textContent = String(state.favorites.size);
   accountHistoryCount.textContent = String(state.history.length);
@@ -460,6 +468,7 @@ accountHistory.addEventListener("click", function(){
   });
 });
 menuToggle.addEventListener("click", openSideMenu);
+titlesMenuToggle.addEventListener("click", toggleTitlesMenu);
 sideMenuSettings.addEventListener("click", function(){
   closeSideMenu();
   openSettings();
