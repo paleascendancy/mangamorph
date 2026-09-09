@@ -59,11 +59,36 @@ favoriteButton.addEventListener("click", () => {
 renderFavorite();
 
 const chapters = Array.from({length:Math.min(30,manga.chapter)},(_,i)=>manga.chapter-i);
-document.querySelector("#chapterCount").textContent = chapters.length + " mais recentes";
-document.querySelector("#chapterList").innerHTML = chapters.map((chapter,index) => {
-  const time = index === 0 ? "mais recente" : index < 4 ? (index * 3) + " h atrás" : Math.ceil(index / 3) + " dias atrás";
-  return '<article class="chapter-row"><div><strong>Capítulo ' + chapter + '</strong><span>' + time + '</span></div><a class="chapter-read" href="#" aria-label="Ler capítulo ' + chapter + '">Ler</a></article>';
-}).join("");
+const chapterList = document.querySelector("#chapterList");
+const chapterCount = document.querySelector("#chapterCount");
+const sortDesc = document.querySelector("#sortDesc");
+const sortAsc = document.querySelector("#sortAsc");
+let chapterOrder = "desc";
+
+chapterCount.textContent = chapters.length + " capítulos";
+
+function renderChapters() {
+  const ordered = chapterOrder === "desc" ? [...chapters] : [...chapters].reverse();
+  chapterList.innerHTML = ordered.map((chapter,index) => {
+    const distanceFromLatest = manga.chapter - chapter;
+    const time = distanceFromLatest === 0 ? "mais recente" : distanceFromLatest < 4 ? (distanceFromLatest * 3) + " h atrás" : Math.ceil(distanceFromLatest / 3) + " dias atrás";
+    return '<article class="chapter-row"><div><strong>Capítulo ' + chapter + '</strong><span>' + time + '</span></div><a class="chapter-read" href="#" aria-label="Ler capítulo ' + chapter + '">Ler</a></article>';
+  }).join("");
+}
+
+function setChapterOrder(order) {
+  chapterOrder = order;
+  const descending = order === "desc";
+  sortDesc.classList.toggle("active", descending);
+  sortAsc.classList.toggle("active", !descending);
+  sortDesc.setAttribute("aria-pressed", descending ? "true" : "false");
+  sortAsc.setAttribute("aria-pressed", descending ? "false" : "true");
+  renderChapters();
+}
+
+sortDesc.addEventListener("click", () => setChapterOrder("desc"));
+sortAsc.addEventListener("click", () => setChapterOrder("asc"));
+renderChapters();
 
 const savedTheme = localStorage.getItem("mangamorph:theme");
 if (savedTheme === "light") document.body.classList.add("light");
