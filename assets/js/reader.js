@@ -188,3 +188,10 @@ if(savedPage > 1){
     if(target) target.scrollIntoView({block:"start"});
   });
 }
+
+window.addEventListener("storage",function(event){
+  if(event.key !== "mangamorph:theme") return;
+  const light = event.newValue === "light";
+  document.body.classList.toggle("light-reader",light);
+  readerThemeLabel.textContent = light ? "Claro" : "Escuro";
+});
