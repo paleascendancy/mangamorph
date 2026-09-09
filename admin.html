@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0f17">
+  <meta name="robots" content="noindex,nofollow">
+  <title>MangaMorph — Administração</title>
+  <link rel="stylesheet" href="assets/css/admin.css?v=001">
+</head>
+<body>
+  <div class="admin-auth" id="adminAuth">
+    <section class="admin-auth-card">
+      <span>MANGAMORPH CONTROL</span>
+      <h1>Administração</h1>
+      <p>Entre com uma conta autorizada para gerenciar obras, capítulos e moderação.</p>
+      <form id="adminLoginForm">
+        <label>E-mail<input id="adminEmail" type="email" autocomplete="email" required></label>
+        <label>Senha<input id="adminPassword" type="password" autocomplete="current-password" minlength="8" required></label>
+        <button type="submit">Entrar</button>
+      </form>
+      <p class="admin-message" id="adminLoginMessage" hidden></p>
+      <a href="index.html">← Voltar ao MangaMorph</a>
+    </section>
+  </div>
+
+  <div class="admin-app" id="adminApp" hidden>
+    <aside class="admin-sidebar">
+      <a class="admin-brand" href="index.html"><span>MM</span><strong>MangaMorph</strong></a>
+      <nav>
+        <button class="active" data-admin-view="dashboard">Visão geral</button>
+        <button data-admin-view="mangas">Obras</button>
+        <button data-admin-view="chapters">Capítulos</button>
+        <button data-admin-view="moderation">Moderação</button>
+      </nav>
+      <button class="admin-signout" id="adminSignOut">Sair</button>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <span>PAINEL ADMINISTRATIVO</span>
+          <h1 id="adminViewTitle">Visão geral</h1>
+        </div>
+        <button id="adminRefresh">↻ Atualizar</button>
+      </header>
+
+      <section class="admin-view active" id="viewDashboard">
+        <div class="admin-stats">
+          <article><span>Obras</span><strong id="statMangas">0</strong></article>
+          <article><span>Publicadas</span><strong id="statPublished">0</strong></article>
+          <article><span>Capítulos</span><strong id="statChapters">0</strong></article>
+          <article><span>Denúncias</span><strong id="statReports">0</strong></article>
+        </div>
+        <div class="admin-card">
+          <div class="admin-card-head"><div><span>CONTEÚDO</span><h2>Últimas obras</h2></div><button data-admin-view="mangas">Gerenciar</button></div>
+          <div class="admin-list" id="dashboardMangas"></div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="viewMangas" hidden>
+        <div class="admin-grid">
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div><span>CATÁLOGO</span><h2>Obras</h2></div>
+              <button id="newMangaButton">＋ Nova obra</button>
+            </div>
+            <input class="admin-search" id="mangaAdminSearch" type="search" placeholder="Buscar obra...">
+            <div class="admin-list" id="mangaAdminList"></div>
+          </div>
+
+          <form class="admin-card admin-form" id="mangaAdminForm">
+            <div class="admin-card-head">
+              <div><span>EDITOR</span><h2 id="mangaFormTitle">Nova obra</h2></div>
+              <span class="admin-status-dot" id="mangaDraftBadge">Rascunho</span>
+            </div>
+            <input id="mangaIdInput" type="hidden">
+            <div class="admin-form-grid">
+              <label class="wide">Título<input id="mangaTitleInput" maxlength="120" required></label>
+              <label>Slug<input id="mangaSlugInput" maxlength="140" required></label>
+              <label>Tipo<select id="mangaTypeInput"><option>Mangá</option><option>Manhwa</option><option>Manhua</option><option>Webtoon</option><option>HQ</option><option>Novel</option><option>Outro</option></select></label>
+              <label>País<input id="mangaCountryInput" placeholder="Japão"></label>
+              <label>Idioma original<input id="mangaLanguageInput" placeholder="Japonês"></label>
+              <label>Autor<input id="mangaAuthorInput"></label>
+              <label>Artista<input id="mangaArtistInput"></label>
+              <label>Editora<input id="mangaPublisherInput"></label>
+              <label>Ano<input id="mangaYearInput" type="number" min="1900" max="2200"></label>
+              <label>Status<select id="mangaStatusInput"><option>Em lançamento</option><option>Concluído</option><option>Pausado</option><option>Cancelado</option><option>Em breve</option></select></label>
+              <label>Classificação<input id="mangaRatingInput" value="Livre"></label>
+              <label>Cor de destaque<input id="mangaAccentInput" type="color" value="#3a4162"></label>
+              <label class="wide">Títulos alternativos<input id="mangaAltTitlesInput" placeholder="Separe por vírgulas"></label>
+              <label class="wide">Gêneros<input id="mangaGenresInput" placeholder="Ação, Ficção científica"></label>
+              <label class="wide">Tags<input id="mangaTagsInput" placeholder="Samurai, Tecnologia"></label>
+              <label class="wide">Sinopse<textarea id="mangaSynopsisInput" rows="5"></textarea></label>
+              <label class="wide">Capa
+                <input id="mangaCoverInput" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
+                <small id="mangaCoverStatus">Nenhuma nova capa selecionada.</small>
+              </label>
+            </div>
+            <div class="admin-checks">
+              <label><input id="mangaFeaturedInput" type="checkbox"> Destaque</label>
+              <label><input id="mangaPublishedInput" type="checkbox"> Publicada</label>
+            </div>
+            <div class="admin-form-actions">
+              <button class="primary" type="submit">Salvar obra</button>
+              <button type="button" id="deleteMangaButton" disabled>Excluir</button>
+            </div>
+            <p class="admin-message" id="mangaFormMessage" hidden></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="admin-view" id="viewChapters" hidden>
+        <div class="admin-card">
+          <div class="admin-card-head">
+            <div><span>PUBLICAÇÃO</span><h2>Capítulos e páginas</h2></div>
+            <select id="chapterMangaSelect"><option value="">Selecione uma obra</option></select>
+          </div>
+          <div class="chapter-admin-grid">
+            <div>
+              <form class="chapter-create-form" id="chapterForm">
+                <input id="chapterNumberInput" type="number" min="0.01" step="0.01" placeholder="Capítulo" required>
+                <input id="chapterTitleInput" placeholder="Título opcional">
+                <label><input id="chapterPublishedInput" type="checkbox"> Publicar</label>
+                <button type="submit">Adicionar</button>
+              </form>
+              <div class="admin-list" id="chapterAdminList"></div>
+            </div>
+            <div class="chapter-pages-panel">
+              <div class="admin-card-head">
+                <div><span>PÁGINAS</span><h3 id="pagesPanelTitle">Selecione um capítulo</h3></div>
+                <label class="upload-pages-button">＋ Enviar páginas<input id="chapterPagesInput" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden></label>
+              </div>
+              <p class="admin-helper">Arquivos são ordenados pelo nome. Use 001, 002, 003… para manter a sequência correta.</p>
+              <div class="admin-pages-grid" id="chapterPagesGrid"></div>
+              <p class="admin-message" id="chapterMessage" hidden></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-view" id="viewModeration" hidden>
+        <div class="admin-card">
+          <div class="admin-card-head"><div><span>SEGURANÇA</span><h2>Denúncias</h2></div><select id="reportFilter"><option value="pending">Pendentes</option><option value="all">Todas</option></select></div>
+          <div class="admin-list" id="reportList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="assets/js/admin.js?v=001"></script>
+</body>
+</html>
