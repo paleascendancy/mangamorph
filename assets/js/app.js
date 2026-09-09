@@ -48,6 +48,7 @@ const rankingPanel = document.querySelector("#rankingPanel");
 const rankingTitle = document.querySelector("#rankingTitle");
 const rankingList = document.querySelector("#rankingList");
 const rankingClose = document.querySelector("#rankingClose");
+const rankingFilterLabel = document.querySelector("#rankingFilterLabel");
 const settingsPanel = document.querySelector("#settingsPanel");
 const settingsClose = document.querySelector("#settingsClose");
 const settingsToggle = document.querySelector("#settingsToggle");
@@ -138,7 +139,7 @@ function rankingRow(item, index, type) {
   '</article>';
 }
 
-function openRanking(type) {
+function renderRanking(type) {
   const items = [...getFilteredCatalog()].sort(function(a,b){
     if (type === "reads") return b.reads - a.reads;
     if (type === "favorites") return b.favorites - a.favorites;
@@ -146,11 +147,23 @@ function openRanking(type) {
   });
 
   rankingTitle.textContent = type === "reads"
-    ? "Ranking dos mais lidos"
+    ? "Mais lidas"
     : type === "favorites"
-      ? "Ranking dos mais favoritados"
-      : "Ranking de novas obras";
+      ? "Mais favoritadas"
+      : "Novas obras";
+
+  document.querySelectorAll("[data-ranking-tab]").forEach(function(button){
+    const active = button.dataset.rankingTab === type;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+
+  rankingFilterLabel.textContent = state.filter;
   rankingList.innerHTML = items.map(function(item,index){ return rankingRow(item,index,type); }).join("");
+}
+
+function openRanking(type) {
+  renderRanking(type);
   rankingPanel.hidden = false;
   document.body.style.overflow = "hidden";
 }
@@ -362,6 +375,12 @@ document.addEventListener("click", function(event) {
   const pageButton = event.target.closest("[data-page]");
   if (pageButton) {
     goToPage(Number(pageButton.dataset.page));
+    return;
+  }
+
+  const rankingTab = event.target.closest("[data-ranking-tab]");
+  if (rankingTab) {
+    renderRanking(rankingTab.dataset.rankingTab);
     return;
   }
 
