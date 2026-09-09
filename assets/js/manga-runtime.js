@@ -41,18 +41,21 @@ if(manga){
 
   if(chapters?.length){
     $("#chapterList").innerHTML=chapters.map((c,index)=>'<article class="chapter-row '+(index===0?'latest':'')+'" id="capitulo-'+Number(c.chapter_number)+'"><div class="chapter-copy"><div class="chapter-number"><strong>Capítulo '+Number(c.chapter_number)+'</strong><span class="chapter-meta-line"><span>◷ '+fmtDate(c.published_at)+'</span>'+(c.title?'<span>'+esc(c.title)+'</span>':'')+'</span></div>'+(index===0?'<span class="chapter-badge">NOVO</span>':'')+'</div><button class="chapter-read" type="button" data-read-chapter="'+Number(c.chapter_number)+'">Ler <span>›</span></button></article>').join("");
-    const read=$("#readLatest");read.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();location.href="reader.html?id="+id+"&chapter="+latest},true);
+    $("#readLatest").dataset.liveChapter=String(latest);
   }
 
+  let targetChapter=latest;
   const {data:{session}}=await db.auth.getSession();
   if(session?.user){
     const {data:progress}=await db.from("mangamorph_reading_progress").select("chapter_number,page_number,progress_percent").eq("user_id",session.user.id).eq("manga_id",id).maybeSingle();
     if(progress?.chapter_number){
-      const read=$("#readLatest");
-      const targetChapter=Number(progress.chapter_number);
+      targetChapter=Number(progress.chapter_number);
       $("#readLatestLabel").textContent="Continuar capítulo "+targetChapter;
-      read.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();location.href="reader.html?id="+id+"&chapter="+targetChapter},true);
     }
+  }
+  const read=$("#readLatest");
+  if(targetChapter){
+    read.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();location.href="reader.html?id="+id+"&chapter="+targetChapter},true);
   }
 
   const related=(catalog||[]).filter(x=>Number(x.id)!==id).slice(0,8);
