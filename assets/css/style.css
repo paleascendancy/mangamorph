@@ -3862,3 +3862,7 @@ body.light .pagination button.active{
 
 /* Profile privacy controls v1 */
 .profile-privacy-section{display:grid;gap:.34rem;padding:.58rem;border:1px solid rgba(255,255,255,.055);border-radius:.7rem;background:#0d141d}.profile-privacy-section>span{color:#aeb8c7;font-size:.56rem;font-weight:720}.profile-privacy-section label{display:grid!important;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:.48rem;margin:0;padding:.4rem .42rem;border:1px solid rgba(255,255,255,.04);border-radius:.58rem;background:#101821}.profile-privacy-section input{width:1rem!important;height:1rem;accent-color:#5b8def}.profile-privacy-section label span{margin:0!important}.profile-privacy-section strong,.profile-privacy-section small{display:block}.profile-privacy-section strong{color:#cbd4e0;font-size:.56rem}.profile-privacy-section small{margin-top:.06rem;color:#68788e;font-size:.47rem}.light .profile-privacy-section{background:#fff;border-color:rgba(17,24,36,.07)}.light .profile-privacy-section label{background:#f5f7fa;border-color:rgba(17,24,36,.05)}.light .profile-privacy-section strong{color:#17202c}
+
+
+/* Performance containment v1 */
+.catalog-section,.releases-section{content-visibility:auto;contain-intrinsic-size:700px}.footer a{color:inherit}.footer a:hover{color:#8db7ef}
