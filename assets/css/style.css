@@ -1048,3 +1048,231 @@ body.light .account-stat + .account-stat{
     font-size:1.28rem;
   }
 }
+
+
+/* Account drawer reference redesign */
+.account-panel{
+  position:fixed;
+  inset:0;
+  z-index:115;
+}
+.account-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(3,5,9,.76);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+.account-drawer{
+  position:absolute;
+  top:0;
+  right:0;
+  width:min(430px,92vw);
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(180deg,#1a2434 0%,#182231 100%);
+  border-left:1px solid rgba(255,255,255,.08);
+  box-shadow:-24px 0 70px rgba(0,0,0,.46);
+  animation:accountDrawerIn .22s ease-out;
+}
+@keyframes accountDrawerIn{
+  from{transform:translateX(100%)}
+  to{transform:translateX(0)}
+}
+.account-drawer-close{
+  position:absolute;
+  top:1rem;
+  right:1rem;
+  z-index:2;
+  width:2.5rem;
+  height:2.5rem;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:.85rem;
+  background:rgba(8,12,18,.24);
+  color:#dce3ed;
+  font-size:1.25rem;
+  cursor:pointer;
+}
+.account-guest{
+  padding:3.2rem 1.5rem 2rem;
+  text-align:center;
+}
+.account-avatar-ring{
+  width:7rem;
+  height:7rem;
+  display:grid;
+  place-items:center;
+  margin:0 auto 1rem;
+  border:3px solid rgba(149,164,185,.38);
+  border-radius:50%;
+  background:rgba(255,255,255,.025);
+  box-shadow:0 0 0 6px rgba(255,255,255,.025),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.account-avatar-core{
+  width:5.55rem;
+  height:5.55rem;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:linear-gradient(145deg,#202c3d,#1b2635);
+}
+.account-avatar-core svg{
+  width:2.25rem;
+  height:2.25rem;
+  fill:none;
+  stroke:#95a0b0;
+  stroke-width:1.55;
+  stroke-linecap:round;
+}
+.account-guest h2{
+  margin:0;
+  font-size:1.7rem;
+  letter-spacing:-.035em;
+}
+.account-status{
+  margin:.35rem 0 1.25rem;
+  color:#8792a4;
+  font-size:.95rem;
+}
+.account-auth-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.7rem;
+  max-width:320px;
+  margin:0 auto;
+}
+.account-auth-button{
+  min-height:3rem;
+  border-radius:.72rem;
+  font-weight:850;
+  cursor:pointer;
+}
+.account-auth-button.primary{
+  border:1px solid #e8edf4;
+  background:#eef2f6;
+  color:#111721;
+}
+.account-auth-button.secondary{
+  border:1px solid rgba(219,228,240,.38);
+  background:transparent;
+  color:#e8edf4;
+}
+.account-auth-button:hover{
+  transform:translateY(-1px);
+}
+.account-auth-message{
+  max-width:300px;
+  margin:.85rem auto 0;
+  color:#8d98aa;
+  font-size:.72rem;
+  line-height:1.4;
+}
+.account-divider{
+  height:1px;
+  background:rgba(255,255,255,.085);
+}
+.account-theme-row{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:.75rem;
+  width:100%;
+  min-height:5rem;
+  padding:0 1.55rem;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.065);
+  background:transparent;
+  color:#e7ebf2;
+  text-align:left;
+  cursor:pointer;
+}
+.account-theme-row:hover{
+  background:rgba(255,255,255,.025);
+}
+.account-theme-icon{
+  width:2rem;
+  text-align:center;
+  color:#9ca8b9;
+  font-size:1.35rem;
+}
+.account-theme-label{
+  font-size:1.05rem;
+  font-weight:800;
+}
+.account-theme-value{
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+  color:#9da7b8;
+  font-size:.9rem;
+}
+.account-theme-dot{
+  width:.48rem;
+  height:.48rem;
+  border-radius:50%;
+  background:#d6dde7;
+  box-shadow:0 0 0 4px rgba(214,221,231,.06);
+}
+.account-theme-chevron{
+  color:#7f8b9e;
+  font-size:1.35rem;
+}
+.account-drawer-footer{
+  margin-top:auto;
+  padding:1.25rem;
+  border-top:1px solid rgba(255,255,255,.07);
+  color:#8d98aa;
+  text-align:center;
+  font-size:.8rem;
+}
+body.light .account-drawer{
+  background:linear-gradient(180deg,#f2f4f7,#e9edf2);
+  color:#131923;
+  border-color:rgba(0,0,0,.08);
+}
+body.light .account-drawer-close,
+body.light .account-theme-row{
+  color:#1b2230;
+}
+body.light .account-avatar-ring{
+  border-color:rgba(35,44,58,.2);
+}
+body.light .account-avatar-core{
+  background:#fff;
+}
+body.light .account-avatar-core svg{
+  stroke:#687386;
+}
+body.light .account-theme-row,
+body.light .account-drawer-footer,
+body.light .account-divider{
+  border-color:rgba(0,0,0,.08);
+}
+body.light .account-auth-button.primary{
+  background:#111721;
+  color:#fff;
+  border-color:#111721;
+}
+body.light .account-auth-button.secondary{
+  color:#111721;
+  border-color:rgba(17,23,33,.22);
+}
+@media(max-width:620px){
+  .account-drawer{
+    width:calc(100% - 1rem);
+  }
+  .account-guest{
+    padding-top:3.8rem;
+  }
+  .account-avatar-ring{
+    width:6.6rem;
+    height:6.6rem;
+  }
+  .account-avatar-core{
+    width:5.2rem;
+    height:5.2rem;
+  }
+}
