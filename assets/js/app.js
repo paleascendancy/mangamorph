@@ -22,7 +22,8 @@ const state = {
   totalPages: 5,
   favorites: new Set(JSON.parse(localStorage.getItem("mangamorph:favorites") || "[]")),
   filter: localStorage.getItem("mangamorph:filter") || "Todos",
-  notifications: localStorage.getItem("mangamorph:notifications") === "on"
+  notifications: localStorage.getItem("mangamorph:notifications") === "on",
+  history: JSON.parse(localStorage.getItem("mangamorph:history") || "[]")
 };
 
 const popularRail = document.querySelector("#popularRail");
@@ -38,6 +39,7 @@ const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
 const searchCount = document.querySelector("#searchCount");
 let searchGenre = "Todos";
+let searchMode = "all";
 const rankingPanel = document.querySelector("#rankingPanel");
 const rankingTitle = document.querySelector("#rankingTitle");
 const rankingList = document.querySelector("#rankingList");
@@ -57,7 +59,13 @@ const accountPanel = document.querySelector("#accountPanel");
 const accountToggle = document.querySelector("#accountToggle");
 const accountClose = document.querySelector("#accountClose");
 const accountThemeName = document.querySelector("#accountThemeName");
+const accountLanguageName = document.querySelector("#accountLanguageName");
 const accountThemeRow = document.querySelector("#accountThemeRow");
+const accountLanguageRow = document.querySelector("#accountLanguageRow");
+const accountFavorites = document.querySelector("#accountFavorites");
+const accountHistory = document.querySelector("#accountHistory");
+const accountFavoritesCount = document.querySelector("#accountFavoritesCount");
+const accountHistoryCount = document.querySelector("#accountHistoryCount");
 const accountLogin = document.querySelector("#accountLogin");
 const accountRegister = document.querySelector("#accountRegister");
 const accountAuthMessage = document.querySelector("#accountAuthMessage");
@@ -67,6 +75,9 @@ function formatNumber(value) {
 }
 
 function openManga(id) {
+  const cleanHistory = state.history.filter(function(historyId){ return historyId !== id; });
+  state.history = [id].concat(cleanHistory).slice(0,20);
+  localStorage.setItem("mangamorph:history", JSON.stringify(state.history));
   location.href = "manga.html?id=" + id;
 }
 
@@ -190,11 +201,27 @@ function toggleFavorite(id) {
   else state.favorites.add(id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(state.favorites)));
   renderCatalogs();
+  if (accountFavoritesCount) accountFavoritesCount.textContent = String(state.favorites.size);
 }
 
-function openSearch() {
+function openSearch(mode) {
+  searchMode = mode || "all";
   searchPanel.hidden = false;
   document.body.style.overflow = "hidden";
+
+  const title = document.querySelector("#searchTitle");
+  const subtitle = document.querySelector(".search-subtitle");
+  if (searchMode === "favorites") {
+    title.textContent = "Seus favoritos";
+    subtitle.textContent = "Obras que você marcou para acompanhar.";
+  } else if (searchMode === "history") {
+    title.textContent = "Seu histórico";
+    subtitle.textContent = "Últimas obras que você abriu.";
+  } else {
+    title.textContent = "Buscar no MangaMorph";
+    subtitle.textContent = "Encontre títulos, gêneros e capítulos rapidamente.";
+  }
+
   setTimeout(function(){searchInput.focus();},0);
   renderSearch(searchInput.value || "");
 }
@@ -207,6 +234,11 @@ function closeSearch() {
 function renderSearch(query) {
   const normalized = query.trim().toLowerCase();
   let source = getFilteredCatalog();
+  if (searchMode === "favorites") {
+    source = source.filter(function(item){ return state.favorites.has(item.id); });
+  } else if (searchMode === "history") {
+    source = state.history.map(function(id){ return catalog.find(function(item){ return item.id === id; }); }).filter(Boolean);
+  }
   if (searchGenre !== "Todos") source = source.filter(function(item){ return item.genre === searchGenre; });
   const matches = normalized ? source.filter(function(item){
     return (item.title + " " + item.genre).toLowerCase().includes(normalized);
@@ -243,7 +275,11 @@ function closeSideMenu() {
 }
 
 function updateAccountPanel() {
+  accountThemeName.textContent = document.body.classList.contains("light") ? "Escuro" : "Escuro";
   accountThemeName.textContent = document.body.classList.contains("light") ? "Claro" : "Escuro";
+  accountLanguageName.textContent = document.documentElement.lang === "en" ? "EN" : "PT";
+  accountFavoritesCount.textContent = String(state.favorites.size);
+  accountHistoryCount.textContent = String(state.history.length);
 }
 
 function openAccount() {
@@ -293,6 +329,7 @@ function applyLanguage(language) {
   document.querySelectorAll("[data-language]").forEach(function(button){
     button.classList.toggle("active", button.dataset.language === language);
   });
+  if (accountLanguageName) accountLanguageName.textContent = language === "en" ? "EN" : "PT";
 }
 
 function applyFilter(filter) {
@@ -400,23 +437,46 @@ document.addEventListener("keydown", function(event) {
 
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
-    openSearch();
+    openSearch("all");
   }
 });
 
 rankingClose.addEventListener("click", closeRanking);
 prevPage.addEventListener("click", function(){ goToPage(state.currentPage - 1); });
 nextPage.addEventListener("click", function(){ goToPage(state.currentPage + 1); });
-document.querySelector("#searchToggle").addEventListener("click", openSearch);
+document.querySelector("#searchToggle").addEventListener("click", function(){ openSearch("all"); });
 document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
 settingsToggle.addEventListener("click", openSettings);
 accountToggle.addEventListener("click", openAccount);
 accountClose.addEventListener("click", closeAccount);
+accountFavorites.addEventListener("click", function(){
+  closeAccount();
+  searchInput.value = "";
+  searchGenre = "Todos";
+  document.querySelectorAll("[data-search-filter]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.searchFilter === "Todos");
+  });
+  openSearch("favorites");
+});
+accountHistory.addEventListener("click", function(){
+  closeAccount();
+  searchInput.value = "";
+  searchGenre = "Todos";
+  document.querySelectorAll("[data-search-filter]").forEach(function(button){
+    button.classList.toggle("active", button.dataset.searchFilter === "Todos");
+  });
+  openSearch("history");
+});
 accountThemeRow.addEventListener("click", function(){
   closeAccount();
   openSettings();
   toggleSettingsSection("theme");
+});
+accountLanguageRow.addEventListener("click", function(){
+  closeAccount();
+  openSettings();
+  toggleSettingsSection("language");
 });
 [accountLogin, accountRegister].forEach(function(button){
   button.addEventListener("click", function(){
