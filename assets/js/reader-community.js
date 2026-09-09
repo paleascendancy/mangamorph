@@ -13,6 +13,9 @@ let profile = null;
 let comments = [];
 let votes = [];
 let reactions = [];
+let replies = [];
+let replyingTo = null;
+let commentSort = "recent";
 
 const title = document.querySelector("#chapterCommunityTitle");
 const reactionTotal = document.querySelector("#chapterReactionTotal");
@@ -29,6 +32,7 @@ const commentMeta = document.querySelector("#chapterCommentMeta");
 const commentSubmit = document.querySelector("#chapterCommentSubmit");
 const commentList = document.querySelector("#chapterCommentList");
 const commentEmpty = document.querySelector("#chapterCommentEmpty");
+const commentSortSelect = document.querySelector("#chapterCommentSort");
 
 function escapeHtml(value){
   return String(value ?? "")
@@ -129,12 +133,40 @@ function myVote(commentId){
   return row ? Number(row.vote) : 0;
 }
 
+function repliesFor(commentId){
+  return replies.filter(row=>Number(row.comment_id)===Number(commentId));
+}
+
+function renderReplies(commentId){
+  const rows=repliesFor(commentId);
+  if(!rows.length)return "";
+  return '<div class="chapter-replies">'+rows.map(reply=>{
+    const author=reply.author||{},name=author.display_name||"Leitor",image=avatarUrl(author.avatar_url);
+    const mine=session?.user?.id===reply.user_id;
+    const avatar=image?'<img src="'+escapeHtml(image)+'" alt="" loading="lazy">':'<span>'+escapeHtml(initials(name))+'</span>';
+    return '<div class="chapter-reply-item"><div class="chapter-comment-avatar reply" style="--avatar-accent:'+escapeHtml(author.accent||"#5b8def")+'">'+avatar+'</div><div><div class="chapter-reply-top"><strong>'+escapeHtml(name)+'</strong><span>@'+escapeHtml(author.username||"usuario")+'</span><time>'+escapeHtml(formatDate(reply.created_at))+'</time></div><p>'+escapeHtml(reply.content)+'</p>'+(mine?'<button type="button" data-delete-reply="'+reply.id+'">Excluir</button>':'')+'</div></div>';
+  }).join("")+'</div>';
+}
+
+function renderReplyComposer(commentId){
+  if(replyingTo!==Number(commentId))return "";
+  return '<form class="chapter-reply-form" data-reply-form="'+commentId+'"><textarea maxlength="280" rows="2" placeholder="Escreva uma resposta..." required></textarea><div><button type="button" data-cancel-reply>Cancelar</button><button type="submit">Responder</button></div></form>';
+}
+
 function renderComments(){
   const count = comments.length;
   commentCount.textContent = count + (count === 1 ? " comentário" : " comentários");
   commentEmpty.hidden = count > 0;
 
-  commentList.innerHTML = comments.map(item => {
+  const ordered=comments.slice().sort((a,b)=>{
+    if(commentSort==="top"){
+      const scoreA=voteCount(a.id,1)-voteCount(a.id,-1),scoreB=voteCount(b.id,1)-voteCount(b.id,-1);
+      return scoreB-scoreA||new Date(b.created_at)-new Date(a.created_at);
+    }
+    return new Date(b.created_at)-new Date(a.created_at);
+  });
+
+  commentList.innerHTML = ordered.map(item => {
     const author = item.author || {};
     const name = author.display_name || "Leitor";
     const username = author.username || "usuario";
@@ -155,8 +187,11 @@ function renderComments(){
         '<div class="chapter-comment-actions">' +
           '<button type="button" data-vote-comment="' + item.id + '" data-vote-value="1" class="' + (currentVote === 1 ? 'active like' : '') + '">👍 <span>' + voteCount(item.id,1) + '</span></button>' +
           '<button type="button" data-vote-comment="' + item.id + '" data-vote-value="-1" class="' + (currentVote === -1 ? 'active dislike' : '') + '">👎 <span>' + voteCount(item.id,-1) + '</span></button>' +
-          (mine ? '<button type="button" data-delete-comment="' + item.id + '" class="delete">Excluir</button>' : '') +
+          '<button type="button" data-reply-comment="' + item.id + '">Responder</button>' +
+          (mine ? '<button type="button" data-edit-comment="' + item.id + '">Editar</button><button type="button" data-delete-comment="' + item.id + '" class="delete">Excluir</button>' : '<button type="button" data-report-comment="' + item.id + '" class="report">Denunciar</button>') +
         '</div>' +
+        renderReplies(item.id) +
+        renderReplyComposer(item.id) +
       '</div>' +
     '</article>';
   }).join("");
@@ -179,8 +214,19 @@ async function loadComments(){
   }
 
   comments = data || [];
-  await loadVotes();
+  await Promise.all([loadVotes(),loadReplies()]);
   renderComments();
+}
+
+async function loadReplies(){
+  if(!comments.length){replies=[];return}
+  const ids=comments.map(item=>item.id);
+  const {data,error}=await supabase
+    .from("mangamorph_comment_replies")
+    .select('id,comment_id,user_id,content,created_at,author:mangamorph_profiles!mangamorph_comment_replies_user_id_fkey(display_name,username,avatar_url,accent)')
+    .in("comment_id",ids)
+    .order("created_at",{ascending:true});
+  replies=error?[]:(data||[]);
 }
 
 function myReactions(){
@@ -250,9 +296,46 @@ commentForm.addEventListener("submit",async event => {
   }
 });
 
+commentSortSelect.addEventListener("change",()=>{commentSort=commentSortSelect.value;renderComments()});
+
+commentList.addEventListener("submit",async event=>{
+  const form=event.target.closest("[data-reply-form]");if(!form)return;
+  event.preventDefault();
+  if(!session?.user||!profile){location.href=loginUrl();return}
+  const text=form.querySelector("textarea").value.trim();if(!text)return;
+  const commentId=Number(form.dataset.replyForm);
+  const {error}=await supabase.from("mangamorph_comment_replies").insert({comment_id:commentId,user_id:session.user.id,content:text.slice(0,280)});
+  if(!error){replyingTo=null;await loadReplies();renderComments()}
+});
+
 commentList.addEventListener("click",async event => {
   const voteButton = event.target.closest("[data-vote-comment]");
   const remove = event.target.closest("[data-delete-comment]");
+  const replyButton=event.target.closest("[data-reply-comment]");
+  const cancelReply=event.target.closest("[data-cancel-reply]");
+  const editButton=event.target.closest("[data-edit-comment]");
+  const reportButton=event.target.closest("[data-report-comment]");
+  const deleteReply=event.target.closest("[data-delete-reply]");
+
+  if(replyButton){if(!session?.user){location.href=loginUrl();return}replyingTo=Number(replyButton.dataset.replyComment);renderComments();return}
+  if(cancelReply){replyingTo=null;renderComments();return}
+  if(editButton&&session?.user){
+    const id=Number(editButton.dataset.editComment),item=comments.find(x=>Number(x.id)===id);if(!item)return;
+    const next=prompt("Editar comentário",item.content);if(next===null)return;
+    const text=next.trim();if(!text)return;
+    await supabase.from("mangamorph_comments").update({content:text.slice(0,280)}).eq("id",id).eq("user_id",session.user.id);
+    await loadComments();return;
+  }
+  if(reportButton){
+    if(!session?.user){location.href=loginUrl();return}
+    if(!confirm("Denunciar este comentário para a moderação?"))return;
+    await supabase.from("mangamorph_reports").insert({reporter_id:session.user.id,target_type:"comment",target_id:String(reportButton.dataset.reportComment),reason:"Conteúdo inadequado",details:"Denúncia enviada pelo leitor do capítulo."});
+    reportButton.textContent="Denunciado";reportButton.disabled=true;return;
+  }
+  if(deleteReply&&session?.user){
+    await supabase.from("mangamorph_comment_replies").delete().eq("id",Number(deleteReply.dataset.deleteReply)).eq("user_id",session.user.id);
+    await loadReplies();renderComments();return;
+  }
 
   if(voteButton){
     if(!session?.user){
@@ -343,6 +426,8 @@ window.addEventListener("mangamorph:reader-chapter-change",async event => {
   comments = [];
   votes = [];
   reactions = [];
+  replies = [];
+  replyingTo = null;
   await refreshChapter();
 });
 
