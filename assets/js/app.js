@@ -73,6 +73,13 @@ const accountHistoryCount = document.querySelector("#accountHistoryCount");
 const accountLogin = document.querySelector("#accountLogin");
 const accountRegister = document.querySelector("#accountRegister");
 const accountAuthMessage = document.querySelector("#accountAuthMessage");
+const accountTitle = document.querySelector("#accountTitle");
+const accountHubSubtitle = document.querySelector(".account-hub-subtitle");
+const accountProfileActions = document.querySelector("#accountProfileActions");
+const accountAvatarInput = document.querySelector("#accountAvatarInput");
+const accountAvatarButtonLabel = document.querySelector("#accountAvatarButtonLabel");
+const accountProfileImage = document.querySelector("#accountProfileImage");
+const headerProfileImage = document.querySelector("#headerProfileImage");
 const accountProfile = document.querySelector("#accountProfile");
 const accountReadingList = document.querySelector("#accountReadingList");
 const accountReadingListCount = document.querySelector("#accountReadingListCount");
@@ -376,7 +383,11 @@ function renderProfileUI() {
   accountAuthActions.hidden = active;
   accountLogout.hidden = !active;
   accountProfileStats.hidden = !active;
+  accountProfileActions.hidden = !active;
   accountAuthMessage.hidden = true;
+
+  accountTitle.textContent = active ? "Perfil" : "Conta";
+  accountHubSubtitle.textContent = active ? "Sua conta, identidade e biblioteca." : "Entre ou crie uma conta para continuar.";
 
   accountFavoritesCount.textContent = String(state.favorites.size);
   accountHistoryCount.textContent = String(state.history.length);
@@ -387,31 +398,41 @@ function renderProfileUI() {
 
   if (active) {
     const initials = profileInitials(profile.name);
+    const hasAvatar = Boolean(profile.avatarUrl);
+
     accountProfileName.textContent = profile.name;
     accountProfileHandle.textContent = "@" + profile.username;
     accountProfileHandle.hidden = false;
     accountProfileBio.textContent = profile.bio || "Leitor do MangaMorph.";
-    accountProfileInitials.textContent = initials;
-    accountProfileInitials.hidden = false;
-    accountGuestAvatar.hidden = true;
-    accountProfileAvatar.style.setProperty("--profile-accent",profile.accent || "#5b8def");
     accountSessionBadge.innerHTML = "<span></span> Online";
     accountSessionBadge.classList.add("online");
+    accountProfileAvatar.style.setProperty("--profile-accent",profile.accent || "#5b8def");
 
+    accountProfileImage.hidden = !hasAvatar;
+    if (hasAvatar) accountProfileImage.src = profile.avatarUrl;
+    accountProfileInitials.textContent = initials;
+    accountProfileInitials.hidden = hasAvatar;
+    accountGuestAvatar.hidden = true;
+    accountAvatarButtonLabel.textContent = hasAvatar ? "Trocar foto" : "Adicionar foto";
+
+    headerProfileImage.hidden = !hasAvatar;
+    if (hasAvatar) headerProfileImage.src = profile.avatarUrl;
     headerProfileInitials.textContent = initials;
-    headerProfileInitials.hidden = false;
+    headerProfileInitials.hidden = hasAvatar;
     headerGuestIcon.hidden = true;
     accountToggle.style.setProperty("--profile-accent",profile.accent || "#5b8def");
   } else {
     accountProfileName.textContent = "Convidado";
     accountProfileHandle.hidden = true;
-    accountProfileBio.textContent = profile ? "Seu perfil está salvo neste dispositivo. Entre para continuar." : "Crie um perfil para organizar sua biblioteca pessoal.";
+    accountProfileBio.textContent = "Entre ou crie uma conta para sincronizar seu perfil.";
+    accountProfileImage.hidden = true;
     accountProfileInitials.hidden = true;
     accountGuestAvatar.hidden = false;
     accountProfileAvatar.style.removeProperty("--profile-accent");
     accountSessionBadge.innerHTML = "<span></span> Offline";
     accountSessionBadge.classList.remove("online");
 
+    headerProfileImage.hidden = true;
     headerProfileInitials.hidden = true;
     headerGuestIcon.hidden = false;
     accountToggle.style.removeProperty("--profile-accent");
@@ -638,11 +659,11 @@ accountHistory.addEventListener("click", function(){
 });
 accountRegister.addEventListener("click", function(){
   closeAccount();
-  window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"register"}}));
+  window.dispatchEvent(new CustomEvent("mangamorph:open-register"));
 });
 accountLogin.addEventListener("click", function(){
   closeAccount();
-  window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"login"}}));
+  window.dispatchEvent(new CustomEvent("mangamorph:open-login"));
 });
 accountLogout.addEventListener("click", function(){
   window.dispatchEvent(new CustomEvent("mangamorph:sign-out"));
@@ -650,7 +671,7 @@ accountLogout.addEventListener("click", function(){
 accountProfile.addEventListener("click", function(){
   closeAccount();
   if (state.profileSession) openProfileEditor("edit");
-  else window.dispatchEvent(new CustomEvent("mangamorph:open-auth",{detail:{mode:"login"}}));
+  else window.dispatchEvent(new CustomEvent("mangamorph:open-login"));
 });
 accountReadingList.addEventListener("click", function(){
   closeAccount();
@@ -662,6 +683,12 @@ accountReadingList.addEventListener("click", function(){
   document.querySelector("#searchTitle").textContent = "Minha lista";
   document.querySelector(".search-subtitle").textContent = "Obras que você salvou para acompanhar.";
   renderSearch("");
+});
+accountAvatarInput.addEventListener("change", function(){
+  const file = accountAvatarInput.files && accountAvatarInput.files[0];
+  if (!file) return;
+  window.dispatchEvent(new CustomEvent("mangamorph:avatar-upload",{detail:{file:file}}));
+  accountAvatarInput.value = "";
 });
 profileClose.addEventListener("click", closeProfileEditor);
 profileCancel.addEventListener("click", closeProfileEditor);
@@ -713,6 +740,11 @@ window.addEventListener("mangamorph:auth-state", function(event){
   }
 
   renderProfileUI();
+});
+
+window.addEventListener("mangamorph:auth-complete", function(){
+  if (!accountPanel.hidden) return;
+  openAccount();
 });
 
 window.addEventListener("mangamorph:auth-message", function(event){
