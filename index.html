@@ -14,6 +14,7 @@
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=023">
+  <link rel="stylesheet" href="assets/css/settings.css?v=001">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
 <body>
@@ -33,7 +34,7 @@
     </nav>
 
     <div class="topbar-actions">
-      <button class="icon-button" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
+      <button class="icon-button" id="settingsToggle" aria-label="Abrir configurações" title="Configurações">⚙</button>
       <button class="icon-button" id="searchToggle" aria-label="Abrir busca" title="Buscar">⌕</button>
     </div>
   </header>
@@ -125,6 +126,70 @@
     </section>
   </main>
 
+  <div class="settings-panel" id="settingsPanel" hidden>
+    <div class="settings-backdrop" data-close-settings></div>
+    <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="settings-header">
+        <div class="settings-title">
+          <span class="settings-title-icon" aria-hidden="true">⚙</span>
+          <div><h2 id="settingsTitle">Configurações</h2><p>Personalize sua experiência</p></div>
+        </div>
+        <button class="icon-button" id="settingsClose" aria-label="Fechar configurações">×</button>
+      </div>
+
+      <div class="settings-list">
+        <button class="settings-row" type="button" data-settings-section="language">
+          <span class="settings-row-icon" aria-hidden="true">文</span>
+          <span class="settings-row-copy"><strong>Idioma</strong><span>Idioma da interface</span></span>
+          <span class="settings-row-end"><span id="languageValue">Português</span><span class="settings-chevron">›</span></span>
+        </button>
+        <div class="settings-submenu" id="languageMenu" hidden>
+          <button class="settings-option active" type="button" data-language="pt-BR">Português</button>
+          <button class="settings-option" type="button" data-language="en">English</button>
+        </div>
+
+        <button class="settings-row" type="button" data-settings-section="theme">
+          <span class="settings-row-icon" aria-hidden="true">◐</span>
+          <span class="settings-row-copy"><strong>Tema</strong><span>Aparência do MangaMorph</span></span>
+          <span class="settings-row-end"><span id="themeValue">Escuro</span><span class="settings-chevron">›</span></span>
+        </button>
+        <div class="settings-submenu" id="themeMenu" hidden>
+          <button class="settings-option active" type="button" data-theme="dark">Escuro</button>
+          <button class="settings-option" type="button" data-theme="light">Claro</button>
+        </div>
+
+        <button class="settings-row" type="button" data-settings-section="filter">
+          <span class="settings-row-icon" aria-hidden="true">⌁</span>
+          <span class="settings-row-copy"><strong>Filtrar por tipo</strong><span>Escolha o gênero exibido</span></span>
+          <span class="settings-row-end"><span id="filterValue">Todos</span><span class="settings-chevron">›</span></span>
+        </button>
+        <div class="settings-submenu" id="filterMenu" hidden>
+          <button class="settings-option active" type="button" data-filter="Todos">Todos</button>
+          <button class="settings-option" type="button" data-filter="Ação">Ação</button>
+          <button class="settings-option" type="button" data-filter="Fantasia">Fantasia</button>
+          <button class="settings-option" type="button" data-filter="Mistério">Mistério</button>
+          <button class="settings-option" type="button" data-filter="Drama">Drama</button>
+          <button class="settings-option" type="button" data-filter="Suspense">Suspense</button>
+        </div>
+
+        <button class="settings-row" id="notificationToggle" type="button" aria-pressed="false">
+          <span class="settings-row-icon" aria-hidden="true">♢</span>
+          <span class="settings-row-copy"><strong>Notificações</strong><span>Alertas de novos capítulos</span></span>
+          <span class="settings-row-end"><span class="settings-toggle" id="notificationSwitch" aria-hidden="true"></span></span>
+        </button>
+
+        <button class="settings-row" type="button" data-settings-section="about">
+          <span class="settings-row-icon" aria-hidden="true">i</span>
+          <span class="settings-row-copy"><strong>Sobre</strong><span>MangaMorph v0.1</span></span>
+          <span class="settings-row-end"><span class="settings-chevron">›</span></span>
+        </button>
+        <div class="settings-submenu" id="aboutMenu" hidden>
+          <div class="settings-about"><strong>MangaMorph v0.1</strong><br>Interface experimental para descobrir, acompanhar e organizar mangás em um só lugar.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div class="search-panel" id="searchPanel" hidden>
     <div class="search-backdrop" data-close-search></div>
     <section class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
@@ -163,6 +228,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=016" defer></script>
+  <script src="assets/js/app.js?v=017" defer></script>
 </body>
 </html>
