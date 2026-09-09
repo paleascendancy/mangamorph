@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=027">
+  <link rel="stylesheet" href="assets/css/style.css?v=028">
   <link rel="stylesheet" href="assets/css/settings.css?v=001">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -170,6 +170,56 @@
     </section>
   </main>
 
+
+  <div class="account-panel" id="accountPanel" hidden>
+    <div class="account-backdrop" data-close-account></div>
+    <section class="account-dialog" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+      <div class="account-top">
+        <div class="account-avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4.5 20c.9-4 3.4-6 7.5-6s6.6 2 7.5 6"></path>
+          </svg>
+        </div>
+        <div class="account-heading">
+          <span class="account-kicker">PERFIL</span>
+          <h2 id="accountTitle">Visitante</h2>
+          <p>Seu espaço no MangaMorph</p>
+        </div>
+        <button class="account-close" id="accountClose" type="button" aria-label="Fechar perfil">×</button>
+      </div>
+
+      <div class="account-stats">
+        <div class="account-stat">
+          <strong id="accountFavoriteCount">0</strong>
+          <span>Favoritos</span>
+        </div>
+        <div class="account-stat">
+          <strong id="accountThemeName">Escuro</strong>
+          <span>Tema</span>
+        </div>
+      </div>
+
+      <div class="account-actions">
+        <button type="button" class="account-action primary" id="accountFavorites">
+          <span class="account-action-icon">☆</span>
+          <span><strong>Meus favoritos</strong><small>Ver obras marcadas</small></span>
+          <span class="account-action-chevron">›</span>
+        </button>
+        <button type="button" class="account-action" id="accountSettings">
+          <span class="account-action-icon">⚙</span>
+          <span><strong>Configurações</strong><small>Idioma, tema e filtros</small></span>
+          <span class="account-action-chevron">›</span>
+        </button>
+      </div>
+
+      <div class="account-login-note">
+        <span class="account-note-dot"></span>
+        <p><strong>Conta MangaMorph</strong><br>Login e sincronização serão conectados ao backend em uma próxima etapa.</p>
+      </div>
+    </section>
+  </div>
+
   <div class="settings-panel" id="settingsPanel" hidden>
     <div class="settings-backdrop" data-close-settings></div>
     <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
@@ -272,6 +322,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=018" defer></script>
+  <script src="assets/js/app.js?v=019" defer></script>
 </body>
 </html>
