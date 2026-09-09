@@ -1090,3 +1090,117 @@
     bottom:max(.45rem,env(safe-area-inset-bottom));
   }
 }
+
+
+/* Reader width + light theme hard fix v3 */
+html{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body.reader-body{
+  width:100%;
+  max-width:none;
+  min-width:0;
+  overflow-x:hidden;
+}
+.reader-header,
+.reader-main,
+.reader-progress-shell,
+.reader-stage{
+  width:100%;
+  max-width:100%;
+}
+.reader-main{
+  margin-inline:auto;
+}
+.reader-stage,
+.reader-finish,
+.chapter-community{
+  min-width:0;
+}
+.reader-page{
+  max-width:100%;
+}
+
+.light-reader .reader-page{
+  background:
+    radial-gradient(circle at 78% 18%,rgba(90,117,153,.08),transparent 25%),
+    linear-gradient(145deg,#ffffff,#f4f6f9 60%,#edf1f5);
+  color:#17202b;
+  border-color:rgba(17,24,36,.07);
+}
+.light-reader .reader-page:before{
+  opacity:.12;
+}
+.light-reader .reader-page-copy span{
+  color:#708096;
+}
+.light-reader .reader-page-copy strong{
+  color:#17202b;
+}
+.light-reader .reader-page-copy small{
+  color:#5d697b;
+}
+
+@media(max-width:760px){
+  body.reader-body{
+    width:100vw;
+    max-width:100vw;
+  }
+  .reader-header{
+    width:100vw;
+    max-width:100vw;
+  }
+  .reader-main{
+    width:100vw;
+    max-width:100vw;
+    margin:0;
+  }
+  .reader-progress-shell{
+    width:100vw;
+  }
+  .reader-stage{
+    width:100vw;
+  }
+  .reader-finish{
+    width:calc(100vw - 1rem);
+    margin:.75rem .5rem 0;
+  }
+  .chapter-community{
+    width:calc(100vw - 1rem) !important;
+    max-width:calc(100vw - 1rem);
+    margin:.75rem .5rem 0 !important;
+  }
+  .chapter-reactions{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    grid-auto-flow:row !important;
+    grid-auto-columns:auto !important;
+    overflow:visible !important;
+    width:100%;
+  }
+  .chapter-reactions button{
+    width:100%;
+    min-width:0;
+  }
+  .chapter-comment-composer{
+    width:100%;
+  }
+}
+
+@media(max-width:430px){
+  .chapter-community{
+    padding:.65rem;
+  }
+  .chapter-reactions{
+    gap:.3rem;
+  }
+  .chapter-reactions button{
+    min-height:2.65rem;
+    padding:.36rem .42rem;
+  }
+  .chapter-reactions button strong{
+    font-size:.5rem;
+  }
+}
