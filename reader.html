@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080b11">
+  <meta name="description" content="Leitor de capítulos do MangaMorph.">
+  <title>MangaMorph — Leitor</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/style.css?v=038">
+  <link rel="stylesheet" href="assets/css/reader.css?v=001">
+</head>
+<body class="reader-body">
+  <header class="reader-header" id="readerHeader">
+    <a class="reader-back" id="readerBack" href="manga.html" aria-label="Voltar para a obra">←</a>
+
+    <div class="reader-heading">
+      <span class="reader-brand">MangaMorph</span>
+      <strong id="readerTitle">Neon Ronin</strong>
+      <small id="readerChapterLabel">Capítulo 127</small>
+    </div>
+
+    <button class="reader-icon-button" id="readerSettingsButton" type="button" aria-label="Configurações de leitura">⚙</button>
+  </header>
+
+  <main class="reader-main">
+    <div class="reader-progress-shell">
+      <div class="reader-progress-meta">
+        <span id="readerProgressText">Página 1 de 6</span>
+        <span id="readerProgressPercent">0%</span>
+      </div>
+      <div class="reader-progress-track"><span id="readerProgressBar"></span></div>
+    </div>
+
+    <section class="reader-stage" id="readerStage" aria-label="Páginas do capítulo"></section>
+
+    <div class="reader-finish" id="readerFinish">
+      <span>Fim do capítulo</span>
+      <strong id="finishChapterLabel">Capítulo 127 concluído</strong>
+      <div class="reader-finish-actions">
+        <button type="button" id="finishPrevious">← Anterior</button>
+        <button type="button" id="finishNext">Próximo →</button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="reader-bottom-bar" aria-label="Controles do leitor">
+    <button type="button" id="previousChapter" aria-label="Capítulo anterior">←</button>
+    <button class="reader-chapter-pill" type="button" id="chapterPickerButton">
+      <span>Capítulo</span>
+      <strong id="bottomChapterLabel">127</strong>
+      <small>⌄</small>
+    </button>
+    <button type="button" id="nextChapter" aria-label="Próximo capítulo">→</button>
+  </nav>
+
+  <div class="reader-sheet" id="chapterPicker" hidden>
+    <div class="reader-sheet-backdrop" data-close-reader-sheet></div>
+    <section class="reader-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="chapterPickerTitle">
+      <div class="reader-sheet-head">
+        <div>
+          <span>CAPÍTULOS</span>
+          <h2 id="chapterPickerTitle">Escolher capítulo</h2>
+        </div>
+        <button type="button" data-close-reader-sheet aria-label="Fechar">×</button>
+      </div>
+      <div class="reader-chapter-grid" id="readerChapterGrid"></div>
+    </section>
+  </div>
+
+  <div class="reader-sheet" id="readerSettings" hidden>
+    <div class="reader-sheet-backdrop" data-close-reader-settings></div>
+    <section class="reader-sheet-panel reader-settings-panel" role="dialog" aria-modal="true" aria-labelledby="readerSettingsTitle">
+      <div class="reader-sheet-head">
+        <div>
+          <span>LEITURA</span>
+          <h2 id="readerSettingsTitle">Configurações</h2>
+        </div>
+        <button type="button" data-close-reader-settings aria-label="Fechar">×</button>
+      </div>
+
+      <div class="reader-setting-row">
+        <div><strong>Modo de leitura</strong><span>Rolagem vertical</span></div>
+        <span class="reader-setting-value">Vertical</span>
+      </div>
+
+      <button class="reader-setting-row reader-setting-button" id="readerThemeToggle" type="button">
+        <div><strong>Tema</strong><span>Fundo do leitor</span></div>
+        <span class="reader-setting-value" id="readerThemeLabel">Escuro</span>
+      </button>
+
+      <button class="reader-setting-row reader-setting-button" id="readerControlsToggle" type="button">
+        <div><strong>Controles</strong><span>Mostrar cabeçalho e barra inferior</span></div>
+        <span class="reader-toggle active" id="readerControlsSwitch"></span>
+      </button>
+    </section>
+  </div>
+
+  <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
+
+  <script src="assets/js/reader.js?v=001" defer></script>
+</body>
+</html>
