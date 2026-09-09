@@ -1773,3 +1773,299 @@ body.light .search-filter.active{
     max-height:52vh;
   }
 }
+
+
+/* Original account hub redesign */
+.account-panel{
+  position:fixed;
+  inset:0;
+  z-index:115;
+}
+.account-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(2,4,8,.74);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+}
+.account-hub{
+  position:absolute;
+  top:0;
+  right:0;
+  width:min(410px,92vw);
+  height:100%;
+  overflow:auto;
+  padding:1rem;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(255,255,255,.045),transparent 26%),
+    linear-gradient(180deg,#111721 0%,#0c1118 100%);
+  border-left:1px solid rgba(219,228,240,.09);
+  box-shadow:-28px 0 80px rgba(0,0,0,.46);
+  animation:accountHubIn .22s ease-out;
+}
+@keyframes accountHubIn{
+  from{transform:translateX(100%);opacity:.65}
+  to{transform:translateX(0);opacity:1}
+}
+.account-hub-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.4rem .2rem 1rem;
+}
+.account-hub-kicker{
+  margin:0 0 .28rem;
+  color:#687386;
+  font-size:.58rem;
+  font-weight:850;
+  letter-spacing:.16em;
+}
+.account-hub-header h2{
+  margin:0;
+  font-size:1.65rem;
+  line-height:1;
+  letter-spacing:-.045em;
+}
+.account-hub-subtitle{
+  margin:.42rem 0 0;
+  color:#7a8597;
+  font-size:.78rem;
+}
+.account-hub-close{
+  flex:0 0 auto;
+  width:2.5rem;
+  height:2.5rem;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:.82rem;
+  background:#141a23;
+  color:#e7ecf3;
+  font-size:1.25rem;
+  cursor:pointer;
+}
+.account-identity-card{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:.85rem;
+  padding:.85rem;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:1rem;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.028),transparent 46%),
+    #121821;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+.account-identity-avatar{
+  width:3.45rem;
+  height:3.45rem;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:.95rem;
+  background:
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.075),transparent 36%),
+    linear-gradient(145deg,#1b2533,#10161f);
+}
+.account-identity-avatar svg{
+  width:1.55rem;
+  height:1.55rem;
+  fill:none;
+  stroke:#c7d0dc;
+  stroke-width:1.55;
+  stroke-linecap:round;
+}
+.account-identity-copy{
+  min-width:0;
+}
+.account-name-row{
+  display:flex;
+  align-items:center;
+  gap:.55rem;
+  flex-wrap:wrap;
+}
+.account-name-row strong{
+  font-size:1rem;
+  letter-spacing:-.02em;
+}
+.account-offline-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  min-height:1.4rem;
+  padding:0 .48rem;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  color:#8994a5;
+  font-size:.62rem;
+  font-weight:760;
+}
+.account-offline-badge span{
+  width:.4rem;
+  height:.4rem;
+  border-radius:50%;
+  background:#6f7b8d;
+}
+.account-identity-copy p{
+  margin:.28rem 0 0;
+  color:#737f91;
+  font-size:.68rem;
+  line-height:1.42;
+}
+.account-auth-actions-redesign{
+  display:grid;
+  grid-template-columns:1.08fr .92fr;
+  gap:.55rem;
+  max-width:none;
+  margin:.7rem 0 0;
+}
+.account-auth-actions-redesign .account-auth-button{
+  min-height:2.85rem;
+  border-radius:.82rem;
+  font-size:.82rem;
+}
+.account-auth-actions-redesign .account-auth-button.primary{
+  border:1px solid #eef2f6;
+  background:#eef2f6;
+  color:#111721;
+}
+.account-auth-actions-redesign .account-auth-button.secondary{
+  border:1px solid rgba(220,229,241,.14);
+  background:#141a23;
+  color:#e8edf4;
+}
+.account-auth-message{
+  margin:.62rem .15rem 0;
+  color:#768294;
+  font-size:.66rem;
+  line-height:1.4;
+}
+.account-hub-section-label{
+  margin:1.05rem .2rem .45rem;
+  color:#667185;
+  font-size:.58rem;
+  font-weight:850;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.account-hub-list{
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:1rem;
+  background:#111720;
+}
+.account-hub-row{
+  width:100%;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:.72rem;
+  min-height:4rem;
+  padding:.62rem .72rem;
+  border:0;
+  background:transparent;
+  color:#e6ebf2;
+  text-align:left;
+  cursor:pointer;
+  transition:background .16s ease;
+}
+.account-hub-row + .account-hub-row{
+  border-top:1px solid rgba(255,255,255,.055);
+}
+.account-hub-row:hover{
+  background:rgba(255,255,255,.025);
+}
+.account-hub-icon{
+  width:2.25rem;
+  height:2.25rem;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:.72rem;
+  background:rgba(255,255,255,.025);
+  color:#aeb8c7;
+  font-size:1rem;
+}
+.account-hub-copy{
+  min-width:0;
+}
+.account-hub-copy strong{
+  display:block;
+  font-size:.83rem;
+}
+.account-hub-copy small{
+  display:block;
+  margin-top:.08rem;
+  color:#717d8f;
+  font-size:.64rem;
+}
+.account-hub-value{
+  max-width:6rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#8d98a9;
+  font-size:.7rem;
+  font-weight:760;
+}
+.account-hub-chevron{
+  color:#667286;
+  font-size:1.2rem;
+}
+.account-hub-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-top:1rem;
+  padding:.75rem .2rem .2rem;
+  color:#5f6a7b;
+  font-size:.64rem;
+}
+body.light .account-hub{
+  background:#eef1f5;
+  color:#121821;
+  border-color:rgba(0,0,0,.08);
+}
+body.light .account-hub-close,
+body.light .account-identity-card,
+body.light .account-hub-list,
+body.light .account-auth-actions-redesign .account-auth-button.secondary{
+  background:#fff;
+  color:#151b24;
+  border-color:rgba(0,0,0,.07);
+}
+body.light .account-identity-avatar,
+body.light .account-hub-icon{
+  background:#f3f5f8;
+  color:#303a49;
+  border-color:rgba(0,0,0,.06);
+}
+body.light .account-identity-avatar svg{
+  stroke:#445063;
+}
+body.light .account-hub-row + .account-hub-row{
+  border-top-color:rgba(0,0,0,.06);
+}
+body.light .account-auth-actions-redesign .account-auth-button.primary{
+  background:#111721;
+  color:#fff;
+  border-color:#111721;
+}
+@media(max-width:620px){
+  .account-hub{
+    width:calc(100% - .75rem);
+    padding:.85rem;
+  }
+  .account-hub-header h2{
+    font-size:1.5rem;
+  }
+  .account-identity-avatar{
+    width:3.25rem;
+    height:3.25rem;
+  }
+}
