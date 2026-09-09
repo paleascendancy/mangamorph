@@ -131,7 +131,7 @@ async function loadProfile(session){
 
   let { data, error } = await supabase
     .from("mangamorph_profiles")
-    .select("id,username,display_name,bio,accent,avatar_url,created_at")
+    .select("id,username,display_name,bio,accent,avatar_url,is_public,show_activity,show_favorites,created_at")
     .eq("id",user.id)
     .maybeSingle();
 
@@ -160,6 +160,9 @@ async function loadProfile(session){
     bio:data.bio || "",
     accent:data.accent || "#5b8def",
     avatarUrl:data.avatar_url || null,
+    isPublic:data.is_public !== false,
+    showActivity:data.show_activity !== false,
+    showFavorites:data.show_favorites !== false,
     createdAt:data.created_at ? new Date(data.created_at).getTime() : Date.now()
   };
 }
