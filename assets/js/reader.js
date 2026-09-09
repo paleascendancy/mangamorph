@@ -96,6 +96,7 @@ function changeChapter(nextChapter){
   updateLabels();
   renderChapterGrid();
   renderPages();
+  window.dispatchEvent(new CustomEvent("mangamorph:reader-chapter-change",{detail:{mangaId:manga.id,chapter:chapter}}));
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
