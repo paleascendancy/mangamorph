@@ -34,6 +34,8 @@ const nextPage = document.querySelector("#nextPage");
 const searchPanel = document.querySelector("#searchPanel");
 const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
+const featuredDetails = document.querySelector("#featuredDetails");
+const featuredExtra = document.querySelector("#featuredExtra");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -144,6 +146,13 @@ document.addEventListener("click", function(event) {
 
   if (event.target.matches("[data-close-search]")) closeSearch();
 });
+
+if (featuredDetails && featuredExtra) {
+  featuredDetails.addEventListener("click", function() {
+    featuredExtra.hidden = !featuredExtra.hidden;
+    featuredDetails.textContent = featuredExtra.hidden ? "Mais detalhes" : "Menos detalhes";
+  });
+}
 
 prevPage.addEventListener("click", function(){ goToPage(state.currentPage - 1); });
 nextPage.addEventListener("click", function(){ goToPage(state.currentPage + 1); });
