@@ -690,3 +690,120 @@ body.light .side-menu-settings:hover{
     height:2.58rem;
   }
 }
+
+
+/* Elegant premium header actions */
+.header-action-button{
+  position:relative;
+  isolation:isolate;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  color:#f5f7fb;
+  background:
+    radial-gradient(circle at 30% 16%,rgba(255,255,255,.085),transparent 38%),
+    linear-gradient(145deg,rgba(23,29,40,.96),rgba(11,15,22,.98));
+  border:1px solid rgba(198,210,228,.12);
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.28),
+    0 2px 8px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.075),
+    inset 0 -1px 0 rgba(255,255,255,.018);
+  backdrop-filter:blur(16px) saturate(125%);
+  -webkit-backdrop-filter:blur(16px) saturate(125%);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.header-action-button::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:1px;
+  border-radius:inherit;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 42%,rgba(121,145,176,.028));
+  pointer-events:none;
+}
+.header-action-button::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:70%;
+  height:45%;
+  top:-20%;
+  left:15%;
+  border-radius:50%;
+  background:rgba(255,255,255,.055);
+  filter:blur(10px);
+  pointer-events:none;
+}
+.header-action-button:hover{
+  transform:translateY(-1px);
+  border-color:rgba(210,222,240,.22);
+  background:
+    radial-gradient(circle at 30% 16%,rgba(255,255,255,.11),transparent 38%),
+    linear-gradient(145deg,rgba(27,34,46,.98),rgba(13,18,26,.99));
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.09);
+}
+.header-action-button:active{
+  transform:translateY(0) scale(.965);
+  box-shadow:
+    0 7px 18px rgba(0,0,0,.25),
+    inset 0 1px 0 rgba(255,255,255,.055);
+}
+.header-action-button:focus-visible{
+  outline:none;
+  border-color:rgba(194,215,243,.48);
+  box-shadow:
+    0 0 0 3px rgba(156,188,230,.12),
+    0 12px 28px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+.action-icon,
+.header-action-button.account-button svg{
+  position:relative;
+  z-index:1;
+  width:1.42rem;
+  height:1.42rem;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.65;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.22));
+}
+.settings-action-icon{
+  stroke-width:1.55;
+}
+.header-action-button.account-button{
+  background:
+    radial-gradient(circle at 32% 18%,rgba(255,255,255,.09),transparent 38%),
+    linear-gradient(145deg,rgba(28,36,50,.98),rgba(14,19,28,.99));
+  border-color:rgba(205,217,234,.14);
+}
+.header-action-button.account-button:hover{
+  background:
+    radial-gradient(circle at 32% 18%,rgba(255,255,255,.12),transparent 38%),
+    linear-gradient(145deg,rgba(32,41,56,.99),rgba(16,22,32,.99));
+}
+body.light .header-action-button{
+  color:#171c25;
+  background:
+    radial-gradient(circle at 30% 16%,rgba(255,255,255,.9),transparent 38%),
+    linear-gradient(145deg,#fff,#e9edf3);
+  border-color:rgba(18,24,34,.1);
+  box-shadow:
+    0 8px 20px rgba(55,65,80,.12),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+body.light .header-action-button:hover{
+  border-color:rgba(18,24,34,.16);
+  background:linear-gradient(145deg,#fff,#eef2f7);
+}
+@media(max-width:760px){
+  .action-icon,
+  .header-action-button.account-button svg{
+    width:1.24rem;
+    height:1.24rem;
+  }
+}
