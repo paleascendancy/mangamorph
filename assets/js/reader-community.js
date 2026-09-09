@@ -11,7 +11,7 @@ let chapter = Math.max(1,Number(new URLSearchParams(location.search).get("chapte
 let session = null;
 let profile = null;
 let comments = [];
-let likes = [];
+let votes = [];
 let reactions = [];
 
 const title = document.querySelector("#chapterCommunityTitle");
@@ -40,10 +40,10 @@ function escapeHtml(value){
 }
 
 function avatarUrl(value){
-  try {
+  try{
     const url = new URL(String(value || ""));
     return url.protocol === "https:" ? url.href : "";
-  } catch {
+  }catch{
     return "";
   }
 }
@@ -65,7 +65,7 @@ function loginUrl(){
 }
 
 async function loadProfile(){
-  if (!session?.user) return null;
+  if(!session?.user) return null;
   const {data,error} = await supabase
     .from("mangamorph_profiles")
     .select("id,display_name,username,avatar_url,accent")
@@ -79,7 +79,7 @@ function renderComposer(){
   commentText.disabled = !logged;
   commentSubmit.textContent = logged ? "Publicar" : "Entrar";
 
-  if (!logged) {
+  if(!logged){
     commentLabel.textContent = "Entre para comentar";
     commentMeta.textContent = "Seu perfil aparece no comentário";
     commentImage.hidden = true;
@@ -91,37 +91,42 @@ function renderComposer(){
 
   const name = profile.display_name || "Leitor";
   const image = avatarUrl(profile.avatar_url);
-  commentLabel.textContent = "Comentar como " + name;
+  commentLabel.textContent = name;
   commentMeta.textContent = "@" + profile.username;
   commentAvatar.style.setProperty("--avatar-accent",profile.accent || "#5b8def");
   commentInitials.textContent = initials(name);
   commentInitials.hidden = Boolean(image);
   commentImage.hidden = !image;
-  if (image) commentImage.src = image;
+  if(image) commentImage.src = image;
 }
 
-async function loadLikes(){
-  if (!comments.length) {
-    likes = [];
+async function loadVotes(){
+  if(!comments.length){
+    votes = [];
     return;
   }
   const ids = comments.map(item => item.id);
   const {data,error} = await supabase
-    .from("mangamorph_comment_likes")
-    .select("comment_id,user_id")
+    .from("mangamorph_comment_votes")
+    .select("comment_id,user_id,vote")
     .in("comment_id",ids);
-  likes = error ? [] : (data || []);
+  votes = error ? [] : (data || []);
 }
 
-function likedByMe(commentId){
-  return Boolean(session?.user && likes.some(row =>
+function voteCount(commentId,value){
+  return votes.filter(row =>
+    Number(row.comment_id) === Number(commentId) &&
+    Number(row.vote) === Number(value)
+  ).length;
+}
+
+function myVote(commentId){
+  if(!session?.user) return 0;
+  const row = votes.find(row =>
     Number(row.comment_id) === Number(commentId) &&
     row.user_id === session.user.id
-  ));
-}
-
-function likeCount(commentId){
-  return likes.filter(row => Number(row.comment_id) === Number(commentId)).length;
+  );
+  return row ? Number(row.vote) : 0;
 }
 
 function renderComments(){
@@ -135,6 +140,7 @@ function renderComments(){
     const username = author.username || "usuario";
     const image = avatarUrl(author.avatar_url);
     const mine = session?.user?.id === item.user_id;
+    const currentVote = myVote(item.id);
     const avatar = image
       ? '<img src="' + escapeHtml(image) + '" alt="" loading="lazy">'
       : '<span>' + escapeHtml(initials(name)) + '</span>';
@@ -147,8 +153,9 @@ function renderComments(){
           '<span>@' + escapeHtml(username) + '</span></div><time>' + escapeHtml(formatDate(item.created_at)) + '</time></div>' +
         '<p>' + escapeHtml(item.content) + '</p>' +
         '<div class="chapter-comment-actions">' +
-          '<button type="button" data-like-comment="' + item.id + '" class="' + (likedByMe(item.id) ? 'active' : '') + '">♡ <span>' + likeCount(item.id) + '</span></button>' +
-          (mine ? '<button type="button" data-delete-comment="' + item.id + '">Excluir</button>' : '') +
+          '<button type="button" data-vote-comment="' + item.id + '" data-vote-value="1" class="' + (currentVote === 1 ? 'active like' : '') + '">👍 <span>' + voteCount(item.id,1) + '</span></button>' +
+          '<button type="button" data-vote-comment="' + item.id + '" data-vote-value="-1" class="' + (currentVote === -1 ? 'active dislike' : '') + '">👎 <span>' + voteCount(item.id,-1) + '</span></button>' +
+          (mine ? '<button type="button" data-delete-comment="' + item.id + '" class="delete">Excluir</button>' : '') +
         '</div>' +
       '</div>' +
     '</article>';
@@ -165,31 +172,31 @@ async function loadComments(){
     .order("created_at",{ascending:false})
     .limit(100);
 
-  if (error) {
+  if(error){
     commentList.innerHTML = '<div class="chapter-community-error">Não foi possível carregar os comentários.</div>';
     commentEmpty.hidden = true;
     return;
   }
 
   comments = data || [];
-  await loadLikes();
+  await loadVotes();
   renderComments();
 }
 
-function myReaction(){
-  if (!session?.user) return null;
-  return reactions.find(row => row.user_id === session.user.id) || null;
+function myReactions(){
+  if(!session?.user) return [];
+  return reactions.filter(row => row.user_id === session.user.id).map(row => row.reaction);
 }
 
 function renderReactions(){
-  const mine = myReaction();
+  const mine = new Set(myReactions());
   const total = reactions.length;
   reactionTotal.textContent = total + (total === 1 ? " reação" : " reações");
 
   reactionButtons.querySelectorAll("[data-reaction]").forEach(button => {
     const key = button.dataset.reaction;
     button.querySelector("small").textContent = reactions.filter(row => row.reaction === key).length;
-    button.classList.toggle("active",mine?.reaction === key);
+    button.classList.toggle("active",mine.has(key));
   });
 }
 
@@ -214,13 +221,14 @@ commentText.addEventListener("input",() => {
 
 commentForm.addEventListener("submit",async event => {
   event.preventDefault();
-  if (!session?.user || !profile) {
+
+  if(!session?.user || !profile){
     location.href = loginUrl();
     return;
   }
 
   const content = commentText.value.trim();
-  if (!content) return;
+  if(!content) return;
 
   commentSubmit.disabled = true;
   commentSubmit.textContent = "Publicando...";
@@ -235,7 +243,7 @@ commentForm.addEventListener("submit",async event => {
   commentSubmit.disabled = false;
   commentSubmit.textContent = "Publicar";
 
-  if (!error) {
+  if(!error){
     commentText.value = "";
     commentChars.textContent = "0/280";
     await loadComments();
@@ -243,31 +251,39 @@ commentForm.addEventListener("submit",async event => {
 });
 
 commentList.addEventListener("click",async event => {
-  const like = event.target.closest("[data-like-comment]");
+  const voteButton = event.target.closest("[data-vote-comment]");
   const remove = event.target.closest("[data-delete-comment]");
 
-  if (like) {
-    if (!session?.user) {
+  if(voteButton){
+    if(!session?.user){
       location.href = loginUrl();
       return;
     }
-    const id = Number(like.dataset.likeComment);
-    like.disabled = true;
 
-    if (likedByMe(id)) {
-      await supabase.from("mangamorph_comment_likes")
+    const commentId = Number(voteButton.dataset.voteComment);
+    const nextVote = Number(voteButton.dataset.voteValue);
+    const currentVote = myVote(commentId);
+    voteButton.disabled = true;
+
+    if(currentVote === nextVote){
+      await supabase.from("mangamorph_comment_votes")
         .delete()
-        .eq("comment_id",id)
+        .eq("comment_id",commentId)
         .eq("user_id",session.user.id);
-    } else {
-      await supabase.from("mangamorph_comment_likes")
-        .insert({comment_id:id,user_id:session.user.id});
+    }else{
+      await supabase.from("mangamorph_comment_votes").upsert({
+        comment_id:commentId,
+        user_id:session.user.id,
+        vote:nextVote
+      },{onConflict:"comment_id,user_id"});
     }
-    await loadLikes();
+
+    await loadVotes();
     renderComments();
+    return;
   }
 
-  if (remove && session?.user) {
+  if(remove && session?.user){
     const id = Number(remove.dataset.deleteComment);
     remove.disabled = true;
     await supabase.from("mangamorph_comments")
@@ -280,54 +296,65 @@ commentList.addEventListener("click",async event => {
 
 reactionButtons.addEventListener("click",async event => {
   const button = event.target.closest("[data-reaction]");
-  if (!button) return;
+  if(!button) return;
 
-  if (!session?.user || !profile) {
+  if(!session?.user || !profile){
     location.href = loginUrl();
     return;
   }
 
   const reaction = button.dataset.reaction;
-  const existing = myReaction();
-  reactionButtons.querySelectorAll("button").forEach(item => item.disabled = true);
+  const mine = new Set(myReactions());
+  button.disabled = true;
 
-  if (existing?.reaction === reaction) {
+  if(mine.has(reaction)){
     await supabase.from("mangamorph_reactions")
       .delete()
       .eq("manga_id",mangaId)
       .eq("chapter_number",chapter)
-      .eq("user_id",session.user.id);
-  } else {
-    await supabase.from("mangamorph_reactions").upsert({
+      .eq("user_id",session.user.id)
+      .eq("reaction",reaction);
+  }else{
+    if(reaction === "like" || reaction === "dislike"){
+      const opposite = reaction === "like" ? "dislike" : "like";
+      await supabase.from("mangamorph_reactions")
+        .delete()
+        .eq("manga_id",mangaId)
+        .eq("chapter_number",chapter)
+        .eq("user_id",session.user.id)
+        .eq("reaction",opposite);
+    }
+
+    await supabase.from("mangamorph_reactions").insert({
       manga_id:mangaId,
       chapter_number:chapter,
       user_id:session.user.id,
       reaction
-    },{onConflict:"manga_id,chapter_number,user_id"});
+    });
   }
 
   await loadReactions();
-  reactionButtons.querySelectorAll("button").forEach(item => item.disabled = false);
+  button.disabled = false;
 });
 
 window.addEventListener("mangamorph:reader-chapter-change",async event => {
   mangaId = Number(event.detail?.mangaId) || mangaId;
   chapter = Number(event.detail?.chapter) || chapter;
   comments = [];
-  likes = [];
+  votes = [];
   reactions = [];
   await refreshChapter();
 });
 
 supabase.auth.onAuthStateChange((event,nextSession) => {
-  if (event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+  if(event === "SIGNED_IN" || event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED"){
     setTimeout(async () => {
       session = nextSession;
       profile = await loadProfile();
       renderComposer();
       await refreshChapter();
     },0);
-  } else if (event === "SIGNED_OUT") {
+  }else if(event === "SIGNED_OUT"){
     setTimeout(async () => {
       session = null;
       profile = null;
@@ -343,6 +370,6 @@ profile = await loadProfile();
 renderComposer();
 await refreshChapter();
 
-if (location.hash === "#chapter-community") {
+if(location.hash === "#chapter-community"){
   document.querySelector("#chapterCommunity")?.scrollIntoView({block:"start"});
 }
