@@ -59,9 +59,7 @@ const accountPanel = document.querySelector("#accountPanel");
 const accountToggle = document.querySelector("#accountToggle");
 const accountClose = document.querySelector("#accountClose");
 const accountThemeName = document.querySelector("#accountThemeName");
-const accountLanguageName = document.querySelector("#accountLanguageName");
 const accountThemeRow = document.querySelector("#accountThemeRow");
-const accountLanguageRow = document.querySelector("#accountLanguageRow");
 const accountFavorites = document.querySelector("#accountFavorites");
 const accountHistory = document.querySelector("#accountHistory");
 const accountFavoritesCount = document.querySelector("#accountFavoritesCount");
@@ -277,7 +275,6 @@ function closeSideMenu() {
 function updateAccountPanel() {
   accountThemeName.textContent = document.body.classList.contains("light") ? "Escuro" : "Escuro";
   accountThemeName.textContent = document.body.classList.contains("light") ? "Claro" : "Escuro";
-  accountLanguageName.textContent = document.documentElement.lang === "en" ? "EN" : "PT";
   accountFavoritesCount.textContent = String(state.favorites.size);
   accountHistoryCount.textContent = String(state.history.length);
 }
@@ -329,7 +326,6 @@ function applyLanguage(language) {
   document.querySelectorAll("[data-language]").forEach(function(button){
     button.classList.toggle("active", button.dataset.language === language);
   });
-  if (accountLanguageName) accountLanguageName.textContent = language === "en" ? "EN" : "PT";
 }
 
 function applyFilter(filter) {
@@ -472,11 +468,6 @@ accountThemeRow.addEventListener("click", function(){
   closeAccount();
   openSettings();
   toggleSettingsSection("theme");
-});
-accountLanguageRow.addEventListener("click", function(){
-  closeAccount();
-  openSettings();
-  toggleSettingsSection("language");
 });
 [accountLogin, accountRegister].forEach(function(button){
   button.addEventListener("click", function(){
