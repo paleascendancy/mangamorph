@@ -369,6 +369,16 @@ tabs.forEach(function(tab) {
   tab.addEventListener("click", function(){ setTab(tab.dataset.tab); });
 });
 
+window.addEventListener("mangamorph:library-loaded",function(event){
+  const row=(event.detail?.library||[]).find(item=>Number(item.manga_id)===manga.id);
+  if(!row)return;
+  if(row.favorite)favorites.add(manga.id);else favorites.delete(manga.id);
+  if(row.in_list)marked.add(manga.id);else marked.delete(manga.id);
+  renderFavorite();
+  renderMarked();
+  if(row.reading_status)renderStatus(row.reading_status);
+});
+
 renderSortButton();
 renderChapters();
 
