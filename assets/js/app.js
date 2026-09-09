@@ -186,11 +186,15 @@ const releases = Array.from({length:150}, function(_,index) {
 });
 
 function releaseTemplate(release) {
-  return '<article class="release-row" data-manga="' + release.manga.id + '">' +
-    '<div class="release-thumb" style="--accent:' + release.manga.accent + '"></div>' +
-    '<div class="release-copy"><strong>' + release.manga.title + '</strong><span>' + release.manga.genre + '</span></div>' +
-    '<span class="release-chapter">Cap. ' + release.chapter + '</span>' +
-    '<span class="release-time">' + release.updated + '</span>' +
+  const flag = release.manga.type === "Mangá" ? "🇯🇵" : release.manga.type === "Manhwa" ? "🇰🇷" : "🇨🇳";
+  return '<article class="release-row premium-release-row" data-manga="' + release.manga.id + '" tabindex="0" role="link" aria-label="Abrir ' + release.manga.title + ' capítulo ' + release.chapter + '">' +
+    '<div class="release-thumb premium-release-thumb" style="--accent:' + release.manga.accent + '"></div>' +
+    '<div class="release-copy premium-release-copy">' +
+      '<strong>' + release.manga.title + '</strong>' +
+      '<span class="release-meta"><span>' + flag + ' ' + release.manga.type + '</span><span>' + release.manga.genre + '</span><span>• ' + release.updated + '</span></span>' +
+    '</div>' +
+    '<span class="release-chapter premium-release-chapter">Cap. ' + release.chapter + '</span>' +
+    '<span class="release-open-arrow" aria-hidden="true">›</span>' +
   '</article>';
 }
 
