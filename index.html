@@ -13,7 +13,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>MangaMorph — rankings e capítulos recentes</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/css/style.css?v=032">
+  <link rel="stylesheet" href="assets/css/style.css?v=033">
   <link rel="stylesheet" href="assets/css/settings.css?v=002">
   <link rel="canonical" href="https://paleascendancy.github.io/mangamorph/">
 </head>
@@ -72,8 +72,7 @@
         <button type="button" class="side-menu-item active" data-menu-target="#inicio"><span class="side-menu-icon">⌂</span><span>Início</span></button>
         <button type="button" class="side-menu-item" data-menu-target="#favoritadas"><span class="side-menu-icon">☆</span><span>Mais favoritadas</span></button>
         <button type="button" class="side-menu-item" data-menu-target="#populares"><span class="side-menu-icon">▥</span><span>Mais lidas</span></button>
-        <button type="button" class="side-menu-item" data-menu-target="#novas"><span class="side-menu-icon">＋</span><span>Novas obras</span></button>
-        <button type="button" class="side-menu-item" data-menu-target="#recentes"><span class="side-menu-icon">◷</span><span>Últimos capítulos</span></button>
+        <button type="button" class="side-menu-item" data-menu-target="#novas"><span class="side-menu-icon">◫</span><span>Novas obras + últimos capítulos</span></button>
       </nav>
 
       <div class="side-menu-footer">
@@ -145,7 +144,7 @@
           <h2>Novas obras</h2>
           <p class="section-description">Obras recém-adicionadas ao catálogo.</p>
         </div>
-        <span class="swipe-hint">deslize →</span>
+        <button class="rank-arrow-button" type="button" data-ranking="newness" aria-label="Abrir ranking completo das novas obras" title="Ver ranking de novas obras">→</button>
       </div>
       <div class="horizontal-rail" id="newRail" aria-label="Novas obras"></div>
     </section>
@@ -360,6 +359,6 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=026" defer></script>
+  <script src="assets/js/app.js?v=027" defer></script>
 </body>
 </html>
