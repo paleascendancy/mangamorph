@@ -3610,3 +3610,247 @@ body.light .account-profile-action{
     grid-template-columns:1fr;
   }
 }
+
+
+/* Light theme contrast + authenticated panel fix v3 */
+
+/* hidden must always win over component display rules */
+.account-auth-actions[hidden],
+.account-auth-actions-redesign[hidden],
+.account-profile-stats[hidden],
+.account-profile-actions[hidden],
+.account-logout-button[hidden],
+.header-profile-image[hidden],
+.header-profile-initials[hidden]{
+  display:none !important;
+}
+
+/* Full light-theme pass: keep surfaces and text consistent */
+body.light{
+  background:#eef1f5;
+  color:#121722;
+}
+
+body.light .hero-feature{
+  border-bottom-color:rgba(16,24,36,.08);
+  background:
+    radial-gradient(circle at 78% 15%,rgba(126,103,148,.12),transparent 28%),
+    radial-gradient(circle at 18% 78%,rgba(91,128,145,.10),transparent 30%),
+    linear-gradient(180deg,#f4f6f9,#e9edf3);
+}
+body.light .hero-feature:before{
+  border-color:rgba(17,25,38,.07);
+  background:linear-gradient(145deg,rgba(255,255,255,.75),rgba(255,255,255,.28));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 22px 60px rgba(68,78,94,.09);
+}
+body.light .hero-feature:after{
+  background:linear-gradient(180deg,transparent,#eef1f5);
+}
+
+body.light .featured-content h1{
+  color:#101722;
+}
+body.light .featured-content .eyebrow{
+  color:#6c7789;
+}
+body.light .featured-meta{
+  color:#315f93;
+}
+body.light .featured-description{
+  color:#5d6879;
+}
+body.light .button-secondary{
+  background:#fff;
+  color:#151b25;
+  border-color:rgba(18,25,36,.11);
+}
+body.light .button-secondary:hover{
+  background:#f7f9fb;
+}
+
+/* Artwork stays readable in both themes */
+body.light .featured-cover strong,
+body.light .featured-cover-kicker,
+body.light .featured-cover small,
+body.light .manga-cover-title,
+body.light .manga-rank{
+  color:#f3f6fb;
+}
+body.light .manga-rank{
+  background:rgba(8,10,15,.68);
+  border-color:rgba(255,255,255,.12);
+}
+body.light .favorite-button.active{
+  color:#18202c;
+}
+
+/* Home sections */
+body.light .catalog-section{
+  color:#121722;
+}
+body.light .catalog-section:nth-of-type(even){
+  background:#e5e9ef;
+}
+body.light .releases-section{
+  background:#e6eaf0;
+}
+body.light .section-heading h2{
+  color:#111722;
+}
+body.light .eyebrow{
+  color:#758196;
+}
+body.light .manga-info h3,
+body.light .release-copy strong{
+  color:#171d27;
+}
+body.light .manga-meta,
+body.light .manga-stats,
+body.light .release-copy span,
+body.light .release-time,
+body.light .section-description{
+  color:#657082;
+}
+body.light .see-more-card{
+  background:linear-gradient(145deg,#fff,#f2f5f8);
+  border-color:rgba(17,24,36,.11);
+}
+body.light .see-more-card strong{
+  color:#151b25;
+}
+body.light .see-more-card span{
+  color:#697486;
+}
+
+/* Search / rankings */
+body.light .ranking-position,
+body.light .ranking-value,
+body.light .ranking-copy strong{
+  color:#171d27;
+}
+body.light .ranking-copy span{
+  color:#6c7687;
+}
+body.light .ranking-thumb{
+  color:#fff;
+}
+body.light .footer{
+  border-top-color:rgba(17,24,36,.08);
+  color:#6d7788;
+}
+body.light .footer strong{
+  color:#171d27;
+}
+
+/* Side menu refined rules were dark-only; override them here */
+body.light .side-menu-group-toggle{
+  background:#fff;
+  border-color:rgba(17,24,36,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.light .side-menu-group-toggle:hover,
+body.light .side-menu-group-toggle[aria-expanded="true"]{
+  background:#f8fafc;
+  border-color:rgba(17,24,36,.1);
+}
+body.light .side-menu-group-copy strong{
+  color:#17202c;
+}
+body.light .side-menu-group-copy small,
+body.light .side-menu-count,
+body.light .side-menu-group-chevron{
+  color:#68778c;
+}
+body.light .side-menu-count{
+  background:#f2f5f8;
+  border-color:rgba(17,24,36,.06);
+}
+body.light .side-menu-subitem{
+  color:#5f6c7f;
+}
+body.light .side-menu-subitem > span:first-child{
+  color:#67768a;
+}
+
+/* Account/profile drawer light theme */
+body.light .account-hub{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(255,255,255,.75),transparent 28%),
+    linear-gradient(180deg,#f4f6f9,#e9edf3);
+}
+body.light .account-hub-header h2,
+body.light .account-name-row strong,
+body.light .account-hub-copy strong,
+body.light .account-profile-stats strong{
+  color:#151b25;
+}
+body.light .account-hub-subtitle,
+body.light .account-identity-copy p,
+body.light .account-hub-copy small,
+body.light .account-hub-value,
+body.light .account-hub-footer{
+  color:#697587;
+}
+body.light .account-offline-badge{
+  background:#f4f6f9;
+  border-color:rgba(17,24,36,.07);
+  color:#657184;
+}
+body.light .account-hub-row{
+  color:#17202c;
+}
+body.light .account-hub-row:hover{
+  background:#f7f9fb;
+}
+body.light .account-profile-stats div{
+  background:#fff;
+  border-color:rgba(17,24,36,.06);
+}
+body.light .account-profile-stats span{
+  color:#697587;
+}
+body.light .account-profile-action{
+  background:#fff;
+  color:#17202c;
+  border-color:rgba(17,24,36,.07);
+}
+body.light .account-profile-action.primary{
+  background:linear-gradient(145deg,#f7faff,#fff);
+  border-color:rgba(69,112,179,.14);
+}
+body.light .account-profile-action>span:first-child{
+  background:#eef4fc;
+  color:#386ba9;
+  border-color:rgba(51,91,151,.08);
+}
+body.light .account-profile-action small{
+  color:#6d798b;
+}
+body.light .account-logout-button{
+  background:#fff7f8;
+  border-color:rgba(197,78,94,.12);
+  color:#b94f60;
+}
+
+/* Make sure labels/icons don't disappear into a light surface */
+body.light .brand-name{
+  color:#151b25;
+}
+body.light .brand-name span{
+  color:#7a8495;
+}
+body.light .rank-arrow-button{
+  background:#fff;
+  color:#17202c;
+  border-color:rgba(17,24,36,.09);
+}
+body.light .pagination button,
+body.light .pagination-arrow{
+  color:#4f5d70;
+}
+body.light .pagination button.active{
+  background:#161d28;
+  color:#fff;
+}
