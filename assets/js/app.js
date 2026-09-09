@@ -1,19 +1,19 @@
 const catalog = [
-  {id:1,title:"Neon Ronin",genre:"Ação",chapter:127,accent:"#3a4162",popularity:99,favorites:48210,newness:72},
-  {id:2,title:"Astral Bloom",genre:"Fantasia",chapter:91,accent:"#523b64",popularity:96,favorites:51740,newness:60},
-  {id:3,title:"Zero District",genre:"Mistério",chapter:68,accent:"#294b52",popularity:94,favorites:39420,newness:48},
-  {id:4,title:"Crimson Archive",genre:"Ação",chapter:143,accent:"#64363c",popularity:91,favorites:45880,newness:44},
-  {id:5,title:"Moon Relay",genre:"Fantasia",chapter:82,accent:"#354561",popularity:88,favorites:42110,newness:38},
-  {id:6,title:"Silent Frame",genre:"Mistério",chapter:74,accent:"#494b55",popularity:86,favorites:36520,newness:34},
-  {id:7,title:"Vector Hearts",genre:"Ação",chapter:112,accent:"#593c4f",popularity:84,favorites:33190,newness:31},
-  {id:8,title:"Glass Kingdom",genre:"Fantasia",chapter:105,accent:"#36545e",popularity:82,favorites:40570,newness:29},
-  {id:9,title:"Night Protocol",genre:"Suspense",chapter:57,accent:"#31384a",popularity:80,favorites:29410,newness:26},
-  {id:10,title:"Afterlight",genre:"Drama",chapter:49,accent:"#5a4650",popularity:78,favorites:31860,newness:22},
-  {id:11,title:"Morrow Gate",genre:"Fantasia",chapter:36,accent:"#3e4e66",popularity:76,favorites:27350,newness:95},
-  {id:12,title:"Black Signal",genre:"Ação",chapter:28,accent:"#52383d",popularity:74,favorites:24590,newness:92},
-  {id:13,title:"Lucid Crown",genre:"Mistério",chapter:19,accent:"#3a5661",popularity:72,favorites:22740,newness:89},
-  {id:14,title:"Echo Garden",genre:"Drama",chapter:16,accent:"#50455f",popularity:70,favorites:21580,newness:87},
-  {id:15,title:"Iron Chapel",genre:"Ação",chapter:11,accent:"#4c4b50",popularity:68,favorites:19860,newness:84}
+  {id:1,title:"Neon Ronin",genre:"Ação",chapter:127,accent:"#3a4162",reads:986400,favorites:48210,newness:72},
+  {id:2,title:"Astral Bloom",genre:"Fantasia",chapter:91,accent:"#523b64",reads:941300,favorites:51740,newness:60},
+  {id:3,title:"Zero District",genre:"Mistério",chapter:68,accent:"#294b52",reads:889700,favorites:39420,newness:48},
+  {id:4,title:"Crimson Archive",genre:"Ação",chapter:143,accent:"#64363c",reads:842100,favorites:45880,newness:44},
+  {id:5,title:"Moon Relay",genre:"Fantasia",chapter:82,accent:"#354561",reads:796800,favorites:42110,newness:38},
+  {id:6,title:"Silent Frame",genre:"Mistério",chapter:74,accent:"#494b55",reads:741900,favorites:36520,newness:34},
+  {id:7,title:"Vector Hearts",genre:"Ação",chapter:112,accent:"#593c4f",reads:698500,favorites:33190,newness:31},
+  {id:8,title:"Glass Kingdom",genre:"Fantasia",chapter:105,accent:"#36545e",reads:655200,favorites:40570,newness:29},
+  {id:9,title:"Night Protocol",genre:"Suspense",chapter:57,accent:"#31384a",reads:612700,favorites:29410,newness:26},
+  {id:10,title:"Afterlight",genre:"Drama",chapter:49,accent:"#5a4650",reads:571300,favorites:31860,newness:22},
+  {id:11,title:"Morrow Gate",genre:"Fantasia",chapter:36,accent:"#3e4e66",reads:529800,favorites:27350,newness:95},
+  {id:12,title:"Black Signal",genre:"Ação",chapter:28,accent:"#52383d",reads:487600,favorites:24590,newness:92},
+  {id:13,title:"Lucid Crown",genre:"Mistério",chapter:19,accent:"#3a5661",reads:446200,favorites:22740,newness:89},
+  {id:14,title:"Echo Garden",genre:"Drama",chapter:16,accent:"#50455f",reads:404900,favorites:21580,newness:87},
+  {id:15,title:"Iron Chapel",genre:"Ação",chapter:11,accent:"#4c4b50",reads:365400,favorites:19860,newness:84}
 ];
 
 const state = {
@@ -36,6 +36,10 @@ const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
 const featuredDetails = document.querySelector("#featuredDetails");
 const featuredExtra = document.querySelector("#featuredExtra");
+const rankingPanel = document.querySelector("#rankingPanel");
+const rankingTitle = document.querySelector("#rankingTitle");
+const rankingList = document.querySelector("#rankingList");
+const rankingClose = document.querySelector("#rankingClose");
 
 function formatNumber(value) {
   return new Intl.NumberFormat("pt-BR", {notation:"compact", maximumFractionDigits:1}).format(value);
@@ -51,20 +55,57 @@ function cardTemplate(item, rank) {
     '<div class="manga-info">' +
       '<h3>' + item.title + '</h3>' +
       '<div class="manga-meta"><span>' + item.genre + '</span><span>Cap. ' + item.chapter + '</span></div>' +
-      '<div class="manga-stats"><span>★ ' + formatNumber(item.favorites) + '</span><span>↗ ' + item.popularity + '%</span>' +
+      '<div class="manga-stats"><span>◉ ' + formatNumber(item.reads) + '</span><span>★ ' + formatNumber(item.favorites) + '</span>' +
       '<button class="favorite-button ' + (active ? 'active' : '') + '" data-favorite="' + item.id + '" aria-label="' + (active ? 'Remover dos favoritos' : 'Adicionar aos favoritos') + '">' + (active ? '★' : '☆') + '</button></div>' +
     '</div>' +
   '</article>';
 }
 
-function renderRail(element, items) {
-  element.innerHTML = items.map(function(item,index){ return cardTemplate(item,index+1); }).join("");
+function seeMoreTemplate(type, label) {
+  return '<button class="see-more-card" type="button" data-ranking="' + type + '" aria-label="Ver ranking completo de ' + label + '">' +
+    '<span class="see-more-arrow">→</span><strong>Ver mais</strong><span>Ranking completo</span>' +
+  '</button>';
+}
+
+function renderRail(element, items, moreType, moreLabel) {
+  const cards = items.map(function(item,index){ return cardTemplate(item,index+1); }).join("");
+  element.innerHTML = cards + (moreType ? seeMoreTemplate(moreType, moreLabel) : "");
 }
 
 function renderCatalogs() {
-  renderRail(popularRail, [...catalog].sort(function(a,b){return b.popularity-a.popularity;}).slice(0,10));
-  renderRail(favoriteRail, [...catalog].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10));
+  renderRail(popularRail, [...catalog].sort(function(a,b){return b.reads-a.reads;}).slice(0,10), "reads", "mais lidos");
+  renderRail(favoriteRail, [...catalog].sort(function(a,b){return b.favorites-a.favorites;}).slice(0,10), "favorites", "mais favoritados");
   renderRail(newRail, [...catalog].sort(function(a,b){return b.newness-a.newness;}).slice(0,10));
+}
+
+function rankingRow(item, index, type) {
+  const value = type === "reads"
+    ? formatNumber(item.reads) + " leituras"
+    : formatNumber(item.favorites) + " favoritos";
+
+  return '<article class="ranking-row">' +
+    '<span class="ranking-position">' + (index + 1) + '</span>' +
+    '<div class="ranking-thumb" style="--accent:' + item.accent + '"></div>' +
+    '<div class="ranking-copy"><strong>' + item.title + '</strong><span>' + item.genre + ' · Cap. ' + item.chapter + '</span></div>' +
+    '<span class="ranking-value">' + value + '</span>' +
+  '</article>';
+}
+
+function openRanking(type) {
+  const byReads = type === "reads";
+  const items = [...catalog].sort(function(a,b){
+    return byReads ? b.reads - a.reads : b.favorites - a.favorites;
+  });
+
+  rankingTitle.textContent = byReads ? "Ranking dos mais lidos" : "Ranking dos mais favoritados";
+  rankingList.innerHTML = items.map(function(item,index){ return rankingRow(item,index,type); }).join("");
+  rankingPanel.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeRanking() {
+  rankingPanel.hidden = true;
+  document.body.style.overflow = "";
 }
 
 const releases = Array.from({length:150}, function(_,index) {
@@ -144,7 +185,11 @@ document.addEventListener("click", function(event) {
   const pageButton = event.target.closest("[data-page]");
   if (pageButton) goToPage(Number(pageButton.dataset.page));
 
+  const rankingButton = event.target.closest("[data-ranking]");
+  if (rankingButton) openRanking(rankingButton.dataset.ranking);
+
   if (event.target.matches("[data-close-search]")) closeSearch();
+  if (event.target.matches("[data-close-ranking]")) closeRanking();
 });
 
 if (featuredDetails && featuredExtra) {
@@ -154,6 +199,7 @@ if (featuredDetails && featuredExtra) {
   });
 }
 
+rankingClose.addEventListener("click", closeRanking);
 prevPage.addEventListener("click", function(){ goToPage(state.currentPage - 1); });
 nextPage.addEventListener("click", function(){ goToPage(state.currentPage + 1); });
 document.querySelector("#searchToggle").addEventListener("click", openSearch);
@@ -161,7 +207,9 @@ document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
 
 document.addEventListener("keydown", function(event) {
-  if (event.key === "Escape" && !searchPanel.hidden) closeSearch();
+  if (event.key === "Escape" && !rankingPanel.hidden) closeRanking();
+  else if (event.key === "Escape" && !searchPanel.hidden) closeSearch();
+
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     openSearch();
