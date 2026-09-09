@@ -31,8 +31,6 @@ const pagination = document.querySelector("#pagination");
 const pageIndicator = document.querySelector("#pageIndicator");
 const prevPage = document.querySelector("#prevPage");
 const nextPage = document.querySelector("#nextPage");
-const favoriteGrid = document.querySelector("#favoriteGrid");
-const favoriteCount = document.querySelector("#favoriteCount");
 const searchPanel = document.querySelector("#searchPanel");
 const searchInput = document.querySelector("#searchInput");
 const searchResults = document.querySelector("#searchResults");
@@ -76,12 +74,7 @@ const releases = Array.from({length:150}, function(_,index) {
   else if (index < 12) updated = (index * 7) + " min";
   else if (index < 30) updated = Math.max(1,Math.floor(index/3)) + " h";
   else updated = Math.max(1,Math.floor(index/24)) + " dias";
-  return {
-    id:index+1,
-    manga:item,
-    chapter:chapter,
-    updated:updated
-  };
+  return {id:index+1,manga:item,chapter:chapter,updated:updated};
 });
 
 function releaseTemplate(release) {
@@ -100,7 +93,6 @@ function renderReleases() {
   pageIndicator.textContent = "Página " + state.currentPage + " de " + state.totalPages;
   prevPage.disabled = state.currentPage === 1;
   nextPage.disabled = state.currentPage === state.totalPages;
-
   pagination.innerHTML = Array.from({length:state.totalPages}, function(_,index) {
     const page = index + 1;
     return '<button class="' + (page === state.currentPage ? 'active' : '') + '" data-page="' + page + '" aria-label="Ir para página ' + page + '"' + (page === state.currentPage ? ' aria-current="page"' : '') + '>' + page + '</button>';
@@ -114,18 +106,11 @@ function goToPage(page) {
   document.querySelector("#recentes").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
-function renderFavorites() {
-  const items = catalog.filter(function(item){ return state.favorites.has(item.id); });
-  favoriteCount.textContent = items.length;
-  favoriteGrid.innerHTML = items.map(function(item,index){ return cardTemplate(item,index+1); }).join("");
-}
-
 function toggleFavorite(id) {
   if (state.favorites.has(id)) state.favorites.delete(id);
   else state.favorites.add(id);
   localStorage.setItem("mangamorph:favorites", JSON.stringify(Array.from(state.favorites)));
   renderCatalogs();
-  renderFavorites();
 }
 
 function openSearch() {
@@ -145,7 +130,6 @@ function renderSearch(query) {
   const matches = normalized ? catalog.filter(function(item){
     return (item.title + " " + item.genre).toLowerCase().includes(normalized);
   }) : catalog.slice(0,7);
-
   searchResults.innerHTML = matches.length ? matches.map(function(item){
     return '<div class="search-result"><strong>' + item.title + '</strong><small>' + item.genre + ' · Capítulo ' + item.chapter + '</small></div>';
   }).join("") : '<div class="search-result">Nenhum resultado encontrado.</div>';
@@ -164,7 +148,6 @@ document.addEventListener("click", function(event) {
 prevPage.addEventListener("click", function(){ goToPage(state.currentPage - 1); });
 nextPage.addEventListener("click", function(){ goToPage(state.currentPage + 1); });
 document.querySelector("#searchToggle").addEventListener("click", openSearch);
-document.querySelector("#mobileSearch").addEventListener("click", openSearch);
 document.querySelector("#searchClose").addEventListener("click", closeSearch);
 searchInput.addEventListener("input", function(event){ renderSearch(event.target.value); });
 
@@ -193,7 +176,6 @@ if (initialQuery) {
 
 renderCatalogs();
 renderReleases();
-renderFavorites();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function(){
