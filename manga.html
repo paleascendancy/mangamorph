@@ -8,7 +8,7 @@
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=038">
-  <link rel="stylesheet" href="assets/css/manga.css?v=014">
+  <link rel="stylesheet" href="assets/css/manga.css?v=015">
 </head>
 <body>
   <header class="topbar manga-topbar">
@@ -112,7 +112,6 @@
     <nav class="manga-tabs" role="tablist" aria-label="Conteúdo da obra">
       <button class="manga-tab active" id="tabChapters" role="tab" aria-selected="true" aria-controls="panelChapters" data-tab="chapters">Capítulos <span id="tabChapterCount"></span></button>
       <button class="manga-tab" id="tabRelated" role="tab" aria-selected="false" aria-controls="panelRelated" data-tab="related">Relacionados</button>
-      <button class="manga-tab" id="tabComments" role="tab" aria-selected="false" aria-controls="panelComments" data-tab="comments">Comentários <span id="tabCommentCount">0</span></button>
     </nav>
 
     <section class="tab-panel active" id="panelChapters" role="tabpanel" aria-labelledby="tabChapters">
@@ -152,13 +151,67 @@
       </div>
     </section>
 
-    <section class="tab-panel" id="panelComments" role="tabpanel" aria-labelledby="tabComments" hidden>
-      <div class="comments-panel comments-panel-premium">
+    <section class="community-section" id="community">
+      <div class="community-heading">
+        <div>
+          <p class="eyebrow">COMUNIDADE</p>
+          <h2>Avaliações e reações</h2>
+          <p>Notas reais dos leitores para cada parte da obra.</p>
+        </div>
+        <span class="community-vote-count" id="ratingCountLabel">0 avaliações</span>
+      </div>
+
+      <div class="ratings-overview">
+        <article class="rating-score-card">
+          <span class="rating-score-label">NOTA DA COMUNIDADE</span>
+          <div class="rating-score-main">
+            <strong id="communityOverall">—</strong>
+            <span>/ 5</span>
+          </div>
+          <div class="rating-summary-stars" id="communityOverallStars" aria-label="Nota média"></div>
+          <small id="ratingSummaryText">Ainda sem avaliações</small>
+        </article>
+
+        <div class="rating-metrics" id="ratingMetrics">
+          <div><span>História</span><strong id="ratingStory">—</strong></div>
+          <div><span>Arte</span><strong id="ratingArt">—</strong></div>
+          <div><span>Personagens</span><strong id="ratingCharacters">—</strong></div>
+          <div><span>Diversão</span><strong id="ratingEnjoyment">—</strong></div>
+        </div>
+      </div>
+
+      <div class="rating-editor-card">
+        <div class="rating-editor-head">
+          <div>
+            <strong>Sua avaliação</strong>
+            <span id="ratingEditorHint">Entre na sua conta para avaliar esta obra.</span>
+          </div>
+          <button type="button" id="ratingSaveButton">Entrar</button>
+        </div>
+        <div class="rating-editor" id="ratingEditor"></div>
+      </div>
+
+      <div class="reaction-section">
+        <div class="reaction-heading">
+          <div><strong>Qual foi sua reação?</strong><span>Escolha a que mais combina com a obra.</span></div>
+          <span id="reactionTotalLabel">0 reações</span>
+        </div>
+        <div class="reaction-buttons" id="reactionButtons">
+          <button type="button" data-reaction="love"><span>❤️</span><strong>Amei</strong><small>0</small></button>
+          <button type="button" data-reaction="fire"><span>🔥</span><strong>Insano</strong><small>0</small></button>
+          <button type="button" data-reaction="wow"><span>😮</span><strong>Surpresa</strong><small>0</small></button>
+          <button type="button" data-reaction="funny"><span>😂</span><strong>Engraçado</strong><small>0</small></button>
+          <button type="button" data-reaction="emotional"><span>🥹</span><strong>Emocionante</strong><small>0</small></button>
+          <button type="button" data-reaction="favorite"><span>⭐</span><strong>Favorito</strong><small>0</small></button>
+        </div>
+      </div>
+
+      <div class="comments-panel comments-panel-premium" id="comments">
         <div class="comments-head">
           <div>
-            <p class="eyebrow">COMUNIDADE</p>
-            <h2>Comentários</h2>
-            <p>Converse sobre a obra sem sair da página.</p>
+            <p class="eyebrow">COMENTÁRIOS</p>
+            <h2>O que os leitores estão dizendo</h2>
+            <p>Seu nome e foto de perfil aparecem junto do comentário.</p>
           </div>
           <span id="commentCountLabel">0 comentários</span>
         </div>
@@ -196,7 +249,7 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=011" defer></script>
-  <script type="module" src="assets/js/manga-comments.js?v=001"></script>
+  <script src="assets/js/manga.js?v=012" defer></script>
+  <script type="module" src="assets/js/manga-comments.js?v=002"></script>
 </body>
 </html>
