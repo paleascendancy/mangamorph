@@ -34,8 +34,10 @@ if(manga){
   $("#mangaRating").textContent="★ "+(Number(stats.average_rating)||0).toFixed(1).replace(".",",");
   $("#mangaReads").textContent="◉ "+new Intl.NumberFormat("pt-BR",{notation:"compact"}).format(Number(stats.reader_count)||0);
   $("#mangaFavorites").textContent="☆ "+new Intl.NumberFormat("pt-BR",{notation:"compact"}).format(Number(stats.favorite_count)||0);
-  const statusNode=document.querySelector(".publication-status");if(statusNode)statusNode.textContent=manga.publication_status||"Em lançamento";
-  const yearFact=[...document.querySelectorAll(".detail-facts-grid dd")].at(-1);if(yearFact&&manga.year)yearFact.textContent=manga.year;
+  const statusFact=$("#mangaStatusFact");if(statusFact)statusFact.textContent=manga.publication_status||"Em lançamento";
+  const yearFact=$("#mangaYearFact");if(yearFact)yearFact.textContent=manga.year||"—";
+  const authorFact=$("#mangaAuthorFact");if(authorFact)authorFact.textContent=manga.author||"—";
+  const artistFact=$("#mangaArtistFact");if(artistFact)artistFact.textContent=manga.artist||"—";
 
   if(chapters?.length){
     $("#chapterList").innerHTML=chapters.map((c,index)=>'<article class="chapter-row '+(index===0?'latest':'')+'" id="capitulo-'+Number(c.chapter_number)+'"><div class="chapter-copy"><div class="chapter-number"><strong>Capítulo '+Number(c.chapter_number)+'</strong><span class="chapter-meta-line"><span>◷ '+fmtDate(c.published_at)+'</span>'+(c.title?'<span>'+esc(c.title)+'</span>':'')+'</span></div>'+(index===0?'<span class="chapter-badge">NOVO</span>':'')+'</div><button class="chapter-read" type="button" data-read-chapter="'+Number(c.chapter_number)+'">Ler <span>›</span></button></article>').join("");
