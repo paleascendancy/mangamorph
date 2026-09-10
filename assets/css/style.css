@@ -3887,3 +3887,7 @@ body.light .pagination button.active{
   .hero-switching .featured-cover,
   .hero-switching .featured-content{animation:none}
 }
+
+/* Hero cover: artwork only */
+.featured-cover > *{display:none!important}
+.featured-cover::before,.featured-cover::after{content:none!important;display:none!important}
