@@ -30,22 +30,32 @@ function fmtDate(value){
     .replace(".","");
 }
 
-function injectReaderV2Styles(){
-  if(document.querySelector("#readerV2Styles"))return;
+function safeText(value){
+  return String(value??"").replace(/[<>]/g,"");
+}
+
+function injectReaderV3Styles(){
+  if(document.querySelector("#readerV3Styles"))return;
   const style=document.createElement("style");
-  style.id="readerV2Styles";
+  style.id="readerV3Styles";
   style.textContent=`
-    .reader-context-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.7rem;align-items:center;margin:0;padding:.68rem clamp(.75rem,3vw,1.2rem);border-bottom:1px solid rgba(255,255,255,.055);background:#0b1119}
-    .reader-context-main{min-width:0}.reader-context-main>span{display:block;color:#6980a1;font-size:.44rem;font-weight:850;letter-spacing:.14em}.reader-context-main>strong{display:block;margin-top:.08rem;font-size:.9rem;letter-spacing:-.02em}.reader-context-main>small{display:block;margin-top:.08rem;max-width:38rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#78869a;font-size:.52rem}
-    .reader-context-stats{display:grid;grid-template-columns:repeat(3,auto);gap:.32rem;margin:0}.reader-context-stats>div{min-width:5.1rem;padding:.38rem .46rem;border:1px solid rgba(255,255,255,.05);border-radius:.58rem;background:#111923}.reader-context-stats dt{color:#63738a;font-size:.4rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.reader-context-stats dd{max-width:9rem;margin:.08rem 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d9e1eb;font-size:.51rem;font-weight:720}
-    .reader-main{padding-top:0!important}.reader-progress-shell{padding-top:.34rem!important}.reader-stage{padding-top:0!important;gap:0!important}.reader-real-page{width:100%;margin:0 auto}.reader-real-page img{display:block;width:100%;height:auto;margin:0 auto}
+    .reader-title-link{display:block;width:max-content;max-width:100%;color:inherit;text-decoration:none;border-radius:.3rem;transition:opacity .16s ease,color .16s ease}
+    .reader-title-link:hover{color:#83aee8}.reader-title-link:active{opacity:.7}
+    .reader-context-card{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.8rem;align-items:center;margin:.65rem clamp(.7rem,3vw,1.1rem);padding:.78rem;border:1px solid rgba(255,255,255,.065);border-radius:1rem;background:linear-gradient(145deg,#101923,#0a1018);box-shadow:0 12px 30px rgba(0,0,0,.16);overflow:hidden}
+    .reader-context-card:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,#7ba9e8,#4e79ba)}
+    .reader-context-number{width:3.2rem;height:3.2rem;display:grid;place-items:center;align-content:center;border:1px solid rgba(118,164,226,.14);border-radius:.82rem;background:linear-gradient(145deg,rgba(107,151,213,.16),rgba(79,108,151,.07));color:#dfe9f7}
+    .reader-context-number span{font-size:.38rem;font-weight:850;letter-spacing:.14em;color:#7891b3}.reader-context-number strong{margin-top:.04rem;font-size:1.2rem;line-height:1;letter-spacing:-.04em}
+    .reader-context-main{min-width:0}.reader-context-main>span{display:block;color:#7188a8;font-size:.42rem;font-weight:850;letter-spacing:.15em;text-transform:uppercase}.reader-context-main>strong{display:block;margin-top:.08rem;font-size:.96rem;letter-spacing:-.025em}.reader-context-main>small{display:block;margin-top:.12rem;max-width:34rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#7d8999;font-size:.51rem}
+    .reader-context-stats{display:grid;grid-template-columns:repeat(2,minmax(5.2rem,auto));gap:.34rem;margin:0}.reader-context-stats>div{padding:.42rem .5rem;border:1px solid rgba(255,255,255,.05);border-radius:.68rem;background:rgba(255,255,255,.025)}.reader-context-stats dt{color:#68788e;font-size:.38rem;font-weight:850;letter-spacing:.09em;text-transform:uppercase}.reader-context-stats dd{margin:.1rem 0 0;color:#e0e7f0;font-size:.52rem;font-weight:760;white-space:nowrap}
+    .reader-main{padding-top:0!important}.reader-progress-shell{padding-top:.32rem!important}.reader-stage{padding-top:0!important;gap:0!important}.reader-real-page{width:100%;margin:0 auto}.reader-real-page img{display:block;width:100%;height:auto;margin:0 auto}
     .reader-width-comfortable .reader-stage{max-width:760px;margin-inline:auto;padding-inline:clamp(.35rem,2vw,1rem)!important}.reader-gap-soft .reader-stage{gap:.72rem!important}.reader-gap-soft .reader-real-page{overflow:hidden;border-radius:.28rem}
     .reader-settings-context{margin:0 0 .55rem;padding:.68rem .72rem;border:1px solid rgba(255,255,255,.055);border-radius:.8rem;background:#101821}.reader-settings-context>span{display:block;color:#6682a8;font-size:.44rem;font-weight:850;letter-spacing:.13em}.reader-settings-context>strong{display:block;margin-top:.12rem;font-size:.92rem}.reader-settings-context>small{display:block;margin-top:.08rem;color:#76859a;font-size:.52rem}
-    .reader-setting-row.reader-setting-button{border:1px solid rgba(255,255,255,.055)}
-    .reader-setting-chevron{color:#7588a2!important;font-size:.75rem!important}
-    .light-reader .reader-context-card{border-bottom-color:rgba(0,0,0,.06);background:#f1f3f6}.light-reader .reader-context-stats>div,.light-reader .reader-settings-context{border-color:rgba(0,0,0,.06);background:#f8f9fb}.light-reader .reader-context-stats dd,.light-reader .reader-settings-context>strong{color:#1b2027}.light-reader .reader-context-main>small,.light-reader .reader-settings-context>small{color:#77808d}
-    @media(max-width:700px){.reader-context-card{grid-template-columns:1fr;padding:.6rem .72rem}.reader-context-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:.28rem}.reader-context-stats>div{min-width:0;padding:.34rem .4rem}.reader-context-stats dd{max-width:100%;font-size:.48rem}}
-    @media(max-width:420px){.reader-context-stats{grid-template-columns:1fr 1fr}.reader-context-stats>div:last-child{grid-column:1/-1}.reader-context-main>strong{font-size:.82rem}}
+    .reader-setting-row.reader-setting-button{border:1px solid rgba(255,255,255,.055)}.reader-setting-chevron{color:#7588a2!important;font-size:.75rem!important}
+    .reader-bottom-bar{grid-template-columns:2.5rem minmax(8rem,11rem) 2.5rem 2.5rem!important}
+    .reader-scroll-top{font-size:1rem!important;font-weight:850;opacity:.48;transform:translateY(2px);transition:opacity .18s ease,transform .18s ease,background .18s ease}.reader-scroll-top.is-visible{opacity:1;transform:none;background:#1b2a3d!important;color:#eaf2ff!important}
+    .light-reader .reader-title-link:hover{color:#2c5f99}.light-reader .reader-context-card{border-color:rgba(17,31,49,.07);background:linear-gradient(145deg,#ffffff,#f2f5f8);box-shadow:0 10px 28px rgba(32,48,68,.08)}.light-reader .reader-context-number{border-color:rgba(64,103,153,.12);background:linear-gradient(145deg,#edf4fd,#f7faff);color:#172233}.light-reader .reader-context-number span{color:#6580a3}.light-reader .reader-context-stats>div,.light-reader .reader-settings-context{border-color:rgba(0,0,0,.06);background:#f8fafc}.light-reader .reader-context-stats dd,.light-reader .reader-settings-context>strong{color:#1b2027}.light-reader .reader-context-main>small,.light-reader .reader-settings-context>small{color:#77808d}.light-reader .reader-scroll-top.is-visible{background:#e8f0fb!important;color:#234d7c!important}
+    @media(max-width:700px){.reader-context-card{grid-template-columns:auto minmax(0,1fr);gap:.58rem;padding:.62rem .66rem}.reader-context-stats{grid-column:1/-1;grid-template-columns:1fr 1fr;width:100%}.reader-context-stats>div{padding:.38rem .45rem}.reader-context-number{width:2.8rem;height:2.8rem}.reader-context-main>strong{font-size:.86rem}}
+    @media(max-width:560px){.reader-bottom-bar{grid-template-columns:2.3rem minmax(7.2rem,9rem) 2.3rem 2.3rem!important;gap:.3rem!important}.reader-bottom-bar>button:not(.reader-chapter-pill){width:2.3rem!important;height:2.3rem!important}}
   `;
   document.head.append(style);
 }
@@ -129,17 +139,30 @@ function renderChapterContext(current,pageCount=null){
     const progress=document.querySelector(".reader-progress-shell");
     progress?.insertAdjacentElement("beforebegin",card);
   }
-  const source=current?.source_name||"MangaMorph";
-  const title=current?.title||"Leitura do capítulo";
-  card.innerHTML='<div class="reader-context-main"><span>CAPÍTULO</span><strong>Capítulo '+chapterNumber+'</strong><small>'+title.replace(/[<>]/g,"")+'</small></div>'+
+  const title=safeText(current?.title||"Leitura do capítulo");
+  card.innerHTML='<div class="reader-context-number"><span>CAP</span><strong>'+chapterNumber+'</strong></div>'+
+    '<div class="reader-context-main"><span>AGORA LENDO</span><strong>Capítulo '+chapterNumber+'</strong><small>'+title+'</small></div>'+
     '<dl class="reader-context-stats">'+
       '<div><dt>Lançamento</dt><dd>'+fmtDate(current?.published_at)+'</dd></div>'+
       '<div><dt>Páginas</dt><dd>'+(pageCount===null?"Carregando…":pageCount)+'</dd></div>'+
-      '<div><dt>Fonte</dt><dd>'+String(source).replace(/[<>]/g,"")+'</dd></div>'+
     '</dl>';
 }
 
-injectReaderV2Styles();
+function setupScrollTop(){
+  const button=document.querySelector("#readerScrollTop");
+  if(!button)return;
+  const render=()=>button.classList.toggle("is-visible",window.scrollY>320);
+  button.addEventListener("click",event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.scrollTo({top:0,behavior:"smooth"});
+  },true);
+  window.addEventListener("scroll",render,{passive:true});
+  render();
+}
+
+injectReaderV3Styles();
+setupScrollTop();
 
 if(manga){
   const current=(chapters||[]).find(c=>Number(c.chapter_number)===chapterNumber);
@@ -151,23 +174,13 @@ if(manga){
   document.title="MangaMorph — "+manga.title+" · Capítulo "+chapterNumber;
   document.querySelector("#readerTitle").textContent=manga.title;
   document.querySelector("#readerChapterLabel").textContent="Capítulo "+chapterNumber;
+  const titleLink=document.querySelector("#readerTitleLink");
+  if(titleLink){
+    titleLink.href="manga.html?id="+mangaId;
+    titleLink.setAttribute("aria-label","Abrir "+manga.title);
+  }
   renderChapterContext(current,null);
   setupReaderSettings(current);
-
-  const credit=document.querySelector("#readerCredit");
-  if(credit&&current&&(current.source_credit||current.source_name)){
-    credit.textContent=current.source_credit||("Tradução e edição: "+current.source_name);
-    if(current.source_url){
-      credit.href=current.source_url;
-      credit.target="_blank";
-      credit.rel="noopener noreferrer";
-    }else{
-      credit.removeAttribute("href");
-    }
-    credit.hidden=false;
-  }else if(credit){
-    credit.hidden=true;
-  }
 
   document.querySelector("#bottomChapterLabel").textContent=chapterNumber;
   document.querySelector("#finishChapterLabel").textContent="Capítulo "+chapterNumber+" concluído";
