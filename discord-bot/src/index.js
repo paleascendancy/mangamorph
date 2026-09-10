@@ -28,6 +28,12 @@ if (!DISCORD_TOKEN) {
   process.exit(1);
 }
 
+const TEMPLATE_ART = {
+  rules: 'https://raw.githubusercontent.com/paleascendancy/mangamorph/main/discord-bot/assets/rules.webp',
+  applications: 'https://raw.githubusercontent.com/paleascendancy/mangamorph/main/discord-bot/assets/applications.webp',
+  support: 'https://raw.githubusercontent.com/paleascendancy/mangamorph/main/discord-bot/assets/support.webp'
+};
+
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
   partials: [Partials.GuildMember]
@@ -96,16 +102,13 @@ async function findApplicationChannel(guild) {
 function buildRulesEmbeds() {
   const header = new EmbedBuilder()
     .setColor(0x6f7cff)
-    .setAuthor({
-      name: 'MangaMorph • Comunidade Oficial',
-      iconURL: client.user.displayAvatarURL()
-    })
+    .setAuthor({ name: 'MangaMorph • Comunidade Oficial' })
     .setTitle('Código da Comunidade')
     .setDescription(
       'Um servidor organizado começa com regras simples e claras. Leia antes de participar.\n\n' +
       '**8 regras essenciais • leitura rápida • canal somente leitura**'
     )
-    .setThumbnail(client.user.displayAvatarURL({ size: 256 }));
+    .setThumbnail(TEMPLATE_ART.rules);
 
   const convivencia = new EmbedBuilder()
     .setColor(0x2f3545)
@@ -251,17 +254,14 @@ function applicationPanelComponents() {
 function buildApplicationEmbeds() {
   const header = new EmbedBuilder()
     .setColor(0x6f7cff)
-    .setAuthor({
-      name: 'MangaMorph • Equipe',
-      iconURL: client.user.displayAvatarURL()
-    })
+    .setAuthor({ name: 'MangaMorph • Equipe' })
     .setTitle('📨 Candidaturas MangaMorph')
     .setDescription(
       'Quer fazer parte da equipe do **MangaMorph**?\n\n' +
       'Buscamos pessoas responsáveis, comunicativas e com vontade de contribuir para o crescimento da comunidade e da plataforma.\n\n' +
       '**Clique em `Abrir candidatura` para começar.**'
     )
-    .setThumbnail(client.user.displayAvatarURL({ size: 256 }));
+    .setThumbnail(TEMPLATE_ART.applications);
 
   const areas = new EmbedBuilder()
     .setColor(0x2f3545)
@@ -529,20 +529,28 @@ async function ensureTicketPanel(guild) {
     message.embeds.some((embed) => embed.title === 'Central de atendimento MangaMorph')
   );
 
-  if (existing) return;
-
   const embed = new EmbedBuilder()
-    .setColor(0x111318)
-    .setAuthor({ name: 'MangaMorph', iconURL: client.user.displayAvatarURL() })
+    .setColor(0x6f7cff)
+    .setAuthor({ name: 'MangaMorph • Suporte' })
     .setTitle('Central de atendimento MangaMorph')
     .setDescription(
       'Precisa falar com a equipe? Abra um atendimento privado.\n\n' +
       'Você poderá escolher entre **problema técnico**, **obra ou capítulo**, **parceria/scan**, **candidatura** e **denúncia**.\n\n' +
       'Clique no botão abaixo para começar.'
     )
+    .setThumbnail(TEMPLATE_ART.support)
     .setFooter({ text: 'MangaMorph • Suporte' });
 
-  await channel.send({ embeds: [embed], components: ticketPanelComponents() });
+  const payload = { embeds: [embed], components: ticketPanelComponents() };
+
+  if (existing) {
+    await existing.edit(payload);
+    console.log(`[${guild.name}] Painel de suporte atualizado.`);
+    return;
+  }
+
+  await channel.send(payload);
+  console.log(`[${guild.name}] Painel de suporte publicado.`);
 }
 
 async function createTicket(interaction, reasonKey) {
@@ -631,6 +639,7 @@ async function createTicket(interaction, reasonKey) {
       { name: 'Solicitante', value: `${user}`, inline: true },
       { name: 'Motivo', value: reason.label, inline: true }
     )
+    .setThumbnail(reasonKey === 'candidatura' ? TEMPLATE_ART.applications : TEMPLATE_ART.support)
     .setFooter({ text: 'MangaMorph • Ticket' })
     .setTimestamp();
 
@@ -824,6 +833,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           { name: 'Como pode ajudar', value: application.contribution },
           { name: 'O que gostaria de aprender', value: application.learning }
         )
+        .setThumbnail(TEMPLATE_ART.applications)
         .setFooter({ text: 'MangaMorph • Processo de candidatura' })
         .setTimestamp();
 
