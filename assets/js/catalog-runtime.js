@@ -13,10 +13,46 @@ cleanCoverStyle.id="mangamorphCleanCatalogCovers";
 cleanCoverStyle.textContent=`
   .featured-cover>*{display:none!important}
   .featured-cover::before,.featured-cover::after{content:none!important;display:none!important}
-  .manga-cover-copy,.manga-cover-title{display:none!important}
   .manga-cover::before{content:none!important;display:none!important}
   .featured-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
   .manga-cover[style*="background-image"]{background-size:auto 150%!important;background-position:center 8%!important;background-repeat:no-repeat!important}
+
+  .premium-manga-card .manga-cover{position:relative!important}
+  .premium-manga-card .manga-cover-copy{
+    position:absolute!important;
+    z-index:4!important;
+    left:.48rem!important;
+    right:.48rem!important;
+    bottom:.48rem!important;
+    display:flex!important;
+    min-width:0!important;
+    flex-direction:column!important;
+    gap:.08rem!important;
+    padding:.48rem .52rem!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    border-radius:.58rem!important;
+    background:linear-gradient(180deg,rgba(6,10,16,.58),rgba(6,10,16,.88))!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.24)!important;
+    backdrop-filter:blur(7px) saturate(115%)!important;
+    -webkit-backdrop-filter:blur(7px) saturate(115%)!important;
+  }
+  .premium-manga-card .manga-cover-title{
+    display:-webkit-box!important;
+    overflow:hidden!important;
+    -webkit-box-orient:vertical!important;
+    -webkit-line-clamp:2!important;
+    color:#f5f7fb!important;
+    font-size:.64rem!important;
+    font-weight:820!important;
+    line-height:1.2!important;
+    letter-spacing:-.015em!important;
+    text-shadow:0 1px 8px rgba(0,0,0,.55)!important;
+  }
+  .premium-manga-card .manga-cover-copy small{display:none!important}
+  @media(max-width:560px){
+    .premium-manga-card .manga-cover-copy{left:.4rem!important;right:.4rem!important;bottom:.4rem!important;padding:.42rem .46rem!important}
+    .premium-manga-card .manga-cover-title{font-size:.6rem!important}
+  }
 `;
 document.head.append(cleanCoverStyle);
 
@@ -50,7 +86,7 @@ try{
   if(data?.length){
     const catalog=data.map((m,i)=>({
       id:Number(m.id),title:m.title,genre:(m.genres&&m.genres[0])||"Outros",type:m.type||"Mangá",
-      chapter:Number(m.latest_chapter)||0,accent:m.accent||"#3a4162",reads:Number(m.reader_count)||0,
+      chapter:m.latest_chapter==null?"—":Number(m.latest_chapter),accent:m.accent||"#3a4162",reads:Number(m.reader_count)||0,
       favorites:Number(m.favorite_count)||0,rating:Number(m.average_rating)||0,newness:Math.max(1,100-i),
       coverUrl:m.cover_url||null,featured:!!m.featured,description:m.synopsis||"",tags:[...(m.genres||[]),...(m.tags||[])],
       author:m.author||"",artist:m.artist||"",status:m.publication_status||"",country:m.country||""
