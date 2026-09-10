@@ -17,3 +17,18 @@
 .manga-import-result>button{min-height:2.1rem;padding:0 .55rem;border:1px solid rgba(93,146,233,.16);border-radius:.52rem;background:#16243a;color:#b9d1f7;font-size:.48rem;font-weight:800}
 @media(max-width:700px){.manga-import-results{grid-template-columns:1fr}}
 @media(max-width:520px){.manga-import-form{grid-template-columns:1fr}.manga-import-form button{width:100%}.manga-import-result{grid-template-columns:2.8rem minmax(0,1fr)}.manga-import-cover{width:2.8rem}.manga-import-result>button{grid-column:1/-1;width:100%}}
+
+/* Automatic ZIP/CBZ chapter importer */
+.chapter-auto-import{margin-top:.7rem;padding:.7rem;border:1px solid rgba(84,139,224,.12);border-radius:.78rem;background:linear-gradient(145deg,rgba(37,75,134,.12),#0a1118)}
+.chapter-auto-import{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.65rem;align-items:center}
+.chapter-auto-import-copy>span{display:block;color:#6f91c4;font-size:.48rem;font-weight:850;letter-spacing:.14em}
+.chapter-auto-import-copy>strong{display:block;margin-top:.12rem;font-size:.72rem}
+.chapter-auto-import-copy>small{display:block;max-width:48rem;margin-top:.16rem;color:#738299;font-size:.5rem;line-height:1.45}
+.chapter-auto-import-actions{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}
+.chapter-auto-publish{display:flex;align-items:center;gap:.3rem;color:#9ba9bb;font-size:.5rem;white-space:nowrap}
+.chapter-auto-publish input{accent-color:#5b8def}
+.chapter-archive-button{min-height:2.45rem;background:#edf2f7;color:#121821}
+.chapter-auto-example{grid-column:1/-1;margin:.05rem 0 0}
+.chapter-auto-example b{color:#9db9df;font-weight:760}
+#chapterArchiveMessage{grid-column:1/-1;margin-top:0}
+@media(max-width:760px){.chapter-auto-import{grid-template-columns:1fr}.chapter-auto-import-actions{justify-content:flex-start}}
