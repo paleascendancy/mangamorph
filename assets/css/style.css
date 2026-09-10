@@ -3866,3 +3866,24 @@ body.light .pagination button.active{
 
 /* Performance containment v1 */
 .catalog-section,.releases-section{content-visibility:auto;contain-intrinsic-size:700px}.footer a{color:inherit}.footer a:hover{color:#8db7ef}
+
+/* Featured carousel v1 */
+.featured-cover{
+  padding:0;
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center;
+}
+.featured-cover:before{display:none}
+.hero-switching .featured-cover,
+.hero-switching .featured-content{
+  animation:featuredSwap .46s ease both;
+}
+@keyframes featuredSwap{
+  from{opacity:.18;transform:translateY(7px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-switching .featured-cover,
+  .hero-switching .featured-content{animation:none}
+}
