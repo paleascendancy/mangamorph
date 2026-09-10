@@ -1,3 +1,13 @@
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+function forceReaderTop(){
+  window.scrollTo({top:0,left:0,behavior:"auto"});
+}
+
+forceReaderTop();
+window.addEventListener("pageshow",forceReaderTop);
+window.addEventListener("load",function(){ requestAnimationFrame(forceReaderTop); },{once:true});
+
 const catalog = [
   {id:1,title:"Neon Ronin",chapter:127,accent:"#3a4162"},
   {id:2,title:"Astral Bloom",chapter:91,accent:"#523b64"},
@@ -102,7 +112,7 @@ function changeChapter(nextChapter){
   renderChapterGrid();
   renderPages();
   window.dispatchEvent(new CustomEvent("mangamorph:reader-chapter-change",{detail:{mangaId:manga.id,chapter:chapter}}));
-  window.scrollTo({top:0,behavior:"smooth"});
+  forceReaderTop();
 }
 
 function openSheet(sheet){
@@ -185,15 +195,8 @@ updateLabels();
 renderPages();
 renderChapterGrid();
 renderControls();
+forceReaderTop();
 updateProgress();
-
-const savedPage = Number(localStorage.getItem("mangamorph:reader:" + manga.id + ":" + chapter) || "1");
-if(savedPage > 1){
-  requestAnimationFrame(function(){
-    const target = document.querySelector('[data-reader-page="' + savedPage + '"]');
-    if(target) target.scrollIntoView({block:"start"});
-  });
-}
 
 window.addEventListener("storage",function(event){
   if(event.key !== "mangamorph:theme") return;
@@ -202,10 +205,6 @@ window.addEventListener("storage",function(event){
   readerThemeLabel.textContent = light ? "Claro" : "Escuro";
 });
 
-window.addEventListener("mangamorph:library-loaded",function(event){
-  const rows=event.detail?.progress||[];
-  const current=rows.find(row=>Number(row.manga_id)===manga.id&&Number(row.chapter_number)===chapter);
-  if(!current||!current.page_number)return;
-  const target=document.querySelector('[data-reader-page="'+Number(current.page_number)+'"]');
-  if(target)target.scrollIntoView({block:"start"});
+window.addEventListener("mangamorph:library-loaded",function(){
+  forceReaderTop();
 });
