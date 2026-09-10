@@ -9,6 +9,66 @@ const markAll=document.querySelector("#notificationsMarkAll");
 const adminLink=document.querySelector("#accountAdminLink");
 let session=null,items=[];
 
+function mountNotificationsInMenu(){
+  const nav=document.querySelector(".side-menu-nav");
+  if(!toggle||!nav)return;
+
+  toggle.className="side-menu-item side-menu-notifications";
+  toggle.removeAttribute("title");
+  toggle.setAttribute("aria-label","Abrir notificações");
+
+  const bell=toggle.querySelector(".notification-bell");
+  if(bell){
+    bell.className="side-menu-icon";
+    bell.textContent="◇";
+  }
+
+  if(!toggle.querySelector(".side-menu-notification-label")){
+    const label=document.createElement("span");
+    label.className="side-menu-notification-label";
+    label.textContent="Notificações";
+    toggle.insertBefore(label,badge||null);
+  }
+
+  if(badge)badge.classList.add("side-menu-notification-badge");
+
+  if(!toggle.querySelector(".side-menu-notification-arrow")){
+    const arrow=document.createElement("span");
+    arrow.className="side-menu-notification-arrow";
+    arrow.setAttribute("aria-hidden","true");
+    arrow.textContent="›";
+    toggle.appendChild(arrow);
+  }
+
+  nav.appendChild(toggle);
+
+  if(!document.querySelector("#mangamorphNotificationMenuStyles")){
+    const style=document.createElement("style");
+    style.id="mangamorphNotificationMenuStyles";
+    style.textContent=`
+      .side-menu-notifications{justify-content:flex-start!important;position:relative!important}
+      .side-menu-notifications .side-menu-notification-label{flex:1;min-width:0;text-align:left;font-weight:700}
+      .side-menu-notifications .side-menu-notification-badge{position:static!important;top:auto!important;right:auto!important;flex:0 0 auto;min-width:1.35rem;height:1.35rem;padding:0 .3rem;margin-left:auto;border:0!important;border-radius:999px;background:#171d27;color:#fff;font-size:.62rem;font-weight:900;line-height:1.35rem;text-align:center}
+      .side-menu-notifications .side-menu-notification-arrow{flex:0 0 auto;margin-left:.15rem;color:#778195;font-size:1.15rem;line-height:1}
+      body:not(.light) .side-menu-notifications .side-menu-notification-badge{background:#f2f5f9;color:#111722}
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function closeSideMenu(){
+  const menu=document.querySelector("#sideMenu");
+  if(!menu||menu.hidden)return;
+  const closeButton=menu.querySelector(".side-menu-close");
+  if(closeButton)closeButton.click();
+  else{
+    menu.hidden=true;
+    document.querySelector("#menuToggle")?.setAttribute("aria-expanded","false");
+  }
+}
+
+mountNotificationsInMenu();
+
 function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function time(v){const d=new Date(v),diff=Date.now()-d.getTime(),m=Math.floor(diff/60000);if(m<1)return"agora";if(m<60)return m+" min";const h=Math.floor(m/60);if(h<24)return h+" h";return d.toLocaleDateString("pt-BR")}
 function close(){panel.hidden=true;document.body.style.overflow=""}
@@ -29,6 +89,7 @@ async function checkAdmin(){
   adminLink.hidden=data!==true;
 }
 toggle?.addEventListener("click",async()=>{
+  closeSideMenu();
   if(!session){window.dispatchEvent(new CustomEvent("mangamorph:open-login"));return}
   await load();panel.hidden=false;document.body.style.overflow="hidden";
 });
