@@ -96,6 +96,72 @@ async function findTicketPanelChannel(guild) {
   );
 }
 
+async function ensureSupportArea(guild) {
+  const channels = await guild.channels.fetch();
+  let category = channels.find((channel) =>
+    channel?.type === ChannelType.GuildCategory && normalize(channel.name).includes('suporte')
+  ) || null;
+
+  if (!category) {
+    category = await guild.channels.create({
+      name: '「 MM 」 SUPORTE',
+      type: ChannelType.GuildCategory,
+      reason: 'Estrutura automática de suporte do MangaMorph'
+    });
+    console.log(`[${guild.name}] Categoria de suporte criada.`);
+  }
+
+  let panelChannel = await findTicketPanelChannel(guild);
+  if (!panelChannel) {
+    const roles = await guild.roles.fetch();
+    const staffRoles = roles.filter((role) => STAFF_ROLE_NAMES.has(normalize(role.name)));
+
+    const permissionOverwrites = [
+      {
+        id: guild.roles.everyone.id,
+        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory],
+        deny: [PermissionFlagsBits.SendMessages]
+      },
+      {
+        id: client.user.id,
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.ReadMessageHistory,
+          PermissionFlagsBits.ManageChannels,
+          PermissionFlagsBits.ManageMessages,
+          PermissionFlagsBits.EmbedLinks
+        ]
+      }
+    ];
+
+    for (const role of staffRoles.values()) {
+      permissionOverwrites.push({
+        id: role.id,
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.ReadMessageHistory
+        ]
+      });
+    }
+
+    panelChannel = await guild.channels.create({
+      name: '🎫・abrir-ticket',
+      type: ChannelType.GuildText,
+      parent: category.id,
+      topic: 'Abra um atendimento privado com a equipe do MangaMorph.',
+      permissionOverwrites,
+      reason: 'Canal automático de tickets do MangaMorph'
+    });
+    console.log(`[${guild.name}] Canal abrir-ticket criado.`);
+  } else if (panelChannel.parentId !== category.id) {
+    await panelChannel.setParent(category.id, { lockPermissions: false }).catch(() => {});
+  }
+
+  return { category, panelChannel };
+}
+
 async function getGuildMember(guild, userId) {
   return guild.members.fetch(userId).catch(() => null);
 }
@@ -142,11 +208,7 @@ function ticketPanelComponents() {
 }
 
 async function ensureTicketPanel(guild) {
-  const channel = await findTicketPanelChannel(guild);
-  if (!channel) {
-    console.warn(`[${guild.name}] Canal abrir-ticket não encontrado.`);
-    return;
-  }
+  const { panelChannel: channel } = await ensureSupportArea(guild);
 
   const recent = await channel.messages.fetch({ limit: 30 }).catch(() => null);
   const existing = recent?.find((message) =>
@@ -192,13 +254,7 @@ async function createTicket(interaction, reasonKey) {
     return;
   }
 
-  const panelChannel = await findTicketPanelChannel(guild);
-  const supportCategory = panelChannel?.parentId
-    ? await guild.channels.fetch(panelChannel.parentId).catch(() => null)
-    : channels.find((channel) =>
-        channel?.type === ChannelType.GuildCategory && normalize(channel.name).includes('suporte')
-      );
-
+  const { category: supportCategory } = await ensureSupportArea(guild);
   const roles = await guild.roles.fetch();
   const staffRoles = roles.filter((role) => STAFF_ROLE_NAMES.has(normalize(role.name)));
 
@@ -245,7 +301,7 @@ async function createTicket(interaction, reasonKey) {
   const channel = await guild.channels.create({
     name: `ticket-${safeName}-${user.id.slice(-4)}`,
     type: ChannelType.GuildText,
-    parent: supportCategory?.id || null,
+    parent: supportCategory.id,
     topic: `MM_TICKET:${user.id}|TYPE:${reasonKey}|CLAIMED:`,
     permissionOverwrites
   });
@@ -283,7 +339,6 @@ async function createTicket(interaction, reasonKey) {
     .setTimestamp();
 
   await channel.send({ content: `${user}`, embeds: [embed], components: [actions] });
-
   await interaction.reply({ content: `Ticket criado: ${channel}`, ephemeral: true });
 
   await sendLog(
@@ -303,9 +358,15 @@ client.once(Events.ClientReady, async () => {
 
   for (const guild of client.guilds.cache.values()) {
     await ensureTicketPanel(guild).catch((error) => {
-      console.error(`Falha ao preparar painel de tickets em ${guild.name}:`, error);
+      console.error(`Falha ao preparar suporte em ${guild.name}:`, error);
     });
   }
+});
+
+client.on(Events.GuildCreate, async (guild) => {
+  await ensureTicketPanel(guild).catch((error) => {
+    console.error(`Falha ao preparar suporte em ${guild.name}:`, error);
+  });
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
