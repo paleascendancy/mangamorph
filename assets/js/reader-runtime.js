@@ -4,13 +4,27 @@ const p=new URLSearchParams(location.search);
 const mangaId=Number(p.get("id"))||1,chapterNumber=Number(p.get("chapter"))||1;
 const [{data:manga},{data:chapters}]=await Promise.all([
   db.from("mangamorph_mangas").select("id,title,accent,cover_url").eq("id",mangaId).maybeSingle(),
-  db.from("mangamorph_chapters").select("id,chapter_number,title,published_at").eq("manga_id",mangaId).eq("published",true).order("chapter_number",{ascending:false})
+  db.from("mangamorph_chapters").select("id,chapter_number,title,published_at,source_name,source_credit,source_url").eq("manga_id",mangaId).eq("published",true).order("chapter_number",{ascending:false})
 ]);
 if(manga){
   const current=(chapters||[]).find(c=>Number(c.chapter_number)===chapterNumber);
   document.title="MangaMorph — "+manga.title+" · Capítulo "+chapterNumber;
   document.querySelector("#readerTitle").textContent=manga.title;
   document.querySelector("#readerChapterLabel").textContent="Capítulo "+chapterNumber;
+  const credit=document.querySelector("#readerCredit");
+  if(credit&&current&&(current.source_credit||current.source_name)){
+    credit.textContent=current.source_credit||("Tradução e edição: "+current.source_name);
+    if(current.source_url){
+      credit.href=current.source_url;
+      credit.target="_blank";
+      credit.rel="noopener noreferrer";
+    }else{
+      credit.removeAttribute("href");
+    }
+    credit.hidden=false;
+  }else if(credit){
+    credit.hidden=true;
+  }
   document.querySelector("#bottomChapterLabel").textContent=chapterNumber;
   document.querySelector("#finishChapterLabel").textContent="Capítulo "+chapterNumber+" concluído";
   document.querySelector("#readerBack").href="manga.html?id="+mangaId;
