@@ -156,6 +156,56 @@ function mountNotificationsInMenu(){
   }
 }
 
+function mountDiscordCommunity(){
+  const discordUrl="https://discord.gg/yWHm5DcPuN";
+  const nav=document.querySelector(".side-menu-nav");
+  if(nav&&!document.querySelector("#sideMenuDiscord")){
+    const link=document.createElement("a");
+    link.id="sideMenuDiscord";
+    link.className="side-menu-item side-menu-discord";
+    link.href=discordUrl;
+    link.target="_blank";
+    link.rel="noopener noreferrer";
+    link.setAttribute("aria-label","Abrir comunidade do MangaMorph no Discord");
+    link.innerHTML='<span class="side-menu-icon" aria-hidden="true">◈</span><span class="side-menu-discord-copy"><strong>Comunidade</strong><small>Entre no Discord do MangaMorph</small></span><span class="side-menu-discord-arrow" aria-hidden="true">↗</span>';
+    nav.appendChild(link);
+  }
+
+  const footer=document.querySelector(".footer");
+  if(footer&&!document.querySelector("#footerDiscord")){
+    const link=document.createElement("a");
+    link.id="footerDiscord";
+    link.className="footer-discord-link";
+    link.href=discordUrl;
+    link.target="_blank";
+    link.rel="noopener noreferrer";
+    link.innerHTML='<span aria-hidden="true">◈</span><span><strong>Comunidade MangaMorph</strong><small>Entrar no Discord</small></span><b aria-hidden="true">↗</b>';
+    footer.insertBefore(link,footer.querySelector("p"));
+  }
+
+  if(!document.querySelector("#mangamorphDiscordStyles")){
+    const style=document.createElement("style");
+    style.id="mangamorphDiscordStyles";
+    style.textContent=`
+      .side-menu-discord{text-decoration:none!important;justify-content:flex-start!important;gap:14px!important}
+      .side-menu-discord-copy{display:flex;flex:1;min-width:0;flex-direction:column;text-align:left}
+      .side-menu-discord-copy strong{font:inherit;font-weight:800;color:inherit}
+      .side-menu-discord-copy small{margin-top:2px;font-size:.72em;font-weight:600;color:#7d8798}
+      .side-menu-discord-arrow{margin-left:auto;color:#778195;font-size:1.05rem;font-weight:800}
+      .footer-discord-link{display:flex;align-items:center;gap:12px;width:min(100%,360px);margin:22px 0 18px;padding:14px 16px;border:1px solid rgba(120,132,151,.22);border-radius:16px;background:rgba(255,255,255,.48);box-shadow:0 10px 28px rgba(25,35,55,.05);color:inherit;text-decoration:none;box-sizing:border-box}
+      .footer-discord-link>span:first-child{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#fff;border:1px solid rgba(120,132,151,.18);font-size:1rem}
+      .footer-discord-link>span:nth-child(2){display:flex;min-width:0;flex:1;flex-direction:column}
+      .footer-discord-link strong{font-size:.93rem;line-height:1.2}
+      .footer-discord-link small{margin-top:3px;color:#778195;font-size:.75rem}
+      .footer-discord-link b{font-size:1rem;color:#778195}
+      body:not(.light) .footer-discord-link{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+      body:not(.light) .footer-discord-link>span:first-child{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}
+      @media(max-width:600px){.footer-discord-link{width:100%;margin-top:18px}}
+    `;
+    document.head.appendChild(style);
+  }
+}
+
 function closeSideMenu(){
   const menu=document.querySelector("#sideMenu");
   if(!menu||menu.hidden)return;
@@ -169,6 +219,7 @@ function closeSideMenu(){
 
 fixHeaderAvatarShape();
 mountNotificationsInMenu();
+mountDiscordCommunity();
 
 function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
 function time(v){const d=new Date(v),diff=Date.now()-d.getTime(),m=Math.floor(diff/60000);if(m<1)return"agora";if(m<60)return m+" min";const h=Math.floor(m/60);if(h<24)return h+" h";return d.toLocaleDateString("pt-BR")}
