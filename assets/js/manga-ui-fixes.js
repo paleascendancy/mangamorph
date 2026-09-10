@@ -40,6 +40,15 @@ function initials(name){
   return (String(name||"Leitor").trim().split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join("")||"L").toUpperCase();
 }
 
+function readerUrl(chapter){
+  return "reader.html?id="+mangaId+"&chapter="+encodeURIComponent(String(chapter));
+}
+
+function openChapter(chapter,hash=""){
+  if(chapter===null||chapter===undefined||!Number.isFinite(Number(chapter)))return;
+  location.href=readerUrl(chapter)+hash;
+}
+
 function installCommentsTab(){
   const relatedTab=$("#tabRelated");
   const nav=relatedTab?.parentElement;
@@ -87,6 +96,9 @@ function installStyles(){
   style.id="mangamorphMangaUiFixStyles";
   style.textContent=`
     .manga-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .chapter-row[data-chapter-card]{cursor:pointer;outline:none}
+    .chapter-row[data-chapter-card]:focus-visible{box-shadow:0 0 0 3px rgba(91,142,224,.22);border-color:rgba(91,142,224,.42)}
+    .chapter-row[data-chapter-card]:active{transform:scale(.995)}
     .work-comments-section{padding-top:.15rem}
     .work-comments-note{margin:0 0 .65rem;padding:.62rem .72rem;border:1px solid rgba(255,255,255,.055);border-radius:.72rem;background:#0d141d;color:#7e8ca0;font-size:.62rem}
     .work-comments-list{display:grid;gap:.46rem}
@@ -130,7 +142,12 @@ function updateSortButton(){
 
 function renderLiveChapters(){
   const list=$("#chapterList");
-  if(!list||!liveChapters.length)return;
+  if(!list)return;
+  if(!liveChapters.length){
+    list.innerHTML='<div class="chapter-empty">Nenhum capítulo publicado ainda.</div>';
+    return;
+  }
+
   const normalized=chapterQuery.trim().toLowerCase();
   let rows=liveChapters.slice().sort((a,b)=>chapterOrder==="desc"
     ?Number(b.chapter_number)-Number(a.chapter_number)
@@ -142,14 +159,15 @@ function renderLiveChapters(){
     list.innerHTML='<div class="chapter-empty">Nenhum capítulo encontrado.</div>';
     return;
   }
+
   const latest=Math.max(...liveChapters.map(ch=>Number(ch.chapter_number)));
   list.innerHTML=rows.map(ch=>{
     const number=Number(ch.chapter_number);
     const isLatest=number===latest;
-    return '<article class="chapter-row '+(isLatest?'latest':'')+'" id="capitulo-'+number+'">'+
+    return '<article class="chapter-row '+(isLatest?'latest':'')+'" id="capitulo-'+number+'" data-chapter-card="'+number+'" role="link" tabindex="0" aria-label="Abrir capítulo '+number+'">'+
       '<div class="chapter-copy"><div class="chapter-number"><strong>Capítulo '+number+'</strong><span class="chapter-meta-line"><span>◷ '+fmtDate(ch.published_at)+'</span>'+(ch.title?'<span>'+esc(ch.title)+'</span>':'')+'</span></div>'+
       (isLatest?'<span class="chapter-badge">NOVO</span>':'')+'</div>'+
-      '<button class="chapter-read" type="button" data-read-chapter="'+number+'">Ler <span>›</span></button></article>';
+      '<button class="chapter-read" type="button" data-read-chapter="'+number+'" tabindex="-1">Ler <span>›</span></button></article>';
   }).join("");
 }
 
@@ -159,8 +177,8 @@ async function loadLiveChapters(){
     .eq("manga_id",mangaId)
     .eq("published",true)
     .order("chapter_number",{ascending:false});
-  if(error||!data?.length)return;
-  liveChapters=data;
+  if(error)return;
+  liveChapters=data||[];
   const count=$("#chapterCount");
   const tabCount=$("#tabChapterCount");
   if(tabCount)tabCount.textContent=String(liveChapters.length);
@@ -236,8 +254,25 @@ document.addEventListener("click",event=>{
   const openComment=event.target.closest("[data-open-comment-chapter]");
   if(openComment){
     event.preventDefault();
-    location.href="reader.html?id="+mangaId+"&chapter="+openComment.dataset.openCommentChapter+"#chapterCommunity";
+    event.stopImmediatePropagation();
+    openChapter(openComment.dataset.openCommentChapter,"#chapterCommunity");
+    return;
   }
+
+  const chapterCard=event.target.closest("[data-chapter-card]");
+  if(chapterCard){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openChapter(chapterCard.dataset.chapterCard);
+  }
+},true);
+
+document.addEventListener("keydown",event=>{
+  if(event.key!=="Enter"&&event.key!==" ")return;
+  const chapterCard=event.target.closest?.("[data-chapter-card]");
+  if(!chapterCard)return;
+  event.preventDefault();
+  openChapter(chapterCard.dataset.chapterCard);
 },true);
 
 document.addEventListener("input",event=>{
