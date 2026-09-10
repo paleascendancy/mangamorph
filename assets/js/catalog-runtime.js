@@ -8,6 +8,18 @@ bootStyle.textContent='@keyframes mmBootSpin{to{transform:rotate(360deg)}}';
 document.head.append(bootStyle);
 document.body.append(boot);
 
+const cleanCoverStyle=document.createElement("style");
+cleanCoverStyle.id="mangamorphCleanCatalogCovers";
+cleanCoverStyle.textContent=`
+  .featured-cover>*{display:none!important}
+  .featured-cover::before,.featured-cover::after{content:none!important;display:none!important}
+  .manga-cover-copy,.manga-cover-title{display:none!important}
+  .manga-cover::before{content:none!important;display:none!important}
+  .featured-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
+  .manga-cover[style*="background-image"]{background-size:auto 150%!important;background-position:center 8%!important;background-repeat:no-repeat!important}
+`;
+document.head.append(cleanCoverStyle);
+
 function finishBoot(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     boot.style.opacity="0";
