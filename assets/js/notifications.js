@@ -9,6 +9,35 @@ const markAll=document.querySelector("#notificationsMarkAll");
 const adminLink=document.querySelector("#accountAdminLink");
 let session=null,items=[];
 
+function fixHeaderAvatarShape(){
+  if(!document.querySelector("#mangamorphCircularAvatarStyles")){
+    const style=document.createElement("style");
+    style.id="mangamorphCircularAvatarStyles";
+    style.textContent=`
+      #accountToggle.account-button{
+        border-radius:50%!important;
+        overflow:hidden!important;
+        aspect-ratio:1/1!important;
+      }
+      #accountToggle .header-profile-image,
+      #accountToggle .header-profile-initials{
+        width:100%!important;
+        height:100%!important;
+        border-radius:50%!important;
+        object-fit:cover!important;
+        overflow:hidden!important;
+      }
+      @media(max-width:760px){
+        #accountToggle.account-button{border-radius:50%!important}
+      }
+      @media(max-width:480px){
+        #accountToggle.account-button{border-radius:50%!important}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
 function mountNotificationsInMenu(){
   const nav=document.querySelector(".side-menu-nav");
   if(!toggle||!nav)return;
@@ -67,6 +96,7 @@ function closeSideMenu(){
   }
 }
 
+fixHeaderAvatarShape();
 mountNotificationsInMenu();
 
 function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
