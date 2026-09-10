@@ -87,17 +87,33 @@ if(status&&coverInput){
     }
   }
 
+  function tryAutomaticLookup(manga={}){
+    const mangaId=Number(manga.id||$("mangaIdInput")?.value);
+    const existing=String(manga.cover_url||$("mangaImportedCoverUrl")?.value||"").trim();
+    if(!Number.isInteger(mangaId)||mangaId<1||existing||autoTried.has(mangaId))return;
+    if(coverInput.files?.length)return;
+    autoTried.add(mangaId);
+    resolveCover(mangaId,{automatic:true});
+  }
+
   button.addEventListener("click",()=>{
     const mangaId=Number($("mangaIdInput")?.value);
     resolveCover(mangaId,{automatic:false});
   });
 
   window.addEventListener("mangamorph:admin-manga-saved",event=>{
-    const manga=event.detail||{};
-    const mangaId=Number(manga.id);
-    if(!Number.isInteger(mangaId)||mangaId<1||manga.cover_url||autoTried.has(mangaId))return;
-    if(coverInput.files?.length)return;
-    autoTried.add(mangaId);
-    resolveCover(mangaId,{automatic:true});
+    tryAutomaticLookup(event.detail||{});
   });
+
+  const saveMessage=$("mangaFormMessage");
+  if(saveMessage){
+    let lastText="";
+    const detectSaved=()=>{
+      const text=String(saveMessage.textContent||"").trim();
+      if(text===lastText)return;
+      lastText=text;
+      if(/obra salva com sucesso/i.test(text))queueMicrotask(()=>tryAutomaticLookup());
+    };
+    new MutationObserver(detectSaved).observe(saveMessage,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["hidden"]});
+  }
 }
