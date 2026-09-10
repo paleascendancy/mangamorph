@@ -89,6 +89,60 @@ async function findRulesChannel(guild) {
   return findTextChannel(guild, null, ['📜・regras', 'regras']);
 }
 
+function buildRulesEmbeds() {
+  const header = new EmbedBuilder()
+    .setColor(0x6f7cff)
+    .setAuthor({
+      name: 'MangaMorph • Comunidade Oficial',
+      iconURL: client.user.displayAvatarURL()
+    })
+    .setTitle('Código da Comunidade')
+    .setDescription(
+      'Um servidor organizado começa com regras simples e claras. Leia antes de participar.\n\n' +
+      '**8 regras essenciais • leitura rápida • canal somente leitura**'
+    )
+    .setThumbnail(client.user.displayAvatarURL({ size: 256 }));
+
+  const convivencia = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('01  ·  CONVIVÊNCIA')
+    .setDescription(
+      '`01` **Respeito**\n' +
+      'Converse com educação. Assédio, discriminação, perseguição e ataques pessoais não são aceitos.\n\n' +
+      '`02` **Sem spam ou flood**\n' +
+      'Evite mensagens repetidas, menções em massa, correntes e excesso de emojis.'
+    );
+
+  const organizacao = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('02  ·  ORGANIZAÇÃO')
+    .setDescription(
+      '`03` **Use o canal certo**\n' +
+      'Mantenha cada assunto no espaço correspondente e respeite avisos fixados pela equipe.\n\n' +
+      '`04` **Divulgação com autorização**\n' +
+      'Servidores, sites, perfis, projetos e publicidade precisam de autorização da staff.\n\n' +
+      '`05` **Privacidade**\n' +
+      'Não publique dados pessoais, informações privadas ou conteúdo usado para expor outras pessoas.'
+    );
+
+  const conteudo = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('03  ·  CONTEÚDO & SUPORTE')
+    .setDescription(
+      '`06` **Spoilers**\n' +
+      'Use aviso de spoiler e não revele acontecimentos importantes sem contexto.\n\n' +
+      '`07` **Suporte e denúncias**\n' +
+      'Problemas, denúncias, parcerias e questões sobre obras devem ir para **🎫・abrir-ticket**.\n\n' +
+      '`08` **Moderação**\n' +
+      'A staff pode aplicar medidas conforme a situação. Contestações devem ser tratadas por ticket, com respeito.'
+    )
+    .setFooter({
+      text: 'Ao participar do servidor, você concorda com estas diretrizes • MangaMorph'
+    });
+
+  return [header, convivencia, organizacao, conteudo];
+}
+
 async function ensureRulesPanel(guild) {
   let channel = await findRulesChannel(guild);
 
@@ -102,24 +156,44 @@ async function ensureRulesPanel(guild) {
       name: '📜・regras',
       type: ChannelType.GuildText,
       parent: startCategory?.id || null,
-      topic: 'Regras oficiais da comunidade MangaMorph.',
+      topic: 'Diretrizes oficiais • leitura obrigatória • canal somente leitura',
       reason: 'Canal de regras do MangaMorph'
     });
     console.log(`[${guild.name}] Canal de regras criado.`);
+  } else {
+    await channel.setTopic('Diretrizes oficiais • leitura obrigatória • canal somente leitura').catch(() => {});
   }
+
+  const readOnlyPermissions = {
+    ViewChannel: true,
+    ReadMessageHistory: true,
+    SendMessages: false,
+    SendMessagesInThreads: false,
+    CreatePublicThreads: false,
+    CreatePrivateThreads: false,
+    AddReactions: false
+  };
 
   await channel.permissionOverwrites.edit(
     guild.roles.everyone.id,
-    {
-      ViewChannel: true,
-      ReadMessageHistory: true,
-      SendMessages: false,
-      SendMessagesInThreads: false,
-      CreatePublicThreads: false,
-      CreatePrivateThreads: false
-    },
+    readOnlyPermissions,
     { reason: 'Canal de regras somente leitura' }
   );
+
+  const memberRole = await findMemberRole(guild);
+  if (memberRole) {
+    await channel.permissionOverwrites.edit(
+      memberRole.id,
+      {
+        SendMessages: false,
+        SendMessagesInThreads: false,
+        CreatePublicThreads: false,
+        CreatePrivateThreads: false,
+        AddReactions: false
+      },
+      { reason: 'Bloquear interação do cargo Membro no canal de regras' }
+    );
+  }
 
   await channel.permissionOverwrites.edit(
     client.user.id,
@@ -133,59 +207,30 @@ async function ensureRulesPanel(guild) {
     { reason: 'Permitir publicação das regras pelo bot' }
   );
 
+  const embeds = buildRulesEmbeds();
   const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
-  const existing = recent?.find((message) =>
+  const ruleMessages = recent?.filter((message) =>
     message.author.id === client.user.id &&
-    message.embeds.some((embed) => embed.title === '📜 Regras do MangaMorph')
+    message.embeds.some((embed) =>
+      embed.title === '📜 Regras do MangaMorph' || embed.title === 'Código da Comunidade'
+    )
   );
 
-  if (existing) return;
+  const primary = ruleMessages?.first() || null;
 
-  const embed = new EmbedBuilder()
-    .setColor(0x111318)
-    .setAuthor({ name: 'MangaMorph', iconURL: client.user.displayAvatarURL() })
-    .setTitle('📜 Regras do MangaMorph')
-    .setDescription(
-      'Bem-vindo à comunidade. Para manter o servidor organizado, seguro e agradável para todos, siga as regras abaixo.'
-    )
-    .addFields(
-      {
-        name: '01 • Respeito acima de tudo',
-        value: 'Trate todos com respeito. Ofensas, perseguição, discriminação, provocações excessivas e ataques pessoais não são permitidos.'
-      },
-      {
-        name: '02 • Sem spam ou flood',
-        value: 'Não repita mensagens, menções, emojis ou conteúdo de forma exagerada. Evite atrapalhar conversas e canais.'
-      },
-      {
-        name: '03 • Use os canais corretamente',
-        value: 'Envie cada assunto no canal apropriado e siga as orientações fixadas pela equipe.'
-      },
-      {
-        name: '04 • Divulgação e links',
-        value: 'Não faça propaganda, divulgação de servidores, sites, perfis ou projetos sem autorização da equipe.'
-      },
-      {
-        name: '05 • Privacidade e segurança',
-        value: 'Não compartilhe dados pessoais seus ou de outras pessoas. Não tente expor, ameaçar ou constranger membros.'
-      },
-      {
-        name: '06 • Mangás, spoilers e discussões',
-        value: 'Respeite avisos de spoiler e evite estragar capítulos ou acontecimentos importantes para outros membros.'
-      },
-      {
-        name: '07 • Problemas, denúncias e suporte',
-        value: 'Use 🎫・abrir-ticket para falar em privado com a equipe sobre suporte, denúncias, parcerias ou problemas com obras e capítulos.'
-      },
-      {
-        name: '08 • Moderação',
-        value: 'A equipe pode advertir ou aplicar medidas quando necessário. Se discordar de uma decisão, abra um ticket e converse com respeito.'
-      }
-    )
-    .setFooter({ text: 'Ao permanecer no servidor, você concorda em seguir estas regras • MangaMorph' })
-    .setTimestamp();
+  if (primary) {
+    await primary.edit({ embeds });
 
-  await channel.send({ embeds: [embed] });
+    const duplicates = ruleMessages.filter((message) => message.id !== primary.id);
+    for (const message of duplicates.values()) {
+      await message.delete().catch(() => {});
+    }
+
+    console.log(`[${guild.name}] Template de regras atualizado.`);
+    return;
+  }
+
+  await channel.send({ embeds });
   console.log(`[${guild.name}] Template de regras publicado.`);
 }
 
