@@ -9,7 +9,7 @@ import {
   GatewayIntentBits
 } from 'discord.js';
 
-const { DISCORD_TOKEN } = process.env;
+const { DISCORD_TOKEN, PIX_KEY } = process.env;
 
 if (!DISCORD_TOKEN) {
   console.error('DISCORD_TOKEN não configurado.');
@@ -60,8 +60,9 @@ async function configureFinancialSupport(guild) {
       },
       {
         name: '💳 Como contribuir',
-        value:
-          `Abra ${supportMention} e selecione **Apoiar o projeto**. A forma de contribuição é passada pelo atendimento.`
+        value: PIX_KEY
+          ? `**Pix (chave aleatória):**\n\`${PIX_KEY}\`\n\nAntes de confirmar, confira no seu banco se o destinatário está correto. Se precisar de ajuda, use ${supportMention}.`
+          : `Abra ${supportMention} e selecione **Apoiar o projeto**. A forma de contribuição é passada pelo atendimento.`
       }
     )
     .setFooter({
@@ -72,8 +73,8 @@ async function configureFinancialSupport(guild) {
     ? [new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Link)
-          .setLabel('Apoiar o projeto')
-          .setEmoji('💙')
+          .setLabel('Suporte')
+          .setEmoji('🎫')
           .setURL(`https://discord.com/channels/${guild.id}/${support.id}`)
       )]
     : [];
