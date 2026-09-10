@@ -829,6 +829,7 @@ function renderFeaturedHero(featured){
   hero.classList.add("hero-switching");
 
   title.textContent=featured.title;
+  cover.replaceChildren();
   cover.setAttribute("style",heroCoverStyle(featured));
 
   const meta=document.querySelector(".featured-meta");
@@ -839,9 +840,13 @@ function renderFeaturedHero(featured){
 
   const links=hero.querySelectorAll(".featured-actions a");
   if(links[0]){
-    links[0].href=featured.chapter>0
+    const hasChapter=featured.chapter>0;
+    links[0].href=hasChapter
       ?"reader.html?id="+featured.id+"&chapter="+featured.chapter
       :"manga.html?id="+featured.id+"#chapters";
+    links[0].innerHTML=hasChapter
+      ?'<span aria-hidden="true">▶</span> Ler agora'
+      :'<span aria-hidden="true">☰</span> Ver capítulos';
   }
   if(links[1])links[1].href="manga.html?id="+featured.id;
 }
