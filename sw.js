@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.21";
+const CACHE = "mangamorph-v0.17.22";
 const ASSETS = [
   "./",
   "./index.html",
@@ -18,6 +18,7 @@ const ASSETS = [
   "./assets/css/public-profile.css?v=001",
   "./assets/js/app.js?v=044",
   "./assets/js/catalog-runtime.js?v=003",
+  "./assets/js/catalog-cover-fix.js?v=002",
   "./assets/js/account-sync.js?v=002",
   "./assets/js/notifications.js?v=001",
   "./assets/js/admin.js?v=004",
@@ -49,17 +50,31 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
+async function fetchFresh(request) {
+  const destination=request.destination;
+  const revalidate=destination === "document" || destination === "script" || destination === "style" || destination === "image";
+  const response=await fetch(request,revalidate?{cache:"no-cache"}:undefined);
+
+  if(response.ok && destination === "script" && new URL(request.url).pathname.endsWith("/assets/js/catalog-runtime.js")){
+    const source=await response.text();
+    const injected=source+'\nimport("./catalog-cover-fix.js?v=002").catch(error=>console.error("MangaMorph cover fix:",error));\n';
+    const headers=new Headers(response.headers);
+    headers.set("Content-Type","text/javascript; charset=utf-8");
+    return new Response(injected,{status:response.status,statusText:response.statusText,headers});
+  }
+
+  return response;
+}
+
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
-  const destination = event.request.destination;
-  const revalidate = destination === "document" || destination === "script" || destination === "style" || destination === "image";
+  if(event.request.method !== "GET")return;
   event.respondWith(
-    fetch(event.request, revalidate ? {cache:"no-cache"} : undefined).then(response => {
-      if (response.ok) {
-        const copy = response.clone();
-        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+    fetchFresh(event.request).then(response=>{
+      if(response.ok){
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
       return response;
-    }).catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
+    }).catch(()=>caches.match(event.request).then(cached=>cached||caches.match("./index.html")))
   );
 });
