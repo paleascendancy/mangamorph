@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0f17">
   <meta name="robots" content="noindex,nofollow">
   <title>MangaMorph — Administração</title>
-  <link rel="stylesheet" href="assets/css/admin.css?v=003">
+  <link rel="stylesheet" href="assets/css/admin.css?v=004">
 </head>
 <body>
   <div class="admin-auth" id="adminAuth">
@@ -31,6 +31,7 @@
         <button class="active" data-admin-view="dashboard">Visão geral</button>
         <button data-admin-view="mangas">Obras</button>
         <button data-admin-view="chapters">Capítulos</button>
+        <button data-admin-view="partners">Scans parceiras</button>
         <button data-admin-view="moderation">Moderação</button>
       </nav>
       <button class="admin-signout" id="adminSignOut">Sair</button>
@@ -171,6 +172,60 @@
         </div>
       </section>
 
+
+      <section class="admin-view" id="viewPartners" hidden>
+        <div class="partner-admin-grid">
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div><span>AUTOMAÇÃO 24/7</span><h2>Scans parceiras</h2></div>
+              <button id="partnerSyncAll" type="button">↻ Sincronizar tudo</button>
+            </div>
+            <p class="admin-helper">O MangaMorph verifica automaticamente as fontes ativas a cada 5 minutos e respeita o intervalo configurado de cada parceria.</p>
+            <div class="partner-list" id="partnerList"><div class="empty-admin">Nenhuma scan parceira conectada ainda.</div></div>
+          </div>
+
+          <form class="admin-card partner-form" id="partnerForm">
+            <div class="admin-card-head">
+              <div><span>INTEGRAÇÃO</span><h2 id="partnerFormTitle">Nova scan parceira</h2></div>
+              <button id="partnerNewButton" type="button">＋ Nova</button>
+            </div>
+
+            <label>Nome da scan<input id="partnerName" maxlength="120" placeholder="Nome da scan" required></label>
+            <label>Site oficial<input id="partnerWebsite" type="url" maxlength="1000" placeholder="https://scan.exemplo"></label>
+            <label>Feed/API de capítulos<input id="partnerFeed" type="url" maxlength="1500" placeholder="https://scan.exemplo/api/mangamorph.json" required></label>
+            <label>Crédito exibido<input id="partnerCredit" maxlength="240" placeholder="Tradução e edição: Nome da Scan"></label>
+
+            <div class="partner-options">
+              <label><input id="partnerEnabled" type="checkbox" checked> Sincronização ativa</label>
+              <label><input id="partnerAutoPublish" type="checkbox" checked> Publicar automaticamente</label>
+              <label><input id="partnerRights" type="checkbox"> A scan confirmou permissão de distribuição</label>
+            </div>
+
+            <label>Verificar a cada
+              <select id="partnerInterval">
+                <option value="5">5 minutos</option>
+                <option value="15" selected>15 minutos</option>
+                <option value="30">30 minutos</option>
+                <option value="60">1 hora</option>
+                <option value="360">6 horas</option>
+                <option value="1440">1 dia</option>
+              </select>
+            </label>
+
+            <details class="partner-feed-help">
+              <summary>Formato da API/feed</summary>
+              <p>O feed deve retornar JSON com obras e capítulos. Cada capítulo precisa ter um identificador, número e uma lista de URLs HTTPS das páginas. O MangaMorph copia as imagens para o próprio Storage e evita importar o mesmo capítulo duas vezes.</p>
+            </details>
+
+            <div class="admin-form-actions">
+              <button class="primary" id="partnerSaveButton" type="submit">Salvar parceria</button>
+              <button id="partnerDeleteButton" type="button" hidden>Remover</button>
+            </div>
+            <p class="admin-message" id="partnerMessage" hidden></p>
+          </form>
+        </div>
+      </section>
+
       <section class="admin-view" id="viewModeration" hidden>
         <div class="admin-card">
           <div class="admin-card-head"><div><span>SEGURANÇA</span><h2>Denúncias</h2></div><select id="reportFilter"><option value="pending">Pendentes</option><option value="all">Todas</option></select></div>
@@ -180,8 +235,9 @@
     </main>
   </div>
 
-  <script type="module" src="assets/js/admin.js?v=003"></script>
+  <script type="module" src="assets/js/admin.js?v=004"></script>
   <script type="module" src="assets/js/admin-import.js?v=003"></script>
   <script type="module" src="assets/js/admin-archive-import.js?v=001"></script>
+  <script type="module" src="assets/js/admin-partners.js?v=001"></script>
 </body>
 </html>
