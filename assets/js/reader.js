@@ -151,7 +151,7 @@ function updateProgress(){
 }
 window.addEventListener("scroll",updateProgress,{passive:true});
 
-const savedReaderTheme = localStorage.getItem("mangamorph:theme") || localStorage.getItem("mangamorph:reader-theme") || "dark";
+const savedReaderTheme = localStorage.getItem("mangamorph:theme") || localStorage.getItem("mangamorph:reader-theme") || "light";
 document.body.classList.toggle("light-reader",savedReaderTheme === "light");
 readerThemeLabel.textContent = savedReaderTheme === "light" ? "Claro" : "Escuro";
 
