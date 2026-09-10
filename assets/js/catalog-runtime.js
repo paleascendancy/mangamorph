@@ -16,7 +16,7 @@ if(data?.length){
     id:Number(m.id),title:m.title,genre:(m.genres&&m.genres[0])||"Outros",type:m.type||"Mangá",
     chapter:Number(m.latest_chapter)||0,accent:m.accent||"#3a4162",reads:Number(m.reader_count)||0,
     favorites:Number(m.favorite_count)||0,rating:Number(m.average_rating)||0,newness:Math.max(1,100-i),
-    coverUrl:m.cover_url||null,description:m.synopsis||"",tags:[...(m.genres||[]),...(m.tags||[])],
+    coverUrl:m.cover_url||null,featured:!!m.featured,description:m.synopsis||"",tags:[...(m.genres||[]),...(m.tags||[])],
     author:m.author||"",artist:m.artist||"",status:m.publication_status||"",country:m.country||""
   }));
   window.dispatchEvent(new CustomEvent("mangamorph:catalog-loaded",{detail:catalog}));
