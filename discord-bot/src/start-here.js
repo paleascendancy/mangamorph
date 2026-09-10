@@ -7,11 +7,12 @@ import {
   Client,
   EmbedBuilder,
   Events,
-  GatewayIntentBits,
-  PermissionFlagsBits
+  GatewayIntentBits
 } from 'discord.js';
 
 const { DISCORD_TOKEN, MEMBER_ROLE_ID } = process.env;
+
+const START_HERE_ART = 'https://raw.githubusercontent.com/paleascendancy/mangamorph/main/discord-bot/assets/start-here.webp';
 
 if (!DISCORD_TOKEN) {
   console.error('DISCORD_TOKEN não configurado.');
@@ -64,19 +65,17 @@ async function ensureStartHereChannel(guild) {
       name: '🧭・comece-aqui',
       type: ChannelType.GuildText,
       parent: category?.id || null,
-      topic: 'Guia rápido • conheça o MangaMorph • encontre cada área do servidor',
+      topic: 'Guia rápido • conheça o MangaMorph • canal somente leitura',
       reason: 'Canal de orientação do MangaMorph'
     });
     console.log(`[${guild.name}] Canal comece-aqui criado.`);
   } else {
     await channel
-      .setTopic('Guia rápido • conheça o MangaMorph • encontre cada área do servidor')
+      .setTopic('Guia rápido • conheça o MangaMorph • canal somente leitura')
       .catch(() => {});
   }
 
-  const readOnly = {
-    ViewChannel: true,
-    ReadMessageHistory: true,
+  const denyInteraction = {
     SendMessages: false,
     SendMessagesInThreads: false,
     CreatePublicThreads: false,
@@ -86,21 +85,31 @@ async function ensureStartHereChannel(guild) {
 
   await channel.permissionOverwrites.edit(
     guild.roles.everyone.id,
-    readOnly,
+    {
+      ViewChannel: true,
+      ReadMessageHistory: true,
+      ...denyInteraction
+    },
     { reason: 'Canal comece-aqui somente leitura' }
   );
+
+  // Bloqueia explicitamente qualquer cargo comum que possa herdar permissão de escrita.
+  // Administradores do Discord ainda podem ignorar overwrites por regra da própria plataforma.
+  const roles = await guild.roles.fetch();
+  for (const role of roles.values()) {
+    if (role.id === guild.roles.everyone.id || role.managed) continue;
+    await channel.permissionOverwrites.edit(
+      role.id,
+      denyInteraction,
+      { reason: 'Comece-aqui somente leitura para todos os cargos' }
+    ).catch(() => {});
+  }
 
   const memberRole = await findMemberRole(guild);
   if (memberRole) {
     await channel.permissionOverwrites.edit(
       memberRole.id,
-      {
-        SendMessages: false,
-        SendMessagesInThreads: false,
-        CreatePublicThreads: false,
-        CreatePrivateThreads: false,
-        AddReactions: false
-      },
+      denyInteraction,
       { reason: 'Bloquear interação de membros no comece-aqui' }
     );
   }
@@ -120,18 +129,16 @@ async function ensureStartHereChannel(guild) {
   return channel;
 }
 
-function buildEmbeds(guild) {
-  const icon = guild.iconURL({ size: 256 }) || client.user.displayAvatarURL({ size: 256 });
-
+function buildEmbeds() {
   const header = new EmbedBuilder()
     .setColor(0x6f7cff)
-    .setAuthor({ name: 'MangaMorph • Comunidade Oficial', iconURL: icon })
+    .setAuthor({ name: 'MangaMorph • Comunidade Oficial' })
     .setTitle('🧭 Comece por aqui')
     .setDescription(
       'Chegou agora? Este é o seu ponto de partida. Em poucos passos você entende como o servidor funciona e encontra tudo o que precisa.\n\n' +
       '**Leitura rápida • navegação direta • sem complicação**'
     )
-    .setThumbnail(icon);
+    .setThumbnail(START_HERE_ART);
 
   const primeirosPassos = new EmbedBuilder()
     .setColor(0x2f3545)
@@ -198,7 +205,7 @@ async function buildNavigationRows(guild) {
 
 async function ensureStartHerePanel(guild) {
   const channel = await ensureStartHereChannel(guild);
-  const embeds = buildEmbeds(guild);
+  const embeds = buildEmbeds();
   const components = await buildNavigationRows(guild);
 
   const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
