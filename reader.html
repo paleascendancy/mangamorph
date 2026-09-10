@@ -9,7 +9,11 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=041">
   <link rel="stylesheet" href="assets/css/reader.css?v=008">
-  <script>window.__mangamorphRequestedChapter=new URLSearchParams(location.search).get("chapter");</script>
+  <script>
+    window.__mangamorphRequestedChapter=new URLSearchParams(location.search).get("chapter");
+    if("scrollRestoration" in history) history.scrollRestoration="manual";
+    window.scrollTo(0,0);
+  </script>
 </head>
 <body class="reader-body light-reader">
   <header class="reader-header" id="readerHeader">
@@ -155,7 +159,7 @@
 
   <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/js/reader.js?v=008" defer></script>
+  <script src="assets/js/reader.js?v=009" defer></script>
   <script type="module" src="assets/js/reader-runtime.js?v=006"></script>
   <script src="assets/js/reader-ui-fixes.js?v=002" defer></script>
   <script type="module" src="assets/js/account-sync.js?v=002"></script>
