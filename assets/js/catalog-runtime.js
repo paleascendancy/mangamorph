@@ -12,6 +12,7 @@ document.body.append(boot);
 const premiumCardStyle=document.createElement("style");
 premiumCardStyle.id="mangamorphPremiumCatalogCards";
 premiumCardStyle.textContent=`
+  .featured-cover{background-color:#151b25!important}
   .featured-cover>*{display:none!important}
   .featured-cover::before,.featured-cover::after{content:none!important;display:none!important}
   .featured-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
@@ -22,7 +23,7 @@ premiumCardStyle.textContent=`
   .premium-manga-card:focus-visible{outline:none!important;box-shadow:0 0 0 3px rgba(91,142,224,.24),0 22px 48px rgba(0,0,0,.3)!important}
 
   .premium-manga-card .manga-cover{position:relative!important;aspect-ratio:3/4.15!important;display:block!important;overflow:hidden!important;padding:0!important;background:#171d27!important;background-image:none!important}
-  .premium-manga-card .manga-cover-image{position:absolute;z-index:0;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center 10%;opacity:0;transform:scale(1.035);transition:opacity .22s ease,transform .42s ease,filter .3s ease;background:#171d27}
+  .premium-manga-card .manga-cover-image{position:absolute;z-index:0;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center 10%;opacity:0;transform:scale(1.035);transition:opacity .18s ease,transform .42s ease,filter .3s ease;background:#171d27}
   .premium-manga-card .manga-cover-image.loaded{opacity:1}
   .premium-manga-card:hover .manga-cover-image{transform:scale(1.075);filter:saturate(1.04) contrast(1.02)}
   .premium-manga-card .manga-cover::before{content:""!important;display:block!important;position:absolute!important;z-index:1!important;inset:0!important;background:linear-gradient(180deg,rgba(6,10,16,.02) 18%,rgba(6,9,14,.12) 48%,rgba(5,8,13,.95) 100%)!important;pointer-events:none!important}
@@ -41,9 +42,11 @@ premiumCardStyle.textContent=`
   .premium-card-stat strong{overflow:hidden;text-overflow:ellipsis;color:#b7c3d3;font-weight:800}
   .premium-card-stat.rating{color:#b9a578}.premium-card-stat.rating strong{color:#d8c58f}
   .premium-card-icon{display:grid;place-items:center;width:1rem;height:1rem;font-size:.61rem;line-height:1;opacity:.9}
-  .premium-manga-card .favorite-button{display:grid!important;place-items:center!important;width:2.1rem!important;height:2.1rem!important;margin:0!important;padding:0!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:.72rem!important;background:rgba(255,255,255,.035)!important;color:#8996a8!important;font-size:1rem!important;line-height:1!important;transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease!important}
-  .premium-manga-card .favorite-button:hover{transform:scale(1.06);background:rgba(255,255,255,.075)!important;color:#e6edf6!important}
+  .premium-manga-card .favorite-button{display:grid!important;place-items:center!important;width:2.1rem!important;height:2.1rem!important;margin:0!important;padding:0!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:.72rem!important;background:rgba(255,255,255,.035)!important;color:#8996a8!important;font-size:1rem!important;line-height:1!important}
   .premium-manga-card .favorite-button.active{color:#f2c96f!important;border-color:rgba(242,201,111,.22)!important;background:rgba(242,201,111,.09)!important}
+
+  .search-result-thumb,.ranking-thumb,.release-thumb{background-color:#171d27!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+  .search-result-thumb[data-cover-ready="true"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 
   body.light .premium-manga-card{border-color:rgba(17,25,38,.075)!important;background:linear-gradient(180deg,#fff,#f7f9fc)!important;box-shadow:0 14px 34px rgba(51,65,85,.10),inset 0 1px 0 #fff!important}
   body.light .premium-manga-card:hover{border-color:rgba(62,103,158,.20)!important;box-shadow:0 22px 46px rgba(51,65,85,.16),0 7px 15px rgba(51,65,85,.07)!important}
@@ -55,7 +58,6 @@ premiumCardStyle.textContent=`
   body.light .premium-card-stat.rating{color:#a1843f}
   body.light .premium-card-stat.rating strong{color:#7d632c}
   body.light .premium-manga-card .favorite-button{border-color:rgba(15,23,42,.07)!important;background:#f3f6fa!important;color:#6f7b8b!important}
-  body.light .premium-manga-card .favorite-button:hover{background:#eaf0f7!important;color:#25344a!important}
   body.light .premium-manga-card .favorite-button.active{background:#fff7df!important;color:#ad7f19!important;border-color:rgba(173,127,25,.16)!important}
 
   @media(max-width:980px){.horizontal-rail{grid-auto-columns:minmax(170px,29vw)!important}}
@@ -73,7 +75,7 @@ premiumCardStyle.textContent=`
     .premium-card-stat{font-size:.57rem}
     .premium-manga-card .favorite-button{width:1.96rem!important;height:1.96rem!important;border-radius:.66rem!important}
   }
-  @media(prefers-reduced-motion:reduce){.premium-manga-card,.premium-manga-card .manga-cover-image,.premium-manga-card .favorite-button{transition:none!important}}
+  @media(prefers-reduced-motion:reduce){.premium-manga-card,.premium-manga-card .manga-cover-image{transition:none!important}}
 `;
 document.head.append(premiumCardStyle);
 
@@ -104,13 +106,50 @@ function compact(value){
   return new Intl.NumberFormat("pt-BR",{notation:"compact",maximumFractionDigits:1}).format(Number(value)||0);
 }
 
+function stableCoverUrl(value){
+  const raw=String(value||"").trim();
+  if(!raw)return"";
+  try{
+    const url=new URL(raw,location.href);
+    if(url.hostname==="fnyellunugdfesprmvzm.supabase.co"){
+      url.searchParams.delete("v");
+      url.searchParams.delete("_mmcover");
+    }
+    return url.href;
+  }catch{return raw;}
+}
+
+function preloadCover(src){
+  if(!src)return Promise.resolve(false);
+  return new Promise(resolve=>{
+    const img=new Image();
+    let done=false;
+    const finish=value=>{if(done)return;done=true;resolve(value)};
+    img.decoding="async";
+    img.onload=()=>finish(true);
+    img.onerror=()=>finish(false);
+    img.src=src;
+    if(img.complete)finish(img.naturalWidth>0);
+    setTimeout(()=>finish(false),1800);
+  });
+}
+
+async function warmCovers(catalog){
+  const urls=[...new Set(catalog.map(item=>stableCoverUrl(item.coverUrl)).filter(Boolean))];
+  const jobs=urls.slice(0,18).map(preloadCover);
+  await Promise.race([
+    Promise.allSettled(jobs),
+    new Promise(resolve=>setTimeout(resolve,1400))
+  ]);
+}
+
 let premiumCatalogMap=new Map();
 let premiumEnhanceQueued=false;
 
 function installCoverImage(cover,item){
   if(!cover)return;
   let image=cover.querySelector(".manga-cover-image");
-  const src=String(item.coverUrl||"").trim();
+  const src=stableCoverUrl(item.coverUrl);
 
   if(!src){
     if(image)image.remove();
@@ -123,36 +162,19 @@ function installCoverImage(cover,item){
     image.alt="";
     image.decoding="async";
     image.loading="eager";
-    image.referrerPolicy="no-referrer";
     image.setAttribute("aria-hidden","true");
     image.draggable=false;
     cover.prepend(image);
-
-    image.addEventListener("load",()=>{
-      image.classList.add("loaded");
-      image.dataset.retry="0";
-    });
-
-    image.addEventListener("error",()=>{
-      image.classList.remove("loaded");
-      const retries=Number(image.dataset.retry||"0");
-      if(retries>=2)return;
-      image.dataset.retry=String(retries+1);
-      setTimeout(()=>{
-        try{
-          const retryUrl=new URL(image.dataset.originalSrc||src,location.href);
-          retryUrl.searchParams.set("_mmcover",String(Date.now()));
-          image.src=retryUrl.href;
-        }catch{}
-      },450*(retries+1));
-    });
+    image.addEventListener("load",()=>image.classList.add("loaded"));
+    image.addEventListener("error",()=>image.classList.remove("loaded"));
   }
 
   if(image.dataset.originalSrc!==src){
     image.dataset.originalSrc=src;
-    image.dataset.retry="0";
     image.classList.remove("loaded");
     image.src=src;
+  }else if(image.complete&&image.naturalWidth>0){
+    image.classList.add("loaded");
   }
 }
 
@@ -160,7 +182,6 @@ function enhanceCard(card){
   if(!card)return;
   const item=premiumCatalogMap.get(Number(card.dataset.manga));
   if(!item)return;
-
   const cover=card.querySelector(".manga-cover");
   const info=card.querySelector(".manga-info");
   if(!cover||!info)return;
@@ -168,44 +189,62 @@ function enhanceCard(card){
   installCoverImage(cover,item);
 
   let copy=cover.querySelector(".manga-cover-copy");
-  if(!copy){
-    copy=document.createElement("div");
-    copy.className="manga-cover-copy";
-    cover.append(copy);
-  }
+  if(!copy){copy=document.createElement("div");copy.className="manga-cover-copy";cover.append(copy)}
   copy.innerHTML='<span class="manga-cover-title">'+esc(item.title)+'</span>';
 
-  if(card.dataset.premiumInfoVersion!=="3"){
+  if(card.dataset.premiumInfoVersion!=="4"){
     const oldFavorite=info.querySelector("[data-favorite]");
     const active=Boolean(oldFavorite?.classList.contains("active"));
     const rating=Number(item.rating)||0;
     const ratingText=rating>0?rating.toFixed(1).replace(".",","):"—";
     const chapterText=item.chapter===null||item.chapter===undefined||item.chapter==="—"?"—":esc(item.chapter);
-
     info.innerHTML=
       '<div class="premium-card-chips">'+
         '<span class="premium-card-chip" title="'+esc(item.genre||"Outros")+'">'+esc(item.genre||"Outros")+'</span>'+
         '<span class="premium-card-chip chapter">Cap. '+chapterText+'</span>'+
       '</div>'+
       '<div class="premium-card-footer">'+
-        '<span class="premium-card-stat"><span class="premium-card-icon" aria-hidden="true">◉</span><strong>'+compact(item.reads)+'</strong></span>'+
+        '<span class="premium-card-stat"><span class="premium-card-icon" aria-hidden="true">●</span><strong>'+compact(item.reads)+'</strong></span>'+
         '<span class="premium-card-stat rating"><span class="premium-card-icon" aria-hidden="true">★</span><strong>'+ratingText+'</strong></span>'+
         '<button class="favorite-button '+(active?"active":"")+'" type="button" data-favorite="'+item.id+'" aria-label="'+(active?"Remover dos favoritos":"Adicionar aos favoritos")+'" title="Favoritar">'+(active?"★":"☆")+'</button>'+
       '</div>';
-
-    card.dataset.premiumInfoVersion="3";
+    card.dataset.premiumInfoVersion="4";
   }
 }
 
-function enhanceAllCards(){
+function hydrateThumbs(){
+  const selectors=[
+    [".search-result-card[data-manga] .search-result-thumb",".search-result-card"],
+    [".ranking-row[data-manga] .ranking-thumb",".ranking-row"],
+    [".release-row[data-manga] .release-thumb",".release-row"]
+  ];
+
+  for(const [thumbSelector,parentSelector] of selectors){
+    document.querySelectorAll(thumbSelector).forEach(thumb=>{
+      const parent=thumb.closest(parentSelector);
+      const item=premiumCatalogMap.get(Number(parent?.dataset.manga));
+      const src=stableCoverUrl(item?.coverUrl);
+      if(!src)return;
+      if(thumb.dataset.coverSrc===src)return;
+      thumb.dataset.coverSrc=src;
+      thumb.style.backgroundImage='url("'+src.replace(/"/g,"%22")+'")';
+      thumb.style.backgroundSize="cover";
+      thumb.style.backgroundPosition="center";
+      thumb.dataset.coverReady="true";
+    });
+  }
+}
+
+function enhanceAll(){
   premiumEnhanceQueued=false;
   document.querySelectorAll(".premium-manga-card[data-manga]").forEach(enhanceCard);
+  hydrateThumbs();
 }
 
 function queueEnhance(){
   if(premiumEnhanceQueued||!premiumCatalogMap.size)return;
   premiumEnhanceQueued=true;
-  requestAnimationFrame(enhanceAllCards);
+  requestAnimationFrame(enhanceAll);
 }
 
 const cardObserver=new MutationObserver(queueEnhance);
@@ -239,7 +278,7 @@ cardObserver.observe(document.body,{childList:true,subtree:true});
         favorites:Number(m.favorite_count)||0,
         rating:Number(m.average_rating)||0,
         newness:Math.max(1,100-i),
-        coverUrl:m.cover_url||null,
+        coverUrl:stableCoverUrl(m.cover_url||""),
         featured:!!m.featured,
         description:m.synopsis||"",
         tags:[...(m.genres||[]),...(m.tags||[])],
@@ -250,10 +289,11 @@ cardObserver.observe(document.body,{childList:true,subtree:true});
       }));
 
       premiumCatalogMap=new Map(catalog.map(item=>[item.id,item]));
+      await warmCovers(catalog);
       window.dispatchEvent(new CustomEvent("mangamorph:catalog-loaded",{detail:catalog}));
-      enhanceAllCards();
-      setTimeout(enhanceAllCards,120);
-      setTimeout(enhanceAllCards,600);
+      enhanceAll();
+      setTimeout(enhanceAll,100);
+      setTimeout(enhanceAll,500);
 
       const map=new Map(catalog.map(item=>[item.id,item]));
       const releases=(chapters||[]).map(ch=>({
@@ -263,7 +303,6 @@ cardObserver.observe(document.body,{childList:true,subtree:true});
         updated:relative(ch.published_at),
         publishedAt:ch.published_at
       })).filter(item=>item.manga);
-
       window.dispatchEvent(new CustomEvent("mangamorph:releases-loaded",{detail:releases}));
     }else{
       window.dispatchEvent(new CustomEvent("mangamorph:catalog-error",{detail:{message:"Catálogo vazio"}}));
