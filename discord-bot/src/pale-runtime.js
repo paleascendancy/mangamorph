@@ -1,4 +1,5 @@
 import { ChannelType } from 'discord.js';
+import { setupPaleCommunity } from './pale-community.js';
 
 const normalize = (value = '') => value
   .normalize('NFD')
@@ -25,13 +26,17 @@ export async function setupPaleRuntime(guild) {
     await suggestions.permissionOverwrites.edit(memberRole.id, {
       ViewChannel: true,
       ReadMessageHistory: true,
-      SendMessages: true,
-      SendMessagesInThreads: true,
+      SendMessages: false,
+      SendMessagesInThreads: false,
       CreatePublicThreads: false,
       CreatePrivateThreads: false,
       AddReactions: true
     }).catch(() => {});
   }
+
+  await setupPaleCommunity(guild).catch((error) => {
+    console.error('[Pale Ascendancy] Falha ao preparar comunidade:', error);
+  });
 
   console.log(`[Pale Ascendancy] Runtime preparado.`);
 }
