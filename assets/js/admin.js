@@ -86,14 +86,14 @@ el("mangaAdminSearch").addEventListener("input",renderMangas);
 document.addEventListener("click",e=>{const row=e.target.closest("[data-edit-manga]");if(row){const m=mangas.find(x=>x.id===Number(row.dataset.editManga));if(m)editManga(m)}});
 
 function resetMangaForm(){
-  selectedManga=null;el("mangaAdminForm").reset();el("mangaIdInput").value="";el("mangaAccentInput").value="#3a4162";el("mangaRatingInput").value="Livre";el("mangaFormTitle").textContent="Nova obra";el("mangaDraftBadge").textContent="Rascunho";el("deleteMangaButton").disabled=true;el("mangaCoverStatus").textContent="Nenhuma nova capa selecionada.";message(el("mangaFormMessage"),"");
+  selectedManga=null;el("mangaAdminForm").reset();el("mangaIdInput").value="";el("mangaImportedCoverUrl").value="";el("mangaMetadataSource").value="";el("mangaMetadataSourceId").value="";el("mangaMetadataSourceUrl").value="";el("mangaAccentInput").value="#3a4162";el("mangaRatingInput").value="Livre";el("mangaFormTitle").textContent="Nova obra";el("mangaDraftBadge").textContent="Rascunho";el("deleteMangaButton").disabled=true;el("mangaCoverStatus").textContent="Nenhuma nova capa selecionada.";message(el("mangaFormMessage"),"");
 }
 el("newMangaButton").addEventListener("click",resetMangaForm);
 el("mangaTitleInput").addEventListener("input",()=>{if(!el("mangaIdInput").value)el("mangaSlugInput").value=slugify(el("mangaTitleInput").value)});
 
 function editManga(m){
   selectedManga=m;setView("mangas");
-  el("mangaIdInput").value=m.id;el("mangaTitleInput").value=m.title||"";el("mangaSlugInput").value=m.slug||"";el("mangaTypeInput").value=m.type||"Mangá";
+  el("mangaIdInput").value=m.id;el("mangaImportedCoverUrl").value=m.cover_url||"";el("mangaMetadataSource").value=m.metadata_source||"";el("mangaMetadataSourceId").value=m.metadata_source_id||"";el("mangaMetadataSourceUrl").value=m.metadata_source_url||"";el("mangaTitleInput").value=m.title||"";el("mangaSlugInput").value=m.slug||"";el("mangaTypeInput").value=m.type||"Mangá";
   el("mangaCountryInput").value=m.country||"";el("mangaLanguageInput").value=m.original_language||"";el("mangaAuthorInput").value=m.author||"";el("mangaArtistInput").value=m.artist||"";el("mangaPublisherInput").value=m.publisher||"";
   el("mangaYearInput").value=m.year||"";el("mangaStatusInput").value=m.publication_status||"Em lançamento";el("mangaRatingInput").value=m.content_rating||"Livre";el("mangaAccentInput").value=m.accent||"#3a4162";
   el("mangaAltTitlesInput").value=(m.alternative_titles||[]).join(", ");el("mangaGenresInput").value=(m.genres||[]).join(", ");el("mangaTagsInput").value=(m.tags||[]).join(", ");el("mangaSynopsisInput").value=m.synopsis||"";
@@ -102,7 +102,7 @@ function editManga(m){
 }
 
 async function uploadCover(mangaId,file){
-  if(!file)return selectedManga?.cover_url||null;
+  if(!file)return el("mangaImportedCoverUrl").value||selectedManga?.cover_url||null;
   const ext=(file.name.split(".").pop()||"webp").toLowerCase();
   const path="covers/"+mangaId+"/cover."+ext;
   const {error}=await supabase.storage.from("mangamorph-content").upload(path,file,{upsert:true,contentType:file.type,cacheControl:"3600"});
@@ -119,7 +119,7 @@ el("mangaAdminForm").addEventListener("submit",async event=>{
     author:el("mangaAuthorInput").value.trim()||null,artist:el("mangaArtistInput").value.trim()||null,publisher:el("mangaPublisherInput").value.trim()||null,
     year:Number(el("mangaYearInput").value)||null,publication_status:el("mangaStatusInput").value,content_rating:el("mangaRatingInput").value.trim()||"Livre",
     accent:el("mangaAccentInput").value,alternative_titles:list(el("mangaAltTitlesInput").value),genres:list(el("mangaGenresInput").value),tags:list(el("mangaTagsInput").value),
-    synopsis:el("mangaSynopsisInput").value.trim(),featured:el("mangaFeaturedInput").checked,published:el("mangaPublishedInput").checked,
+    synopsis:el("mangaSynopsisInput").value.trim(),metadata_source:el("mangaMetadataSource").value||null,metadata_source_id:el("mangaMetadataSourceId").value||null,metadata_source_url:el("mangaMetadataSourceUrl").value||null,featured:el("mangaFeaturedInput").checked,published:el("mangaPublishedInput").checked,
     published_at:el("mangaPublishedInput").checked?(selectedManga?.published_at||new Date().toISOString()):null,updated_by:session.user.id
   };
   let result;
