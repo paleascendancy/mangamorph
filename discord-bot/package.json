@@ -6,7 +6,7 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/start-here.js && node src/index.js"
   },
   "engines": {
     "node": ">=20"
