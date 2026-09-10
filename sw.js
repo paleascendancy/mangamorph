@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.15";
+const CACHE = "mangamorph-v0.17.16";
 const ASSETS = [
   "./",
   "./index.html",
@@ -50,8 +50,10 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  const destination = event.request.destination;
+  const revalidate = destination === "document" || destination === "script" || destination === "style";
   event.respondWith(
-    fetch(event.request).then(response => {
+    fetch(event.request, revalidate ? {cache:"no-cache"} : undefined).then(response => {
       const copy = response.clone();
       caches.open(CACHE).then(cache => cache.put(event.request, copy));
       return response;
