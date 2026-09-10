@@ -248,8 +248,8 @@ function applicationPanelComponents() {
   return [new ActionRowBuilder().addComponents(button)];
 }
 
-function buildApplicationEmbed() {
-  return new EmbedBuilder()
+function buildApplicationEmbeds() {
+  const header = new EmbedBuilder()
     .setColor(0x6f7cff)
     .setAuthor({
       name: 'MangaMorph • Equipe',
@@ -257,40 +257,53 @@ function buildApplicationEmbed() {
     })
     .setTitle('📨 Candidaturas MangaMorph')
     .setDescription(
-      '**Quer fazer parte do MangaMorph?**\n' +
-      'Estamos formando uma equipe para ajudar no crescimento da comunidade e da plataforma. Se você tem responsabilidade, vontade de contribuir e interesse em evoluir com o projeto, envie sua candidatura.'
+      'Quer fazer parte da equipe do **MangaMorph**?\n\n' +
+      'Buscamos pessoas responsáveis, comunicativas e com vontade de contribuir para o crescimento da comunidade e da plataforma.\n\n' +
+      '**Clique em `Abrir candidatura` para começar.**'
     )
-    .addFields(
-      {
-        name: 'Áreas com prioridade',
-        value:
-          '🛡️ **Moderação & suporte** — atendimento e organização da comunidade\n' +
-          '📚 **Curadoria de obras** — títulos, capítulos, capas e informações\n' +
-          '🗂️ **Organização de conteúdo** — pedidos, correções e qualidade do catálogo\n' +
-          '🎨 **Design & divulgação** — artes, identidade visual e materiais\n' +
-          '✍️ **Editorial / scan** — revisão, tradução, clean, redraw e type'
-      },
-      {
-        name: 'O que esperamos',
-        value:
-          '• Compromisso e boa comunicação\n' +
-          '• Respeito com a equipe e a comunidade\n' +
-          '• Disponibilidade para colaborar\n' +
-          '• Vontade de aprender e evoluir'
-      },
-      {
-        name: 'Como funciona',
-        value:
-          'Clique em **Abrir candidatura**. Você responderá algumas perguntas rápidas e o bot abrirá um atendimento privado para a equipe analisar.'
-      },
-      {
-        name: 'Não precisa saber tudo',
-        value:
-          'Experiência ajuda, mas não é obrigatória em todas as áreas. Dedicação, responsabilidade e vontade de aprender também contam.'
-      }
-    )
-    .setFooter({ text: 'MangaMorph • Candidaturas oficiais da equipe' })
     .setThumbnail(client.user.displayAvatarURL({ size: 256 }));
+
+  const areas = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('01  ·  ÁREAS COM PRIORIDADE')
+    .setDescription(
+      '🛡️ **Moderação & suporte**\n' +
+      'Atendimento, organização e apoio à comunidade.\n\n' +
+      '📚 **Curadoria de obras**\n' +
+      'Títulos, capítulos, capas e informações.\n\n' +
+      '🗂️ **Organização de conteúdo**\n' +
+      'Pedidos, correções e qualidade do catálogo.\n\n' +
+      '🎨 **Design & divulgação**\n' +
+      'Artes, identidade visual e materiais promocionais.\n\n' +
+      '✍️ **Editorial / scan**\n' +
+      'Revisão, tradução, clean, redraw e type.'
+    );
+
+  const perfil = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('02  ·  O QUE ESPERAMOS')
+    .setDescription(
+      '• Compromisso\n' +
+      '• Boa comunicação\n' +
+      '• Responsabilidade\n' +
+      '• Respeito com a equipe\n' +
+      '• Vontade de aprender e evoluir'
+    );
+
+  const processo = new EmbedBuilder()
+    .setColor(0x2f3545)
+    .setTitle('03  ·  COMO FUNCIONA')
+    .setDescription(
+      '`01` Área de interesse\n' +
+      '`02` Disponibilidade\n' +
+      '`03` Experiência\n' +
+      '`04` Como você pode ajudar\n' +
+      '`05` O que deseja aprender\n\n' +
+      '**Não é obrigatório saber tudo.** Dedicação, responsabilidade e potencial também contam.'
+    )
+    .setFooter({ text: 'MangaMorph • Candidaturas oficiais da equipe' });
+
+  return [header, areas, perfil, processo];
 }
 
 async function ensureApplicationPanel(guild) {
@@ -372,7 +385,7 @@ async function ensureApplicationPanel(guild) {
   );
   const primary = applicationMessages?.first() || null;
   const payload = {
-    embeds: [buildApplicationEmbed()],
+    embeds: buildApplicationEmbeds(),
     components: applicationPanelComponents()
   };
 
