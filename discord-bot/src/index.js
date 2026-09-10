@@ -29,10 +29,7 @@ if (!DISCORD_TOKEN) {
 }
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers
-  ],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
   partials: [Partials.GuildMember]
 });
 
@@ -81,19 +78,115 @@ async function findMemberRole(guild) {
 }
 
 async function findLogChannel(guild) {
-  return findTextChannel(
-    guild,
-    LOG_CHANNEL_ID,
-    ['📋・logs', 'logs', 'log']
-  );
+  return findTextChannel(guild, LOG_CHANNEL_ID, ['📋・logs', 'logs', 'log']);
 }
 
 async function findTicketPanelChannel(guild) {
-  return findTextChannel(
-    guild,
-    null,
-    ['🎫・abrir-ticket', 'abrir-ticket', 'abrirticket']
+  return findTextChannel(guild, null, ['🎫・abrir-ticket', 'abrir-ticket', 'abrirticket']);
+}
+
+async function findRulesChannel(guild) {
+  return findTextChannel(guild, null, ['📜・regras', 'regras']);
+}
+
+async function ensureRulesPanel(guild) {
+  let channel = await findRulesChannel(guild);
+
+  if (!channel) {
+    const channels = await guild.channels.fetch();
+    const startCategory = channels.find((item) =>
+      item?.type === ChannelType.GuildCategory && normalize(item.name).includes('inicio')
+    ) || null;
+
+    channel = await guild.channels.create({
+      name: '📜・regras',
+      type: ChannelType.GuildText,
+      parent: startCategory?.id || null,
+      topic: 'Regras oficiais da comunidade MangaMorph.',
+      reason: 'Canal de regras do MangaMorph'
+    });
+    console.log(`[${guild.name}] Canal de regras criado.`);
+  }
+
+  await channel.permissionOverwrites.edit(
+    guild.roles.everyone.id,
+    {
+      ViewChannel: true,
+      ReadMessageHistory: true,
+      SendMessages: false,
+      SendMessagesInThreads: false,
+      CreatePublicThreads: false,
+      CreatePrivateThreads: false
+    },
+    { reason: 'Canal de regras somente leitura' }
   );
+
+  await channel.permissionOverwrites.edit(
+    client.user.id,
+    {
+      ViewChannel: true,
+      SendMessages: true,
+      ReadMessageHistory: true,
+      EmbedLinks: true,
+      ManageMessages: true
+    },
+    { reason: 'Permitir publicação das regras pelo bot' }
+  );
+
+  const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
+  const existing = recent?.find((message) =>
+    message.author.id === client.user.id &&
+    message.embeds.some((embed) => embed.title === '📜 Regras do MangaMorph')
+  );
+
+  if (existing) return;
+
+  const embed = new EmbedBuilder()
+    .setColor(0x111318)
+    .setAuthor({ name: 'MangaMorph', iconURL: client.user.displayAvatarURL() })
+    .setTitle('📜 Regras do MangaMorph')
+    .setDescription(
+      'Bem-vindo à comunidade. Para manter o servidor organizado, seguro e agradável para todos, siga as regras abaixo.'
+    )
+    .addFields(
+      {
+        name: '01 • Respeito acima de tudo',
+        value: 'Trate todos com respeito. Ofensas, perseguição, discriminação, provocações excessivas e ataques pessoais não são permitidos.'
+      },
+      {
+        name: '02 • Sem spam ou flood',
+        value: 'Não repita mensagens, menções, emojis ou conteúdo de forma exagerada. Evite atrapalhar conversas e canais.'
+      },
+      {
+        name: '03 • Use os canais corretamente',
+        value: 'Envie cada assunto no canal apropriado e siga as orientações fixadas pela equipe.'
+      },
+      {
+        name: '04 • Divulgação e links',
+        value: 'Não faça propaganda, divulgação de servidores, sites, perfis ou projetos sem autorização da equipe.'
+      },
+      {
+        name: '05 • Privacidade e segurança',
+        value: 'Não compartilhe dados pessoais seus ou de outras pessoas. Não tente expor, ameaçar ou constranger membros.'
+      },
+      {
+        name: '06 • Mangás, spoilers e discussões',
+        value: 'Respeite avisos de spoiler e evite estragar capítulos ou acontecimentos importantes para outros membros.'
+      },
+      {
+        name: '07 • Problemas, denúncias e suporte',
+        value: 'Use 🎫・abrir-ticket para falar em privado com a equipe sobre suporte, denúncias, parcerias ou problemas com obras e capítulos.'
+      },
+      {
+        name: '08 • Moderação',
+        value: 'A equipe pode advertir ou aplicar medidas quando necessário. Se discordar de uma decisão, abra um ticket e converse com respeito.'
+      }
+    )
+    .setFooter({ text: 'Ao permanecer no servidor, você concorda em seguir estas regras • MangaMorph' })
+    .setTimestamp();
+
+  await channel.send({ embeds: [embed] });
+  console.log(`[${guild.name}] Template de regras publicado.`);
 }
 
 async function ensureSupportArea(guild) {
@@ -209,7 +302,6 @@ function ticketPanelComponents() {
 
 async function ensureTicketPanel(guild) {
   const { panelChannel: channel } = await ensureSupportArea(guild);
-
   const recent = await channel.messages.fetch({ limit: 30 }).catch(() => null);
   const existing = recent?.find((message) =>
     message.author.id === client.user.id &&
@@ -247,10 +339,7 @@ async function createTicket(interaction, reasonKey) {
   );
 
   if (alreadyOpen) {
-    await interaction.reply({
-      content: `Você já tem um ticket aberto: ${alreadyOpen}`,
-      ephemeral: true
-    });
+    await interaction.reply({ content: `Você já tem um ticket aberto: ${alreadyOpen}`, ephemeral: true });
     return;
   }
 
@@ -259,10 +348,7 @@ async function createTicket(interaction, reasonKey) {
   const staffRoles = roles.filter((role) => STAFF_ROLE_NAMES.has(normalize(role.name)));
 
   const permissionOverwrites = [
-    {
-      id: guild.roles.everyone.id,
-      deny: [PermissionFlagsBits.ViewChannel]
-    },
+    { id: guild.roles.everyone.id, deny: [PermissionFlagsBits.ViewChannel] },
     {
       id: user.id,
       allow: [
@@ -307,21 +393,9 @@ async function createTicket(interaction, reasonKey) {
   });
 
   const actions = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId('mm_ticket_claim')
-      .setLabel('Assumir')
-      .setEmoji('🛡️')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId('mm_ticket_add')
-      .setLabel('Adicionar membro')
-      .setEmoji('➕')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId('mm_ticket_close')
-      .setLabel('Fechar ticket')
-      .setEmoji('🔒')
-      .setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId('mm_ticket_claim').setLabel('Assumir').setEmoji('🛡️').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('mm_ticket_add').setLabel('Adicionar membro').setEmoji('➕').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('mm_ticket_close').setLabel('Fechar ticket').setEmoji('🔒').setStyle(ButtonStyle.Danger)
   );
 
   const embed = new EmbedBuilder()
@@ -341,15 +415,20 @@ async function createTicket(interaction, reasonKey) {
   await channel.send({ content: `${user}`, embeds: [embed], components: [actions] });
   await interaction.reply({ content: `Ticket criado: ${channel}`, ephemeral: true });
 
-  await sendLog(
-    guild,
-    'Ticket aberto',
-    `${user} abriu um novo atendimento.`,
-    [
-      { name: 'Motivo', value: reason.label, inline: true },
-      { name: 'Canal', value: `${channel}`, inline: true }
-    ]
-  );
+  await sendLog(guild, 'Ticket aberto', `${user} abriu um novo atendimento.`, [
+    { name: 'Motivo', value: reason.label, inline: true },
+    { name: 'Canal', value: `${channel}`, inline: true }
+  ]);
+}
+
+async function setupGuild(guild) {
+  await ensureRulesPanel(guild).catch((error) => {
+    console.error(`Falha ao preparar regras em ${guild.name}:`, error);
+  });
+
+  await ensureTicketPanel(guild).catch((error) => {
+    console.error(`Falha ao preparar suporte em ${guild.name}:`, error);
+  });
 }
 
 client.once(Events.ClientReady, async () => {
@@ -357,16 +436,12 @@ client.once(Events.ClientReady, async () => {
   client.user.setActivity('MangaMorph');
 
   for (const guild of client.guilds.cache.values()) {
-    await ensureTicketPanel(guild).catch((error) => {
-      console.error(`Falha ao preparar suporte em ${guild.name}:`, error);
-    });
+    await setupGuild(guild);
   }
 });
 
 client.on(Events.GuildCreate, async (guild) => {
-  await ensureTicketPanel(guild).catch((error) => {
-    console.error(`Falha ao preparar suporte em ${guild.name}:`, error);
-  });
+  await setupGuild(guild);
 });
 
 client.on(Events.GuildMemberAdd, async (member) => {
@@ -389,10 +464,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
     if (welcomeChannel) {
       const embed = new EmbedBuilder()
         .setColor(0x111318)
-        .setAuthor({
-          name: 'MangaMorph',
-          iconURL: client.user.displayAvatarURL()
-        })
+        .setAuthor({ name: 'MangaMorph', iconURL: client.user.displayAvatarURL() })
         .setTitle('Bem-vindo ao MangaMorph')
         .setDescription(
           `Olá, ${member}. Você acaba de entrar na comunidade oficial do **MangaMorph**.\n\n` +
@@ -411,16 +483,11 @@ client.on(Events.GuildMemberAdd, async (member) => {
       console.warn('Canal de boas-vindas não encontrado.');
     }
 
-    await sendLog(
-      member.guild,
-      'Novo membro',
-      `${member} entrou no servidor.`,
-      [
-        { name: 'Usuário', value: `${member.user.tag}`, inline: true },
-        { name: 'ID', value: member.id, inline: true },
-        { name: 'Total', value: String(member.guild.memberCount), inline: true }
-      ]
-    );
+    await sendLog(member.guild, 'Novo membro', `${member} entrou no servidor.`, [
+      { name: 'Usuário', value: `${member.user.tag}`, inline: true },
+      { name: 'ID', value: member.id, inline: true },
+      { name: 'Total', value: String(member.guild.memberCount), inline: true }
+    ]);
   } catch (error) {
     console.error('Falha ao processar entrada de membro:', error);
   }
@@ -469,12 +536,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const baseTopic = interaction.channel.topic?.replace(/\|CLAIMED:[^|]*/g, '') || `MM_TICKET:${ownerId}`;
       await interaction.channel.setTopic(`${baseTopic}|CLAIMED:${interaction.user.id}`);
       await interaction.reply({ content: `🛡️ Atendimento assumido por ${interaction.user}.` });
-
-      await sendLog(
-        interaction.guild,
-        'Ticket assumido',
-        `${interaction.user} assumiu ${interaction.channel}.`
-      );
+      await sendLog(interaction.guild, 'Ticket assumido', `${interaction.user} assumiu ${interaction.channel}.`);
       return;
     }
 
@@ -524,7 +586,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       });
 
       await interaction.reply({ content: `${member} foi adicionado ao ticket.` });
-
       await sendLog(
         interaction.guild,
         'Membro adicionado ao ticket',
@@ -540,7 +601,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
 
       await interaction.reply({ content: '🔒 Ticket encerrado. Este canal será removido em alguns segundos.' });
-
       await sendLog(
         interaction.guild,
         'Ticket fechado',
