@@ -65,6 +65,82 @@ function setValue(id,value){
   if(node) node.value = value ?? "";
 }
 
+
+function aniCountry(code){
+  return ({
+    JP:{country:"Japão",language:"Japonês",type:"Mangá"},
+    KR:{country:"Coreia do Sul",language:"Coreano",type:"Manhwa"},
+    CN:{country:"China",language:"Chinês",type:"Manhua"},
+    TW:{country:"Taiwan",language:"Chinês",type:"Manhua"}
+  })[code] || {country:code || "",language:"",type:"Outro"};
+}
+
+function aniPublicationStatus(status){
+  return ({
+    RELEASING:"Em lançamento",
+    FINISHED:"Concluído",
+    HIATUS:"Pausado",
+    CANCELLED:"Cancelado",
+    NOT_YET_RELEASED:"Em breve"
+  })[status] || "Em lançamento";
+}
+
+function stripAniText(value){
+  return String(value || "").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").trim();
+}
+
+function normalizeAniDirect(media){
+  const info=aniCountry(media?.countryOfOrigin);
+  const author=[],artist=[];
+  for(const edge of media?.staff?.edges || []){
+    const role=String(edge?.role || "").toLowerCase();
+    const name=edge?.node?.name?.full;
+    if(!name) continue;
+    if(role.includes("story") || role.includes("original creator") || role.includes("writer")) author.push(name);
+    if(role.includes("art") || role.includes("illustrat")) artist.push(name);
+  }
+  const title=media?.title?.english || media?.title?.romaji || media?.title?.native || "Sem título";
+  const uniq=items=>[...new Set(items.filter(Boolean).map(x=>String(x).trim()).filter(Boolean))];
+  return {
+    source:"AniList API (direto)",
+    sourceId:String(media?.id || ""),
+    sourceUrl:media?.siteUrl || (media?.id ? "https://anilist.co/manga/" + media.id : ""),
+    title,
+    alternativeTitles:uniq([media?.title?.romaji,media?.title?.english,media?.title?.native,...(media?.synonyms || [])]).filter(x=>x!==title),
+    type:String(media?.format || "").toUpperCase()==="NOVEL" ? "Novel" : info.type,
+    country:info.country,
+    originalLanguage:info.language,
+    author:uniq(author).join(", "),
+    artist:uniq(artist).join(", "),
+    publisher:"",
+    year:media?.startDate?.year || null,
+    publicationStatus:aniPublicationStatus(media?.status),
+    genres:uniq(media?.genres || []),
+    tags:uniq((media?.tags || []).filter(t=>Number(t?.rank || 0)>=60).slice(0,14).map(t=>t?.name)),
+    synopsis:stripAniText(media?.description),
+    coverUrl:media?.coverImage?.extraLarge || media?.coverImage?.large || ""
+  };
+}
+
+async function searchAniListDirect(query){
+  const linkMatch=String(query).match(/anilist\.co\/manga\/(\d+)/i);
+  const gql=linkMatch
+    ? 'query($id:Int!){Media(id:$id,type:MANGA){id siteUrl countryOfOrigin format status startDate{year} title{romaji english native} synonyms coverImage{extraLarge large} description(asHtml:false) genres tags{name rank} staff(perPage:25){edges{role node{name{full}}}}}}'
+    : 'query($search:String!){Page(page:1,perPage:8){media(search:$search,type:MANGA,sort:SEARCH_MATCH){id siteUrl countryOfOrigin format status startDate{year} title{romaji english native} synonyms coverImage{extraLarge large} description(asHtml:false) genres tags{name rank} staff(perPage:25){edges{role node{name{full}}}}}}}';
+  const variables=linkMatch ? {id:Number(linkMatch[1])} : {search:String(query).trim()};
+  const response=await fetch("https://graphql.anilist.co",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Accept":"application/json"},
+    body:JSON.stringify({query:gql,variables})
+  });
+  if(!response.ok) throw new Error("AniList não respondeu no navegador.");
+  const payload=await response.json();
+  if(linkMatch){
+    return payload?.data?.Media ? [normalizeAniDirect(payload.data.Media)] : [];
+  }
+  return (payload?.data?.Page?.media || []).map(normalizeAniDirect);
+}
+
 function useResult(item){
   el("newMangaButton")?.click();
 
@@ -123,10 +199,18 @@ form?.addEventListener("submit",async event=>{
       body:{input:query}
     });
     if(error) throw error;
-    if(data?.error) throw new Error(data.error);
 
     results = Array.isArray(data?.results) ? data.results : [];
-    if(!results.length) throw new Error("Nenhuma obra encontrada.");
+
+    if((data?.error || !results.length) && (/anilist\.co\/manga\//i.test(query) || !/^https?:\/\//i.test(query))){
+      try{
+        results = await searchAniListDirect(query);
+      }catch{}
+    }
+
+    if(!results.length){
+      throw new Error(data?.error || "Nenhuma obra encontrada.");
+    }
 
     renderResults();
     setMessage(results.length === 1 ? "1 resultado encontrado." : results.length + " resultados encontrados.");
