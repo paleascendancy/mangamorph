@@ -807,29 +807,74 @@ window.addEventListener("mangamorph:library-loaded",function(event){
   renderProfileUI();
 });
 
+let featuredTimer=null;
+let featuredIndex=0;
+let featuredItems=[];
+
+function heroCoverStyle(item){
+  const accent=item.accent||"#3a4162";
+  if(!item.coverUrl)return "--accent:"+accent+";";
+  const safe=String(item.coverUrl).replace(/["'()]/g,"");
+  return "--accent:"+accent+";background-image:url("+safe+");background-size:cover;background-position:center;";
+}
+
+function renderFeaturedHero(featured){
+  const hero=document.querySelector(".hero-feature");
+  const cover=document.querySelector(".featured-cover");
+  const title=document.querySelector("#featuredTitle");
+  if(!featured||!hero||!cover||!title)return;
+
+  hero.classList.remove("hero-switching");
+  void hero.offsetWidth;
+  hero.classList.add("hero-switching");
+
+  title.textContent=featured.title;
+  cover.setAttribute("style",heroCoverStyle(featured));
+
+  const meta=document.querySelector(".featured-meta");
+  if(meta)meta.innerHTML="<span>★ "+Number(featured.rating||0).toFixed(1).replace(".",",")+"</span><span>☆ "+formatNumber(featured.favorites||0)+"</span><span>◷ "+(featured.status||featured.country||"Atual")+"</span>";
+
+  const desc=document.querySelector(".featured-description");
+  if(desc)desc.textContent=featured.description||"";
+
+  const links=hero.querySelectorAll(".featured-actions a");
+  if(links[0]){
+    links[0].href=featured.chapter>0
+      ?"reader.html?id="+featured.id+"&chapter="+featured.chapter
+      :"manga.html?id="+featured.id+"#chapters";
+  }
+  if(links[1])links[1].href="manga.html?id="+featured.id;
+}
+
+function startFeaturedRotation(){
+  if(featuredTimer){
+    clearInterval(featuredTimer);
+    featuredTimer=null;
+  }
+  featuredIndex=0;
+
+  const withCover=catalog.filter(function(item){return item.featured&&item.coverUrl;});
+  featuredItems=withCover.length?withCover:catalog.filter(function(item){return item.featured;});
+  if(!featuredItems.length&&catalog.length)featuredItems=[catalog[0]];
+
+  if(!featuredItems.length)return;
+  renderFeaturedHero(featuredItems[0]);
+
+  if(featuredItems.length>1){
+    featuredTimer=setInterval(function(){
+      featuredIndex=(featuredIndex+1)%featuredItems.length;
+      renderFeaturedHero(featuredItems[featuredIndex]);
+    },5000);
+  }
+}
+
 window.addEventListener("mangamorph:catalog-loaded",function(event){
   if(!Array.isArray(event.detail)||!event.detail.length)return;
   catalog=event.detail;
   state.totalPages=Math.max(1,Math.ceil(catalog.length/state.pageSize));
   state.currentPage=Math.min(state.currentPage,state.totalPages);
 
-  const featured=catalog[0];
-  const hero=document.querySelector(".hero-feature");
-  const cover=document.querySelector(".featured-cover");
-  const title=document.querySelector("#featuredTitle");
-  if(featured&&hero&&cover&&title){
-    title.textContent=featured.title;
-    const coverTitle=cover.querySelector("strong");
-    if(coverTitle)coverTitle.innerHTML=featured.title.toUpperCase().split(" ").join("<br>");
-    cover.setAttribute("style",coverStyle(featured));
-    const meta=document.querySelector(".featured-meta");
-    if(meta)meta.innerHTML="<span>★ "+Number(featured.rating||0).toFixed(1).replace(".",",")+"</span><span>☆ "+formatNumber(featured.favorites||0)+"</span><span>◷ "+(featured.status||featured.country||"Atual")+"</span>";
-    const desc=document.querySelector(".featured-description");
-    if(desc)desc.textContent=featured.description||"";
-    const links=hero.querySelectorAll(".featured-actions a");
-    if(links[0])links[0].href="reader.html?id="+featured.id+"&chapter="+featured.chapter;
-    if(links[1])links[1].href="manga.html?id="+featured.id;
-  }
+  startFeaturedRotation();
 
   renderCatalogs();
   renderReleases();
