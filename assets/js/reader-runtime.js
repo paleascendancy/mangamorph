@@ -33,6 +33,45 @@ if(manga){
   const progressPercent=document.querySelector("#readerProgressPercent");
   const progressBar=document.querySelector("#readerProgressBar");
   let hasPages=false;
+  let sourceFailureShown=false;
+
+  function hideReaderExtras(){
+    document.querySelector("#readerFinish")?.setAttribute("hidden","");
+    document.querySelector("#chapterCommunity")?.setAttribute("hidden","");
+    document.querySelector(".reader-bottom-bar")?.setAttribute("hidden","");
+  }
+
+  function renderUnavailable(titleText,bodyText){
+    if(sourceFailureShown)return;
+    sourceFailureShown=true;
+    stage.replaceChildren();
+    const box=document.createElement("section");
+    box.className="reader-empty-state reader-source-unavailable";
+    const kicker=document.createElement("span");
+    kicker.textContent="LEITURA";
+    const title=document.createElement("strong");
+    title.textContent=titleText;
+    const body=document.createElement("p");
+    body.textContent=bodyText;
+    box.append(kicker,title,body);
+    if(current?.source_url&&/^https:\/\//i.test(current.source_url)){
+      const sourceLink=document.createElement("a");
+      sourceLink.href=current.source_url;
+      sourceLink.target="_blank";
+      sourceLink.rel="noopener noreferrer";
+      sourceLink.textContent="Verificar na fonte";
+      box.append(sourceLink);
+    }
+    const back=document.createElement("a");
+    back.href="manga.html?id="+mangaId;
+    back.textContent="Voltar para a obra";
+    box.append(back);
+    stage.append(box);
+    if(progressText)progressText.textContent="Fonte indisponível";
+    if(progressPercent)progressPercent.textContent="—";
+    if(progressBar)progressBar.style.width="0%";
+    hideReaderExtras();
+  }
 
   if(current){
     const {data:pages}=await db.from("mangamorph_chapter_pages").select("id,page_number,image_url,width,height").eq("chapter_id",current.id).order("page_number");
@@ -40,6 +79,36 @@ if(manga){
       hasPages=true;
       stage.innerHTML=pages.map(pg=>'<figure class="reader-real-page" data-reader-page="'+pg.page_number+'"><img src="'+pg.image_url+'" alt="Página '+pg.page_number+' do capítulo '+chapterNumber+'" loading="'+(pg.page_number<=2?"eager":"lazy")+'" decoding="async"></figure>').join("");
       if(progressText)progressText.textContent="Página 1 de "+pages.length;
+
+      let loaded=0,failed=0,initialFailures=0;
+      const images=[...stage.querySelectorAll(".reader-real-page img")];
+      images.forEach((img,index)=>{
+        img.addEventListener("load",()=>{loaded++},{once:true});
+        img.addEventListener("error",()=>{
+          failed++;
+          if(index<2)initialFailures++;
+          const figure=img.closest(".reader-real-page");
+          if(figure&&!sourceFailureShown){
+            figure.classList.add("reader-real-page-failed");
+            figure.replaceChildren();
+            const note=document.createElement("div");
+            note.className="reader-page-unavailable";
+            note.innerHTML="<span>PÁGINA "+String(index+1).padStart(2,"0")+"</span><strong>Imagem indisponível</strong><small>A fonte não entregou esta página.</small>";
+            figure.append(note);
+          }
+          if(loaded===0&&initialFailures>=Math.min(2,images.length)){
+            renderUnavailable(
+              "Capítulo temporariamente indisponível",
+              "As imagens deste capítulo não estão carregando na fonte parceira. O MangaMorph tentará novamente automaticamente quando a fonte voltar."
+            );
+          }else if(failed===images.length&&loaded===0){
+            renderUnavailable(
+              "Capítulo temporariamente indisponível",
+              "Nenhuma página pôde ser carregada agora. O MangaMorph tentará novamente automaticamente."
+            );
+          }
+        },{once:true});
+      });
       requestAnimationFrame(()=>window.dispatchEvent(new Event("scroll")));
     }
   }
@@ -50,14 +119,9 @@ if(manga){
     const bodyText=hasAnyChapter
       ?"Este capítulo existe, mas ainda não recebeu páginas para leitura."
       :"Esta obra foi adicionada ao catálogo, mas ainda não possui capítulos publicados.";
-    stage.innerHTML='<section class="reader-empty-state"><span>LEITURA</span><strong>'+titleText+'</strong><p>'+bodyText+'</p><a href="manga.html?id='+mangaId+'">Voltar para a obra</a></section>';
-    if(progressText)progressText.textContent="Sem páginas";
-    if(progressPercent)progressPercent.textContent="—";
-    if(progressBar)progressBar.style.width="0%";
-    document.querySelector("#readerFinish")?.setAttribute("hidden","");
-    document.querySelector("#chapterCommunity")?.setAttribute("hidden","");
-    document.querySelector(".reader-bottom-bar")?.setAttribute("hidden","");
+    renderUnavailable(titleText,bodyText);
   }
+
   const grid=document.querySelector("#readerChapterGrid");
   if(chapters?.length){
     grid.innerHTML=chapters.slice(0,60).map(c=>'<button type="button" data-live-chapter="'+Number(c.chapter_number)+'" class="'+(Number(c.chapter_number)===chapterNumber?"active":"")+'">Cap. '+Number(c.chapter_number)+'</button>').join("");
