@@ -6,6 +6,7 @@ function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function flag(country,type){if(country==="Japão"||type==="Mangá")return"🇯🇵";if(country==="Coreia"||type==="Manhwa")return"🇰🇷";if(country==="China"||type==="Manhua")return"🇨🇳";return"🌐"}
 function fmtDate(v){return v?new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(v)).replace(".",""):"—"}
 function meta(name,content,property=false){let node=document.head.querySelector(property?'meta[property="'+name+'"]':'meta[name="'+name+'"]');if(!node){node=document.createElement("meta");node.setAttribute(property?"property":"name",name);document.head.appendChild(node)}node.content=content}
+function compactNumber(value){return new Intl.NumberFormat("pt-BR",{notation:"compact"}).format(Number(value)||0)}
 const [{data:manga},{data:chapters},{data:catalog}]=await Promise.all([
   db.from("mangamorph_mangas").select("*").eq("id",id).maybeSingle(),
   db.from("mangamorph_chapters").select("id,chapter_number,title,published_at").eq("manga_id",id).eq("published",true).order("chapter_number",{ascending:false}),
@@ -15,12 +16,20 @@ if(manga){
   const stats=(catalog||[]).find(x=>Number(x.id)===id)||{};
   const latest=chapters?.[0]?Number(chapters[0].chapter_number):Number(stats.latest_chapter)||0;
   const tags=[...(manga.genres||[]),...(manga.tags||[])];
+  const altTitles=(manga.alternative_titles||[]).filter(Boolean);
+  const localChapterCount=chapters?.length||0;
+  const sourceChapterCount=Number(manga.source_chapter_count)||0;
+  const communityRating=Number(stats.average_rating)||0;
+  const displayedRating=communityRating||Number(manga.source_score)||0;
+  const communityReads=Number(stats.reader_count)||0;
+  const communityFavorites=Number(stats.favorite_count)||0;
+  const sourceFavorites=Number(manga.source_favorites)||Number(manga.source_votes)||0;
   document.title="MangaMorph — "+manga.title;
   meta("description",manga.synopsis||("Leia "+manga.title+" no MangaMorph."));
   meta("og:title",manga.title,true);meta("og:description",manga.synopsis||"",true);
   if(manga.cover_url)meta("og:image",manga.cover_url,true);
   $("#mangaTitle").textContent=manga.title;
-  $("#mangaAltTitle").textContent=tags.join(" · ")||manga.type;
+  $("#mangaAltTitle").textContent=altTitles.join(" · ")||tags.join(" · ")||manga.type;
   $("#coverTitle").textContent=manga.title.toUpperCase();
   $("#coverType").textContent=(manga.type||"OBRA").toUpperCase();
   $("#detailCover").style.setProperty("--detail-accent",manga.accent||"#3a4162");
@@ -30,10 +39,11 @@ if(manga){
   $("#mangaDescription").textContent=manga.synopsis||"Sem sinopse cadastrada.";
   $("#mangaTags").innerHTML=tags.map(t=>"<span>"+esc(t)+"</span>").join("");
   $("#latestChapter").textContent=latest||"—";$("#readLatestLabel").textContent=latest?"Ler capítulo "+latest:"Sem capítulos";
-  $("#tabChapterCount").textContent=chapters?.length||0;$("#chapterCount").textContent=(chapters?.length||0)+" capítulos publicados";
-  $("#mangaRating").textContent="★ "+(Number(stats.average_rating)||0).toFixed(1).replace(".",",");
-  $("#mangaReads").textContent="◉ "+new Intl.NumberFormat("pt-BR",{notation:"compact"}).format(Number(stats.reader_count)||0);
-  $("#mangaFavorites").textContent="☆ "+new Intl.NumberFormat("pt-BR",{notation:"compact"}).format(Number(stats.favorite_count)||0);
+  $("#tabChapterCount").textContent=localChapterCount;
+  $("#chapterCount").textContent=localChapterCount+" capítulos publicados"+(sourceChapterCount>localChapterCount?" · "+sourceChapterCount+" na fonte":"");
+  $("#mangaRating").textContent="★ "+displayedRating.toFixed(1).replace(".",",");
+  $("#mangaReads").textContent="◉ "+(communityReads?compactNumber(communityReads):(manga.source_views||"0"));
+  $("#mangaFavorites").textContent="☆ "+(communityFavorites?compactNumber(communityFavorites):(sourceFavorites?compactNumber(sourceFavorites):"0"));
   const statusFact=$("#mangaStatusFact");if(statusFact)statusFact.textContent=manga.publication_status||"Em lançamento";
   const yearFact=$("#mangaYearFact");if(yearFact)yearFact.textContent=manga.year||"—";
   const authorFact=$("#mangaAuthorFact");if(authorFact)authorFact.textContent=manga.author||"—";
