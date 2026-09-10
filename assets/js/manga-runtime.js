@@ -8,6 +8,15 @@ bootStyle.textContent='@keyframes mmMangaBootSpin{to{transform:rotate(360deg)}}'
 document.head.append(bootStyle);
 document.body.append(boot);
 
+const cleanCoverStyle=document.createElement("style");
+cleanCoverStyle.id="mangamorphCleanMangaCovers";
+cleanCoverStyle.textContent=`
+  .detail-cover-kicker,.compact-cover>strong,.compact-cover>small,.related-cover-title{display:none!important}
+  .compact-cover::after{content:none!important;display:none!important}
+  .compact-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
+`;
+document.head.append(cleanCoverStyle);
+
 function finishBoot(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     boot.style.opacity="0";
@@ -57,7 +66,7 @@ try{
     $("#coverTitle").textContent=manga.title.toUpperCase();
     $("#coverType").textContent=(manga.type||"OBRA").toUpperCase();
     $("#detailCover").style.setProperty("--detail-accent",manga.accent||"#3a4162");
-    if(manga.cover_url){$("#detailCover").style.backgroundImage='linear-gradient(180deg,transparent 45%,rgba(4,7,12,.72)),url("'+manga.cover_url+'")';$("#detailCover").style.backgroundSize="cover";$("#detailCover").style.backgroundPosition="center"}
+    if(manga.cover_url){$("#detailCover").style.backgroundImage='url("'+manga.cover_url+'")';$("#detailCover").style.backgroundSize="auto 178%";$("#detailCover").style.backgroundPosition="center top";$("#detailCover").style.backgroundRepeat="no-repeat"}
     const country=manga.country||"";$("#mangaOriginBadge").textContent=flag(country,manga.type)+" "+manga.type+(country?" · "+country:"");
     $("#mangaTypeFact").textContent=manga.type+(country?" · "+country:"");
     $("#mangaDescription").textContent=manga.synopsis||"Sem sinopse cadastrada.";
