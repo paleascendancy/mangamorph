@@ -40,7 +40,7 @@ loginForm.addEventListener("submit",async event=>{
 
 el("adminSignOut").addEventListener("click",async()=>{await supabase.auth.signOut();location.reload()});
 
-const viewTitles={dashboard:"Visão geral",mangas:"Obras",chapters:"Capítulos",moderation:"Moderação"};
+const viewTitles={dashboard:"Visão geral",mangas:"Obras",chapters:"Capítulos",partners:"Scans parceiras",moderation:"Moderação"};
 function setView(name){
   document.querySelectorAll(".admin-view").forEach(v=>{v.hidden=true;v.classList.remove("active")});
   el("view"+name[0].toUpperCase()+name.slice(1)).hidden=false;
