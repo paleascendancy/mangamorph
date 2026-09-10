@@ -68,7 +68,7 @@ async function ensureAdmin(){
 async function importArchive(file,mangaId,session,publishNow){
   if(file.size>250*1024*1024)throw new Error(file.name+": arquivo maior que 250 MB.");
   const chapterNumber=chapterFromName(file.name);
-  if(!chapterNumber||chapterNumber<=0)throw new Error(file.name+": não consegui identificar o número do capítulo. Use um nome como Capitulo 12.zip.");
+  if(chapterNumber===null||!Number.isFinite(chapterNumber)||chapterNumber<0)throw new Error(file.name+": não consegui identificar o número do capítulo. Use um nome como Capitulo 0.zip ou Capitulo 12.zip.");
 
   const bytes=new Uint8Array(await file.arrayBuffer());
   let entries;
@@ -171,7 +171,7 @@ input?.addEventListener("change",async()=>{
     const session=await ensureAdmin();
     const completed=[];
     const failures=[];
-    const ordered=files.sort((a,b)=>(chapterFromName(a.name)||999999)-(chapterFromName(b.name)||999999));
+    const ordered=files.sort((a,b)=>(chapterFromName(a.name)??999999)-(chapterFromName(b.name)??999999));
 
     for(const file of ordered){
       try{
