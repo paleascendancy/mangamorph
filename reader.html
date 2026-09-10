@@ -17,9 +17,8 @@
 
     <div class="reader-heading">
       <span class="reader-brand">MangaMorph</span>
-      <strong id="readerTitle">Neon Ronin</strong>
+      <a class="reader-title-link" id="readerTitleLink" href="manga.html" aria-label="Abrir página da obra"><strong id="readerTitle">Neon Ronin</strong></a>
       <small id="readerChapterLabel">Capítulo 127</small>
-      <a id="readerCredit" class="reader-credit" hidden></a>
     </div>
 
     <button class="reader-icon-button" id="readerSettingsButton" type="button" aria-label="Configurações de leitura">⚙</button>
@@ -109,6 +108,7 @@
       <small>⌄</small>
     </button>
     <button type="button" id="nextChapter" aria-label="Próximo capítulo">→</button>
+    <button class="reader-scroll-top" type="button" id="readerScrollTop" aria-label="Voltar ao início do capítulo" title="Voltar ao topo">↑</button>
   </nav>
 
   <div class="reader-sheet" id="chapterPicker" hidden>
@@ -156,7 +156,7 @@
   <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
   <script src="assets/js/reader.js?v=008" defer></script>
-  <script type="module" src="assets/js/reader-runtime.js?v=005"></script>
+  <script type="module" src="assets/js/reader-runtime.js?v=006"></script>
   <script type="module" src="assets/js/account-sync.js?v=002"></script>
   <script type="module" src="assets/js/reader-community.js?v=003"></script>
 </body>
