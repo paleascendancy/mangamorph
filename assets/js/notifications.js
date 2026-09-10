@@ -10,32 +10,103 @@ const adminLink=document.querySelector("#accountAdminLink");
 let session=null,items=[];
 
 function fixHeaderAvatarShape(){
-  if(!document.querySelector("#mangamorphCircularAvatarStyles")){
-    const style=document.createElement("style");
-    style.id="mangamorphCircularAvatarStyles";
-    style.textContent=`
+  if(document.querySelector("#mangamorphCircularAvatarStyles"))return;
+  const style=document.createElement("style");
+  style.id="mangamorphCircularAvatarStyles";
+  style.textContent=`
+    #accountToggle.account-button{
+      position:relative!important;
+      display:block!important;
+      flex:0 0 66px!important;
+      width:66px!important;
+      min-width:66px!important;
+      max-width:66px!important;
+      height:66px!important;
+      min-height:66px!important;
+      max-height:66px!important;
+      padding:4px!important;
+      border-radius:50%!important;
+      overflow:hidden!important;
+      aspect-ratio:1/1!important;
+      box-sizing:border-box!important;
+    }
+    #accountToggle .header-profile-image,
+    #accountToggle .header-profile-initials{
+      position:absolute!important;
+      inset:4px!important;
+      width:calc(100% - 8px)!important;
+      height:calc(100% - 8px)!important;
+      margin:0!important;
+      padding:0!important;
+      border-radius:50%!important;
+      overflow:hidden!important;
+    }
+    #accountToggle .header-profile-image{
+      display:block!important;
+      object-fit:cover!important;
+      object-position:center!important;
+      z-index:3!important;
+    }
+    #accountToggle .header-profile-initials{
+      display:grid!important;
+      place-items:center!important;
+      z-index:2!important;
+    }
+    #accountToggle #headerGuestIcon{
+      position:absolute!important;
+      left:50%!important;
+      top:50%!important;
+      width:27px!important;
+      height:27px!important;
+      margin:0!important;
+      transform:translate(-50%,-50%)!important;
+      z-index:1!important;
+    }
+    #accountToggle .header-profile-image[hidden],
+    #accountToggle .header-profile-initials[hidden],
+    #accountToggle #headerGuestIcon[hidden]{
+      display:none!important;
+    }
+    @media(max-width:760px){
       #accountToggle.account-button{
-        border-radius:50%!important;
-        overflow:hidden!important;
-        aspect-ratio:1/1!important;
+        flex-basis:48px!important;
+        width:48px!important;
+        min-width:48px!important;
+        max-width:48px!important;
+        height:48px!important;
+        min-height:48px!important;
+        max-height:48px!important;
+        padding:3px!important;
       }
       #accountToggle .header-profile-image,
       #accountToggle .header-profile-initials{
-        width:100%!important;
-        height:100%!important;
-        border-radius:50%!important;
-        object-fit:cover!important;
-        overflow:hidden!important;
+        inset:3px!important;
+        width:calc(100% - 6px)!important;
+        height:calc(100% - 6px)!important;
       }
-      @media(max-width:760px){
-        #accountToggle.account-button{border-radius:50%!important}
+      #accountToggle #headerGuestIcon{
+        width:23px!important;
+        height:23px!important;
       }
-      @media(max-width:480px){
-        #accountToggle.account-button{border-radius:50%!important}
+    }
+    @media(max-width:480px){
+      #accountToggle.account-button{
+        flex-basis:40px!important;
+        width:40px!important;
+        min-width:40px!important;
+        max-width:40px!important;
+        height:40px!important;
+        min-height:40px!important;
+        max-height:40px!important;
+        padding:3px!important;
       }
-    `;
-    document.head.appendChild(style);
-  }
+      #accountToggle #headerGuestIcon{
+        width:20px!important;
+        height:20px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 function mountNotificationsInMenu(){
