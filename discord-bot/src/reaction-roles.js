@@ -1,7 +1,6 @@
 import {
   ChannelType,
-  EmbedBuilder,
-  PermissionFlagsBits
+  EmbedBuilder
 } from 'discord.js';
 
 const normalize = (value = '') => value
@@ -57,10 +56,6 @@ const PANEL_TITLES = new Map(
 );
 
 const ALL_ITEMS = Object.values(ROLE_GROUPS).flatMap((group) => group.items);
-
-function findItemByEmoji(emojiName) {
-  return ALL_ITEMS.find((item) => item.emoji === emojiName) || null;
-}
 
 async function findRoleByName(guild, roleName) {
   const roles = await guild.roles.fetch();
@@ -166,8 +161,7 @@ async function setReadOnlyReactionPermissions(channel, guild, client) {
       SendMessages: true,
       EmbedLinks: true,
       AddReactions: true,
-      ManageMessages: true,
-      ManageRoles: true
+      ManageMessages: true
     },
     { reason: 'Permissões do bot para o sistema de cargos por reação' }
   );
@@ -306,7 +300,7 @@ async function resolveReactionContext(reaction, user) {
   const member = await guild.members.fetch(user.id).catch(() => null);
   if (!member) return null;
 
-  return { guild, channel, message, member, group, groupKey, item };
+  return { guild, message, member, group, groupKey, item };
 }
 
 export async function handleReactionRoleAdd(reaction, user) {
