@@ -26,6 +26,35 @@ const client = new Client({
   partials: [Partials.GuildMember]
 });
 
+const normalize = (value = '') => value
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]/g, '');
+
+async function findTextChannel(guild, configuredId, expectedNames) {
+  if (configuredId) {
+    const byId = await guild.channels.fetch(configuredId).catch(() => null);
+    if (byId?.isTextBased()) return byId;
+  }
+
+  const channels = await guild.channels.fetch();
+  const wanted = expectedNames.map(normalize);
+  return channels.find((channel) =>
+    channel?.isTextBased() && wanted.includes(normalize(channel.name))
+  ) || null;
+}
+
+async function findMemberRole(guild) {
+  if (MEMBER_ROLE_ID) {
+    const byId = await guild.roles.fetch(MEMBER_ROLE_ID).catch(() => null);
+    if (byId) return byId;
+  }
+
+  const roles = await guild.roles.fetch();
+  return roles.find((role) => normalize(role.name) === 'membro') || null;
+}
+
 client.once('ready', () => {
   console.log(`MangaMorph online como ${client.user.tag}`);
   client.user.setActivity('MangaMorph');
@@ -33,18 +62,22 @@ client.once('ready', () => {
 
 client.on('guildMemberAdd', async (member) => {
   try {
-    if (MEMBER_ROLE_ID) {
-      const role = await member.guild.roles.fetch(MEMBER_ROLE_ID).catch(() => null);
-      if (role) {
-        await member.roles.add(role, 'Entrada automática no MangaMorph').catch(console.error);
-      }
+    const role = await findMemberRole(member.guild);
+    if (role) {
+      await member.roles.add(role, 'Entrada automática no MangaMorph').catch((error) => {
+        console.error('Não foi possível adicionar o cargo Membro:', error);
+      });
+    } else {
+      console.warn('Cargo Membro não encontrado.');
     }
 
-    const welcomeChannel = WELCOME_CHANNEL_ID
-      ? await member.guild.channels.fetch(WELCOME_CHANNEL_ID).catch(() => null)
-      : null;
+    const welcomeChannel = await findTextChannel(
+      member.guild,
+      WELCOME_CHANNEL_ID,
+      ['👋・boas-vindas', 'boas-vindas', 'boasvindas']
+    );
 
-    if (welcomeChannel?.isTextBased()) {
+    if (welcomeChannel) {
       const embed = new EmbedBuilder()
         .setColor(0x111318)
         .setAuthor({
@@ -65,13 +98,17 @@ client.on('guildMemberAdd', async (member) => {
         .setTimestamp();
 
       await welcomeChannel.send({ embeds: [embed] });
+    } else {
+      console.warn('Canal de boas-vindas não encontrado.');
     }
 
-    const logChannel = LOG_CHANNEL_ID
-      ? await member.guild.channels.fetch(LOG_CHANNEL_ID).catch(() => null)
-      : null;
+    const logChannel = await findTextChannel(
+      member.guild,
+      LOG_CHANNEL_ID,
+      ['📋・logs', 'logs', 'log']
+    );
 
-    if (logChannel?.isTextBased()) {
+    if (logChannel) {
       const logEmbed = new EmbedBuilder()
         .setColor(0x2b2f36)
         .setTitle('Novo membro')
