@@ -18,11 +18,13 @@ const catalog = [
 
 const params = new URLSearchParams(location.search);
 const mangaId = Number(params.get("id")) || 1;
-const requestedChapter = Math.max(1,Number(params.get("chapter")) || 1);
+const rawRequestedChapter = params.get("chapter");
+const parsedRequestedChapter = Number(rawRequestedChapter);
+const requestedChapter = Number.isFinite(parsedRequestedChapter) && parsedRequestedChapter >= 0 ? parsedRequestedChapter : 1;
 const manga = catalog.find(function(item){ return item.id === mangaId; }) || {
   id:mangaId,title:"Carregando...",chapter:requestedChapter,accent:"#3a4162"
 };
-let chapter = Math.max(1, Math.min(requestedChapter, manga.chapter));
+let chapter = Math.max(0, Math.min(requestedChapter, manga.chapter));
 
 const readerTitle = document.querySelector("#readerTitle");
 const readerChapterLabel = document.querySelector("#readerChapterLabel");
@@ -82,7 +84,7 @@ function updateLabels(){
 }
 
 function renderChapterGrid(){
-  const start = Math.max(1,manga.chapter-29);
+  const start = Math.max(0,manga.chapter-29);
   const values = [];
   for(let value=manga.chapter;value>=start;value--) values.push(value);
   chapterGrid.innerHTML = values.map(function(value){
@@ -91,7 +93,7 @@ function renderChapterGrid(){
 }
 
 function changeChapter(nextChapter){
-  if(nextChapter < 1 || nextChapter > manga.chapter){
+  if(nextChapter < 0 || nextChapter > manga.chapter){
     showToast(nextChapter > manga.chapter ? "Este é o capítulo mais recente." : "Não há capítulo anterior.");
     return;
   }
@@ -142,7 +144,7 @@ function updateProgress(){
     const top = page.offsetTop;
     if(viewportMid >= top) current = index + 1;
   });
-  const percent = Math.round(((current-1)/(pages.length-1))*100);
+  const percent = pages.length > 1 ? Math.round(((current-1)/(pages.length-1))*100) : 100;
   progressText.textContent = "Página " + current + " de " + pages.length;
   progressPercent.textContent = percent + "%";
   progressBar.style.width = percent + "%";
@@ -199,7 +201,6 @@ window.addEventListener("storage",function(event){
   document.body.classList.toggle("light-reader",light);
   readerThemeLabel.textContent = light ? "Claro" : "Escuro";
 });
-
 
 window.addEventListener("mangamorph:library-loaded",function(event){
   const rows=event.detail?.progress||[];
