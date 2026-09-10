@@ -54,6 +54,7 @@ async function refreshAll(){
   renderDashboardMangas();
 }
 el("adminRefresh").addEventListener("click",refreshAll);
+window.addEventListener("mangamorph:chapters-imported",async()=>{await loadChapters();await loadStats()});
 
 async function loadStats(){
   const [{count:mangaCount},{count:pubCount},{count:chapterCount},{count:reportCount}]=await Promise.all([
