@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.24";
+const CACHE = "mangamorph-v0.17.25";
 const ASSETS = [
   "./",
   "./index.html",
@@ -25,6 +25,7 @@ const ASSETS = [
   "./assets/js/admin-import.js?v=003",
   "./assets/js/admin-archive-import.js?v=001",
   "./assets/js/admin-partners.js?v=001",
+  "./assets/js/admin-anilist-cover.js?v=001",
   "./assets/js/public-profile.js?v=001",
   "./assets/js/auth.js?v=004",
   "./assets/js/manga.js?v=017",
@@ -61,6 +62,14 @@ async function fetchFresh(request) {
     if(pathname.endsWith("/assets/js/catalog-runtime.js")){
       const source=await response.text();
       const injected=source+'\nimport("./catalog-cover-fix.js?v=003").catch(error=>console.error("MangaMorph cover fix:",error));\n';
+      const headers=new Headers(response.headers);
+      headers.set("Content-Type","text/javascript; charset=utf-8");
+      return new Response(injected,{status:response.status,statusText:response.statusText,headers});
+    }
+
+    if(pathname.endsWith("/assets/js/admin.js")){
+      const source=await response.text();
+      const injected=source+'\nimport("./admin-anilist-cover.js?v=001").catch(error=>console.error("MangaMorph AniList cover importer:",error));\n';
       const headers=new Headers(response.headers);
       headers.set("Content-Type","text/javascript; charset=utf-8");
       return new Response(injected,{status:response.status,statusText:response.statusText,headers});
