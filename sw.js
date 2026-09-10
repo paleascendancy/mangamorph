@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.22";
+const CACHE = "mangamorph-v0.17.23";
 const ASSETS = [
   "./",
   "./index.html",
@@ -55,12 +55,32 @@ async function fetchFresh(request) {
   const revalidate=destination === "document" || destination === "script" || destination === "style" || destination === "image";
   const response=await fetch(request,revalidate?{cache:"no-cache"}:undefined);
 
-  if(response.ok && destination === "script" && new URL(request.url).pathname.endsWith("/assets/js/catalog-runtime.js")){
-    const source=await response.text();
-    const injected=source+'\nimport("./catalog-cover-fix.js?v=002").catch(error=>console.error("MangaMorph cover fix:",error));\n';
-    const headers=new Headers(response.headers);
-    headers.set("Content-Type","text/javascript; charset=utf-8");
-    return new Response(injected,{status:response.status,statusText:response.statusText,headers});
+  if(response.ok && destination === "script"){
+    const pathname=new URL(request.url).pathname;
+
+    if(pathname.endsWith("/assets/js/catalog-runtime.js")){
+      const source=await response.text();
+      const injected=source+'\nimport("./catalog-cover-fix.js?v=002").catch(error=>console.error("MangaMorph cover fix:",error));\n';
+      const headers=new Headers(response.headers);
+      headers.set("Content-Type","text/javascript; charset=utf-8");
+      return new Response(injected,{status:response.status,statusText:response.statusText,headers});
+    }
+
+    if(pathname.endsWith("/assets/js/manga.js")){
+      const source=await response.text();
+      const guard='(()=>{if(document.getElementById("mmMangaLiveGuard"))return;const s=document.createElement("style");s.id="mmMangaLiveGuard";s.textContent="#mangaPage,.footer{visibility:hidden!important}";document.head.append(s)})();\n';
+      const headers=new Headers(response.headers);
+      headers.set("Content-Type","text/javascript; charset=utf-8");
+      return new Response(guard+source,{status:response.status,statusText:response.statusText,headers});
+    }
+
+    if(pathname.endsWith("/assets/js/manga-runtime.js")){
+      const source=await response.text();
+      const reveal='\nqueueMicrotask(()=>{document.getElementById("mmMangaLiveGuard")?.remove();document.documentElement.classList.add("manga-live-ready")});\n';
+      const headers=new Headers(response.headers);
+      headers.set("Content-Type","text/javascript; charset=utf-8");
+      return new Response(source+reveal,{status:response.status,statusText:response.statusText,headers});
+    }
   }
 
   return response;
