@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.3";
+const CACHE = "mangamorph-v0.17.4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -13,15 +13,16 @@ const ASSETS = [
   "./assets/css/settings.css?v=002",
   "./assets/css/manga.css?v=016",
   "./assets/css/reader.css?v=007",
-  "./assets/css/admin.css?v=003",
+  "./assets/css/admin.css?v=004",
   "./assets/css/public-profile.css?v=001",
   "./assets/js/app.js?v=044",
   "./assets/js/catalog-runtime.js?v=003",
   "./assets/js/account-sync.js?v=002",
   "./assets/js/notifications.js?v=001",
-  "./assets/js/admin.js?v=003",
+  "./assets/js/admin.js?v=004",
   "./assets/js/admin-import.js?v=003",
   "./assets/js/admin-archive-import.js?v=001",
+  "./assets/js/admin-partners.js?v=001",
   "./assets/js/public-profile.js?v=001",
   "./assets/js/auth.js?v=004",
   "./assets/js/manga.js?v=017",
