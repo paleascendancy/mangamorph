@@ -1,0 +1,30 @@
+{
+  "works": [
+    {
+      "id": "obra-exemplo",
+      "title": "Obra Exemplo",
+      "slug": "obra-exemplo",
+      "type": "Manhwa",
+      "country": "Coreia do Sul",
+      "language": "Português",
+      "author": "Autor",
+      "artist": "Artista",
+      "cover_url": "https://scan.exemplo/capas/obra-exemplo.jpg",
+      "synopsis": "Sinopse da obra.",
+      "genres": ["Ação", "Fantasia"],
+      "chapters": [
+        {
+          "id": "obra-exemplo-cap-1",
+          "number": 1,
+          "title": "Capítulo 1",
+          "published_at": "2026-09-10T00:00:00Z",
+          "pages": [
+            "https://scan.exemplo/obra-exemplo/1/001.jpg",
+            "https://scan.exemplo/obra-exemplo/1/002.jpg",
+            "https://scan.exemplo/obra-exemplo/1/003.jpg"
+          ]
+        }
+      ]
+    }
+  ]
+}
