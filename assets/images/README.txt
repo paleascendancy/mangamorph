@@ -1,1 +1,0 @@
-MangaMorph image assets.
