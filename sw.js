@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.18";
+const CACHE = "mangamorph-v0.17.19";
 const ASSETS = [
   "./",
   "./index.html",
