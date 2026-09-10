@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.16.8";
+const CACHE = "mangamorph-v0.16.9";
 const ASSETS = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const ASSETS = [
   "./assets/js/account-sync.js?v=002",
   "./assets/js/notifications.js?v=001",
   "./assets/js/admin.js?v=002",
-  "./assets/js/admin-import.js?v=001",
+  "./assets/js/admin-import.js?v=002",
   "./assets/js/public-profile.js?v=001",
   "./assets/js/auth.js?v=004",
   "./assets/js/manga.js?v=017",
