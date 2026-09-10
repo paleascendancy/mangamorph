@@ -118,6 +118,7 @@ form?.addEventListener("submit",async event=>{
     const {data:isAdmin,error:adminError} = await supabase.rpc("is_mangamorph_admin");
     if(adminError || isAdmin !== true) throw new Error("Sua conta não possui acesso administrativo.");
 
+    supabase.functions.setAuth(session.access_token);
     const {data,error} = await supabase.functions.invoke("mangamorph-import-metadata",{
       body:{input:query}
     });
@@ -130,7 +131,13 @@ form?.addEventListener("submit",async event=>{
     renderResults();
     setMessage(results.length === 1 ? "1 resultado encontrado." : results.length + " resultados encontrados.");
   }catch(error){
-    const text = error?.context?.body?.error || error?.message || "Não foi possível consultar a fonte.";
+    let text = error?.message || "Não foi possível consultar a fonte.";
+    try{
+      if(error?.context && typeof error.context.clone === "function"){
+        const payload = await error.context.clone().json();
+        if(payload?.error) text = payload.error;
+      }
+    }catch{}
     setMessage(String(text),true);
   }finally{
     setBusy(false);
