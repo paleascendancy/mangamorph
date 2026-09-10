@@ -794,7 +794,7 @@ sideMenuSettings.addEventListener("click", function(){
 settingsClose.addEventListener("click", closeSettings);
 notificationToggle.addEventListener("click", function(){ applyNotifications(!state.notifications); });
 
-const savedTheme = localStorage.getItem("mangamorph:theme") || "dark";
+const savedTheme = localStorage.getItem("mangamorph:theme") || "light";
 applyTheme(savedTheme);
 applyFilter(state.filter);
 applyNotifications(state.notifications);
