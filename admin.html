@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0f17">
   <meta name="robots" content="noindex,nofollow">
   <title>MangaMorph — Administração</title>
-  <link rel="stylesheet" href="assets/css/admin.css?v=001">
+  <link rel="stylesheet" href="assets/css/admin.css?v=002">
 </head>
 <body>
   <div class="admin-auth" id="adminAuth">
@@ -59,6 +59,20 @@
       </section>
 
       <section class="admin-view" id="viewMangas" hidden>
+        <div class="admin-card manga-import-card">
+          <div class="admin-card-head">
+            <div><span>IMPORTAÇÃO AUTOMÁTICA</span><h2>Importar obra</h2></div>
+            <span class="manga-import-badge">API + fallback</span>
+          </div>
+          <form class="manga-import-form" id="mangaImportForm">
+            <input id="mangaImportInput" type="text" maxlength="300" placeholder="Nome da obra ou link do AniList / MyAnimeList" autocomplete="off">
+            <button id="mangaImportButton" class="primary" type="submit">Buscar</button>
+          </form>
+          <p class="admin-helper">Busca metadados pelo AniList e Jikan/MyAnimeList. Links suportados usam a API e, se necessário, um fallback seguro de metadados da própria página.</p>
+          <p class="admin-message" id="mangaImportMessage" hidden></p>
+          <div class="manga-import-results" id="mangaImportResults"></div>
+        </div>
+
         <div class="admin-grid">
           <div class="admin-card">
             <div class="admin-card-head">
@@ -75,6 +89,10 @@
               <span class="admin-status-dot" id="mangaDraftBadge">Rascunho</span>
             </div>
             <input id="mangaIdInput" type="hidden">
+            <input id="mangaImportedCoverUrl" type="hidden">
+            <input id="mangaMetadataSource" type="hidden">
+            <input id="mangaMetadataSourceId" type="hidden">
+            <input id="mangaMetadataSourceUrl" type="hidden">
             <div class="admin-form-grid">
               <label class="wide">Título<input id="mangaTitleInput" maxlength="120" required></label>
               <label>Slug<input id="mangaSlugInput" maxlength="140" required></label>
@@ -148,6 +166,7 @@
     </main>
   </div>
 
-  <script type="module" src="assets/js/admin.js?v=001"></script>
+  <script type="module" src="assets/js/admin.js?v=002"></script>
+  <script type="module" src="assets/js/admin-import.js?v=001"></script>
 </body>
 </html>
