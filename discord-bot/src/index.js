@@ -89,6 +89,10 @@ async function findRulesChannel(guild) {
   return findTextChannel(guild, null, ['📜・regras', 'regras']);
 }
 
+async function findApplicationChannel(guild) {
+  return findTextChannel(guild, null, ['📨・candidaturas', 'candidaturas', 'candidatura']);
+}
+
 function buildRulesEmbeds() {
   const header = new EmbedBuilder()
     .setColor(0x6f7cff)
@@ -234,6 +238,158 @@ async function ensureRulesPanel(guild) {
   console.log(`[${guild.name}] Template de regras publicado.`);
 }
 
+function applicationPanelComponents() {
+  const button = new ButtonBuilder()
+    .setCustomId('mm_application_open')
+    .setLabel('Abrir candidatura')
+    .setEmoji('📨')
+    .setStyle(ButtonStyle.Primary);
+
+  return [new ActionRowBuilder().addComponents(button)];
+}
+
+function buildApplicationEmbed() {
+  return new EmbedBuilder()
+    .setColor(0x6f7cff)
+    .setAuthor({
+      name: 'MangaMorph • Equipe',
+      iconURL: client.user.displayAvatarURL()
+    })
+    .setTitle('📨 Candidaturas MangaMorph')
+    .setDescription(
+      '**Quer fazer parte do MangaMorph?**\n' +
+      'Estamos formando uma equipe para ajudar no crescimento da comunidade e da plataforma. Se você tem responsabilidade, vontade de contribuir e interesse em evoluir com o projeto, envie sua candidatura.'
+    )
+    .addFields(
+      {
+        name: 'Áreas com prioridade',
+        value:
+          '🛡️ **Moderação & suporte** — atendimento e organização da comunidade\n' +
+          '📚 **Curadoria de obras** — títulos, capítulos, capas e informações\n' +
+          '🗂️ **Organização de conteúdo** — pedidos, correções e qualidade do catálogo\n' +
+          '🎨 **Design & divulgação** — artes, identidade visual e materiais\n' +
+          '✍️ **Editorial / scan** — revisão, tradução, clean, redraw e type'
+      },
+      {
+        name: 'O que esperamos',
+        value:
+          '• Compromisso e boa comunicação\n' +
+          '• Respeito com a equipe e a comunidade\n' +
+          '• Disponibilidade para colaborar\n' +
+          '• Vontade de aprender e evoluir'
+      },
+      {
+        name: 'Como funciona',
+        value:
+          'Clique em **Abrir candidatura**. Você responderá algumas perguntas rápidas e o bot abrirá um atendimento privado para a equipe analisar.'
+      },
+      {
+        name: 'Não precisa saber tudo',
+        value:
+          'Experiência ajuda, mas não é obrigatória em todas as áreas. Dedicação, responsabilidade e vontade de aprender também contam.'
+      }
+    )
+    .setFooter({ text: 'MangaMorph • Candidaturas oficiais da equipe' })
+    .setThumbnail(client.user.displayAvatarURL({ size: 256 }));
+}
+
+async function ensureApplicationPanel(guild) {
+  let channel = await findApplicationChannel(guild);
+
+  if (!channel) {
+    const channels = await guild.channels.fetch();
+    let contributeCategory = channels.find((item) =>
+      item?.type === ChannelType.GuildCategory && normalize(item.name).includes('contribuir')
+    ) || null;
+
+    if (!contributeCategory) {
+      contributeCategory = await guild.channels.create({
+        name: '「 MM 」 CONTRIBUIR',
+        type: ChannelType.GuildCategory,
+        reason: 'Estrutura de candidaturas do MangaMorph'
+      });
+    }
+
+    channel = await guild.channels.create({
+      name: '📨・candidaturas',
+      type: ChannelType.GuildText,
+      parent: contributeCategory.id,
+      topic: 'Entre para a equipe do MangaMorph • candidaturas abertas',
+      reason: 'Canal de candidaturas do MangaMorph'
+    });
+    console.log(`[${guild.name}] Canal de candidaturas criado.`);
+  } else {
+    await channel.setTopic('Entre para a equipe do MangaMorph • candidaturas abertas').catch(() => {});
+  }
+
+  const readOnlyPermissions = {
+    ViewChannel: true,
+    ReadMessageHistory: true,
+    SendMessages: false,
+    SendMessagesInThreads: false,
+    CreatePublicThreads: false,
+    CreatePrivateThreads: false,
+    AddReactions: false
+  };
+
+  await channel.permissionOverwrites.edit(
+    guild.roles.everyone.id,
+    readOnlyPermissions,
+    { reason: 'Canal de candidaturas somente leitura' }
+  );
+
+  const memberRole = await findMemberRole(guild);
+  if (memberRole) {
+    await channel.permissionOverwrites.edit(
+      memberRole.id,
+      {
+        SendMessages: false,
+        SendMessagesInThreads: false,
+        CreatePublicThreads: false,
+        CreatePrivateThreads: false,
+        AddReactions: false
+      },
+      { reason: 'Bloquear mensagens no canal de candidaturas' }
+    );
+  }
+
+  await channel.permissionOverwrites.edit(
+    client.user.id,
+    {
+      ViewChannel: true,
+      SendMessages: true,
+      ReadMessageHistory: true,
+      EmbedLinks: true,
+      ManageMessages: true
+    },
+    { reason: 'Permitir painel de candidaturas do MangaMorph' }
+  );
+
+  const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
+  const applicationMessages = recent?.filter((message) =>
+    message.author.id === client.user.id &&
+    message.embeds.some((embed) => embed.title === '📨 Candidaturas MangaMorph')
+  );
+  const primary = applicationMessages?.first() || null;
+  const payload = {
+    embeds: [buildApplicationEmbed()],
+    components: applicationPanelComponents()
+  };
+
+  if (primary) {
+    await primary.edit(payload);
+    const duplicates = applicationMessages.filter((message) => message.id !== primary.id);
+    for (const message of duplicates.values()) {
+      await message.delete().catch(() => {});
+    }
+    console.log(`[${guild.name}] Painel de candidaturas atualizado.`);
+    return;
+  }
+
+  await channel.send(payload);
+  console.log(`[${guild.name}] Painel de candidaturas publicado.`);
+}
+
 async function ensureSupportArea(guild) {
   const channels = await guild.channels.fetch();
   let category = channels.find((channel) =>
@@ -319,6 +475,13 @@ function isTicketChannel(channel) {
   return channel?.type === ChannelType.GuildText && channel.topic?.startsWith('MM_TICKET:');
 }
 
+async function findOpenTicket(guild, userId) {
+  const channels = await guild.channels.fetch();
+  return channels.find((channel) =>
+    isTicketChannel(channel) && getTicketOwnerId(channel) === userId
+  ) || null;
+}
+
 async function sendLog(guild, title, description, fields = []) {
   const logChannel = await findLogChannel(guild);
   if (!logChannel) return;
@@ -375,17 +538,13 @@ async function createTicket(interaction, reasonKey) {
 
   if (!guild || !reason) {
     await interaction.reply({ content: 'Não foi possível abrir o ticket.', ephemeral: true });
-    return;
+    return null;
   }
 
-  const channels = await guild.channels.fetch();
-  const alreadyOpen = channels.find((channel) =>
-    isTicketChannel(channel) && getTicketOwnerId(channel) === user.id
-  );
-
+  const alreadyOpen = await findOpenTicket(guild, user.id);
   if (alreadyOpen) {
     await interaction.reply({ content: `Você já tem um ticket aberto: ${alreadyOpen}`, ephemeral: true });
-    return;
+    return null;
   }
 
   const { category: supportCategory } = await ensureSupportArea(guild);
@@ -429,8 +588,12 @@ async function createTicket(interaction, reasonKey) {
   }
 
   const safeName = normalize(user.username).slice(0, 16) || 'membro';
+  const channelName = reasonKey === 'candidatura'
+    ? `candidatura-${safeName}-${user.id.slice(-4)}`
+    : `ticket-${safeName}-${user.id.slice(-4)}`;
+
   const channel = await guild.channels.create({
-    name: `ticket-${safeName}-${user.id.slice(-4)}`,
+    name: channelName,
     type: ChannelType.GuildText,
     parent: supportCategory.id,
     topic: `MM_TICKET:${user.id}|TYPE:${reasonKey}|CLAIMED:`,
@@ -444,11 +607,12 @@ async function createTicket(interaction, reasonKey) {
   );
 
   const embed = new EmbedBuilder()
-    .setColor(0x111318)
+    .setColor(reasonKey === 'candidatura' ? 0x6f7cff : 0x111318)
     .setTitle(`${reason.emoji} ${reason.label}`)
     .setDescription(
-      `${user}, seu atendimento foi aberto. Explique o que aconteceu e envie as informações necessárias para a equipe analisar.\n\n` +
-      'A conversa deste canal é privada entre você e a equipe do MangaMorph.'
+      reasonKey === 'candidatura'
+        ? `${user}, sua candidatura foi recebida. A equipe poderá conversar com você por este canal durante a análise.`
+        : `${user}, seu atendimento foi aberto. Explique o que aconteceu e envie as informações necessárias para a equipe analisar.\n\nA conversa deste canal é privada entre você e a equipe do MangaMorph.`
     )
     .addFields(
       { name: 'Solicitante', value: `${user}`, inline: true },
@@ -458,17 +622,76 @@ async function createTicket(interaction, reasonKey) {
     .setTimestamp();
 
   await channel.send({ content: `${user}`, embeds: [embed], components: [actions] });
-  await interaction.reply({ content: `Ticket criado: ${channel}`, ephemeral: true });
+  await interaction.reply({ content: `${reasonKey === 'candidatura' ? 'Candidatura' : 'Ticket'} criado: ${channel}`, ephemeral: true });
 
-  await sendLog(guild, 'Ticket aberto', `${user} abriu um novo atendimento.`, [
+  await sendLog(guild, reasonKey === 'candidatura' ? 'Nova candidatura' : 'Ticket aberto', `${user} abriu ${channel}.`, [
     { name: 'Motivo', value: reason.label, inline: true },
     { name: 'Canal', value: `${channel}`, inline: true }
   ]);
+
+  return channel;
+}
+
+function buildApplicationModal() {
+  const area = new TextInputBuilder()
+    .setCustomId('application_area')
+    .setLabel('Qual área você quer seguir?')
+    .setPlaceholder('Ex.: curadoria de obras, design, moderação...')
+    .setStyle(TextInputStyle.Short)
+    .setMaxLength(100)
+    .setRequired(true);
+
+  const availability = new TextInputBuilder()
+    .setCustomId('application_availability')
+    .setLabel('Qual sua disponibilidade?')
+    .setPlaceholder('Ex.: 1 hora por dia / fins de semana')
+    .setStyle(TextInputStyle.Short)
+    .setMaxLength(100)
+    .setRequired(true);
+
+  const experience = new TextInputBuilder()
+    .setCustomId('application_experience')
+    .setLabel('Você já tem experiência?')
+    .setPlaceholder('Se não tiver, pode dizer que está começando.')
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(500)
+    .setRequired(true);
+
+  const contribution = new TextInputBuilder()
+    .setCustomId('application_contribution')
+    .setLabel('Como você pode ajudar o MangaMorph?')
+    .setPlaceholder('Conte de forma breve como pretende contribuir.')
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(500)
+    .setRequired(true);
+
+  const learning = new TextInputBuilder()
+    .setCustomId('application_learning')
+    .setLabel('O que você gostaria de aprender?')
+    .setPlaceholder('Opcional: função ou habilidade que quer desenvolver.')
+    .setStyle(TextInputStyle.Paragraph)
+    .setMaxLength(300)
+    .setRequired(false);
+
+  return new ModalBuilder()
+    .setCustomId('mm_application_modal')
+    .setTitle('Candidatura MangaMorph')
+    .addComponents(
+      new ActionRowBuilder().addComponents(area),
+      new ActionRowBuilder().addComponents(availability),
+      new ActionRowBuilder().addComponents(experience),
+      new ActionRowBuilder().addComponents(contribution),
+      new ActionRowBuilder().addComponents(learning)
+    );
 }
 
 async function setupGuild(guild) {
   await ensureRulesPanel(guild).catch((error) => {
     console.error(`Falha ao preparar regras em ${guild.name}:`, error);
+  });
+
+  await ensureApplicationPanel(guild).catch((error) => {
+    console.error(`Falha ao preparar candidaturas em ${guild.name}:`, error);
   });
 
   await ensureTicketPanel(guild).catch((error) => {
@@ -541,6 +764,59 @@ client.on(Events.GuildMemberAdd, async (member) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
     if (!interaction.inGuild()) return;
+
+    if (interaction.isButton() && interaction.customId === 'mm_application_open') {
+      const alreadyOpen = await findOpenTicket(interaction.guild, interaction.user.id);
+      if (alreadyOpen) {
+        await interaction.reply({
+          content: `Você já tem um atendimento aberto: ${alreadyOpen}. Feche-o antes de iniciar uma candidatura.`,
+          ephemeral: true
+        });
+        return;
+      }
+
+      await interaction.showModal(buildApplicationModal());
+      return;
+    }
+
+    if (interaction.isModalSubmit() && interaction.customId === 'mm_application_modal') {
+      const alreadyOpen = await findOpenTicket(interaction.guild, interaction.user.id);
+      if (alreadyOpen) {
+        await interaction.reply({
+          content: `Você já tem um atendimento aberto: ${alreadyOpen}.`,
+          ephemeral: true
+        });
+        return;
+      }
+
+      const application = {
+        area: interaction.fields.getTextInputValue('application_area'),
+        availability: interaction.fields.getTextInputValue('application_availability'),
+        experience: interaction.fields.getTextInputValue('application_experience'),
+        contribution: interaction.fields.getTextInputValue('application_contribution'),
+        learning: interaction.fields.getTextInputValue('application_learning') || 'Não informado'
+      };
+
+      const channel = await createTicket(interaction, 'candidatura');
+      if (!channel) return;
+
+      const summary = new EmbedBuilder()
+        .setColor(0x6f7cff)
+        .setTitle('Ficha de candidatura')
+        .setDescription(`Respostas enviadas por ${interaction.user}.`)
+        .addFields(
+          { name: 'Área de interesse', value: application.area },
+          { name: 'Disponibilidade', value: application.availability },
+          { name: 'Experiência', value: application.experience },
+          { name: 'Como pode ajudar', value: application.contribution },
+          { name: 'O que gostaria de aprender', value: application.learning }
+        )
+        .setFooter({ text: 'MangaMorph • Processo de candidatura' })
+        .setTimestamp();
+
+      await channel.send({ embeds: [summary] });
+      return;
+    }
 
     if (interaction.isButton() && interaction.customId === 'mm_ticket_open') {
       const select = new StringSelectMenuBuilder()
