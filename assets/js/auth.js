@@ -278,9 +278,7 @@ async function oauth(provider,source){
 }
 
 document.querySelector("#authGoogleLogin").addEventListener("click",() => oauth("google","login"));
-document.querySelector("#authGithubLogin").addEventListener("click",() => oauth("github","login"));
 document.querySelector("#authGoogleRegister").addEventListener("click",() => oauth("google","register"));
-document.querySelector("#authGithubRegister").addEventListener("click",() => oauth("github","register"));
 
 document.querySelector("#authMagicLink").addEventListener("click",async () => {
   const email = loginEmail.value.trim();
