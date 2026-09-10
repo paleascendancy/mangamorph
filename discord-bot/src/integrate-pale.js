@@ -12,15 +12,21 @@ let changed = false;
 if (!source.includes("from './pale.js'")) {
   source = source.replace(
     "import 'dotenv/config';",
-    "import 'dotenv/config';\nimport { PALE_GUILD_ID, handlePaleInteraction, handlePaleMemberAdd } from './pale.js';"
+    "import 'dotenv/config';\nimport { PALE_GUILD_ID, handlePaleInteraction, handlePaleMemberAdd } from './pale.js';\nimport { setupPaleRuntime } from './pale-runtime.js';"
+  );
+  changed = true;
+} else if (!source.includes("from './pale-runtime.js'")) {
+  source = source.replace(
+    "import { PALE_GUILD_ID, handlePaleInteraction, handlePaleMemberAdd } from './pale.js';",
+    "import { PALE_GUILD_ID, handlePaleInteraction, handlePaleMemberAdd } from './pale.js';\nimport { setupPaleRuntime } from './pale-runtime.js';"
   );
   changed = true;
 }
 
-if (!source.includes('if (guild.id === PALE_GUILD_ID) return;')) {
+if (!source.includes('await setupPaleRuntime(guild)')) {
   source = source.replace(
     'async function setupGuild(guild) {',
-    'async function setupGuild(guild) {\n  if (guild.id === PALE_GUILD_ID) return;'
+    "async function setupGuild(guild) {\n  if (guild.id === PALE_GUILD_ID) {\n    await setupPaleRuntime(guild).catch((error) => {\n      console.error(`Falha ao preparar Pale Ascendancy:`, error);\n    });\n    return;\n  }"
   );
   changed = true;
 }
