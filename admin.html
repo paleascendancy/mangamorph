@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0a0f17">
   <meta name="robots" content="noindex,nofollow">
   <title>MangaMorph — Administração</title>
-  <link rel="stylesheet" href="assets/css/admin.css?v=002">
+  <link rel="stylesheet" href="assets/css/admin.css?v=003">
 </head>
 <body>
   <div class="admin-auth" id="adminAuth">
@@ -134,6 +134,20 @@
             <div><span>PUBLICAÇÃO</span><h2>Capítulos e páginas</h2></div>
             <select id="chapterMangaSelect"><option value="">Selecione uma obra</option></select>
           </div>
+          <div class="chapter-auto-import">
+            <div class="chapter-auto-import-copy">
+              <span>AUTOMAÇÃO</span>
+              <strong>Importar capítulos por ZIP/CBZ</strong>
+              <small>Selecione a obra acima e envie um ou vários arquivos. O número do capítulo é lido do nome do arquivo, as páginas são extraídas, ordenadas e enviadas automaticamente.</small>
+            </div>
+            <div class="chapter-auto-import-actions">
+              <label class="chapter-auto-publish"><input id="chapterArchivePublish" type="checkbox" checked> Publicar automaticamente</label>
+              <label class="upload-pages-button chapter-archive-button"><span id="chapterArchiveButtonLabel">Importar ZIP/CBZ</span><input id="chapterArchiveInput" type="file" accept=".zip,.cbz,application/zip,application/x-cbz" multiple hidden></label>
+            </div>
+            <p class="admin-helper chapter-auto-example">Exemplo: <b>Capitulo 1.cbz</b>, <b>Capitulo 2.zip</b>. Um arquivo = um capítulo.</p>
+            <p class="admin-message" id="chapterArchiveMessage" hidden></p>
+          </div>
+
           <div class="chapter-admin-grid">
             <div>
               <form class="chapter-create-form" id="chapterForm">
@@ -166,7 +180,8 @@
     </main>
   </div>
 
-  <script type="module" src="assets/js/admin.js?v=002"></script>
+  <script type="module" src="assets/js/admin.js?v=003"></script>
   <script type="module" src="assets/js/admin-import.js?v=003"></script>
+  <script type="module" src="assets/js/admin-archive-import.js?v=001"></script>
 </body>
 </html>
