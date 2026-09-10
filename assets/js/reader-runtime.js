@@ -14,12 +14,35 @@ if(manga){
   document.querySelector("#bottomChapterLabel").textContent=chapterNumber;
   document.querySelector("#finishChapterLabel").textContent="Capítulo "+chapterNumber+" concluído";
   document.querySelector("#readerBack").href="manga.html?id="+mangaId;
+  const stage=document.querySelector("#readerStage");
+  const progressText=document.querySelector("#readerProgressText");
+  const progressPercent=document.querySelector("#readerProgressPercent");
+  const progressBar=document.querySelector("#readerProgressBar");
+  let hasPages=false;
+
   if(current){
     const {data:pages}=await db.from("mangamorph_chapter_pages").select("id,page_number,image_url,width,height").eq("chapter_id",current.id).order("page_number");
     if(pages?.length){
-      document.querySelector("#readerStage").innerHTML=pages.map(pg=>'<figure class="reader-real-page" data-reader-page="'+pg.page_number+'"><img src="'+pg.image_url+'" alt="Página '+pg.page_number+' do capítulo '+chapterNumber+'" loading="'+(pg.page_number<=2?"eager":"lazy")+'" decoding="async"></figure>').join("");
+      hasPages=true;
+      stage.innerHTML=pages.map(pg=>'<figure class="reader-real-page" data-reader-page="'+pg.page_number+'"><img src="'+pg.image_url+'" alt="Página '+pg.page_number+' do capítulo '+chapterNumber+'" loading="'+(pg.page_number<=2?"eager":"lazy")+'" decoding="async"></figure>').join("");
+      if(progressText)progressText.textContent="Página 1 de "+pages.length;
       requestAnimationFrame(()=>window.dispatchEvent(new Event("scroll")));
     }
+  }
+
+  if(!hasPages){
+    const hasAnyChapter=Array.isArray(chapters)&&chapters.length>0;
+    const titleText=hasAnyChapter?"Páginas ainda não disponíveis":"Nenhum capítulo publicado";
+    const bodyText=hasAnyChapter
+      ?"Este capítulo existe, mas ainda não recebeu páginas para leitura."
+      :"Esta obra foi adicionada ao catálogo, mas ainda não possui capítulos publicados.";
+    stage.innerHTML='<section class="reader-empty-state"><span>LEITURA</span><strong>'+titleText+'</strong><p>'+bodyText+'</p><a href="manga.html?id='+mangaId+'">Voltar para a obra</a></section>';
+    if(progressText)progressText.textContent="Sem páginas";
+    if(progressPercent)progressPercent.textContent="—";
+    if(progressBar)progressBar.style.width="0%";
+    document.querySelector("#readerFinish")?.setAttribute("hidden","");
+    document.querySelector("#chapterCommunity")?.setAttribute("hidden","");
+    document.querySelector(".reader-bottom-bar")?.setAttribute("hidden","");
   }
   const grid=document.querySelector("#readerChapterGrid");
   if(chapters?.length){
