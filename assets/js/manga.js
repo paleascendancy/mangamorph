@@ -385,7 +385,7 @@ window.addEventListener("mangamorph:library-loaded",function(event){
 renderSortButton();
 renderChapters();
 
-const savedTheme = localStorage.getItem("mangamorph:theme");
+const savedTheme = localStorage.getItem("mangamorph:theme") || "light";
 if (savedTheme === "light") document.body.classList.add("light");
 document.querySelector("#themeToggle").addEventListener("click", function() {
   document.body.classList.toggle("light");
