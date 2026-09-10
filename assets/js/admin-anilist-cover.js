@@ -9,14 +9,16 @@ const supabase=createClient(
 const $=id=>document.querySelector("#"+id);
 const status=$("mangaCoverStatus");
 const coverInput=$("mangaCoverInput");
+const autoTried=new Set();
+let busy=false;
 
 if(status&&coverInput){
   const tools=document.createElement("div");
   tools.className="anilist-cover-tools";
   tools.innerHTML=`
-    <button id="importAniListCover" type="button">⬇ Importar capa do AniList</button>
-    <span id="anilistCoverMessage">Salva uma cópia permanente no Storage do MangaMorph.</span>
-    <img id="anilistCoverPreview" alt="Prévia da capa importada" hidden>
+    <button id="importAniListCover" type="button">✨ Buscar capa automaticamente</button>
+    <span id="anilistCoverMessage">Se a obra for salva sem capa, o MangaMorph procura sozinho por títulos equivalentes.</span>
+    <img id="anilistCoverPreview" alt="Prévia da capa encontrada" hidden>
   `;
   status.insertAdjacentElement("afterend",tools);
 
@@ -34,16 +36,19 @@ if(status&&coverInput){
   const message=$("anilistCoverMessage");
   const preview=$("anilistCoverPreview");
 
-  button.addEventListener("click",async()=>{
-    const mangaId=Number($("mangaIdInput")?.value);
+  async function resolveCover(mangaId,{automatic=false}={}){
+    if(busy)return null;
     if(!Number.isInteger(mangaId)||mangaId<1){
-      message.textContent="Salve a obra primeiro ou selecione uma obra existente.";
-      return;
+      if(!automatic)message.textContent="Salve a obra primeiro ou selecione uma obra existente.";
+      return null;
     }
 
+    busy=true;
     button.disabled=true;
-    button.textContent="Importando…";
-    message.textContent="Buscando a melhor capa no AniList…";
+    button.textContent=automatic?"Buscando capa…":"Buscando…";
+    message.textContent=automatic
+      ?"A obra ficou sem capa. Procurando pelo nome em português, títulos alternativos, AniList e MyAnimeList…"
+      :"Comparando títulos e procurando a melhor capa…";
 
     try{
       const {data:{session}}=await supabase.auth.getSession();
@@ -51,26 +56,48 @@ if(status&&coverInput){
       supabase.functions.setAuth(session.access_token);
       const {data,error}=await supabase.functions.invoke("mangamorph-import-anilist-cover",{body:{manga_id:mangaId}});
       if(error)throw error;
-      if(!data?.ok)throw new Error(data?.error||"Não foi possível importar a capa.");
+      if(!data?.ok)throw new Error(data?.error||"Não foi possível encontrar uma capa segura.");
 
       const url=String(data.cover_url||"");
-      $("mangaImportedCoverUrl").value=url;
-      status.textContent="Capa do AniList importada e armazenada no MangaMorph.";
-      message.textContent="Pronto: "+(data.anilist_title||"capa encontrada")+". A imagem agora fica salva no Storage.";
+      const imported=$("mangaImportedCoverUrl");
+      if(imported)imported.value=url;
+      status.textContent="Capa encontrada automaticamente e salva no MangaMorph.";
+      const source=data.provider==="jikan"?"MyAnimeList":"AniList";
+      const score=Number(data.match_score);
+      message.textContent=`Pronto: ${data.matched_title||"correspondência encontrada"} · ${source}${Number.isFinite(score)?` · ${Math.round(score*100)}%`:""}.`;
       if(url){preview.src=url;preview.hidden=false;}
       window.dispatchEvent(new CustomEvent("mangamorph:admin-cover-imported",{detail:data}));
+      return data;
     }catch(error){
-      let text=error?.message||"Falha ao importar a capa.";
+      let text=error?.message||"Falha ao buscar a capa.";
       try{
         if(error?.context&&typeof error.context.clone==="function"){
           const payload=await error.context.clone().json();
           if(payload?.error)text=payload.error;
         }
       }catch{}
-      message.textContent=String(text);
+      message.textContent=automatic
+        ?"Busca automática: "+String(text)
+        :String(text);
+      return null;
     }finally{
+      busy=false;
       button.disabled=false;
-      button.textContent="⬇ Importar capa do AniList";
+      button.textContent="✨ Buscar capa automaticamente";
     }
+  }
+
+  button.addEventListener("click",()=>{
+    const mangaId=Number($("mangaIdInput")?.value);
+    resolveCover(mangaId,{automatic:false});
+  });
+
+  window.addEventListener("mangamorph:admin-manga-saved",event=>{
+    const manga=event.detail||{};
+    const mangaId=Number(manga.id);
+    if(!Number.isInteger(mangaId)||mangaId<1||manga.cover_url||autoTried.has(mangaId))return;
+    if(coverInput.files?.length)return;
+    autoTried.add(mangaId);
+    resolveCover(mangaId,{automatic:true});
   });
 }
