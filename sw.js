@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.33";
+const CACHE = "mangamorph-v0.17.34";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -40,14 +40,15 @@ async function cleanDocument(request,response){
   const path=url.pathname;
   let html=await response.text();
 
-  const perf='<link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="assets/css/navigation-speed.css?v=001"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
+  const perf='<link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="assets/css/navigation-speed.css?v=002"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
   html=html.replace(/<\/head>/i,perf+'</head>');
 
   const home=path.endsWith("/")||path.endsWith("/index.html")||path.endsWith("/mangamorph/");
   const manga=path.endsWith("/manga.html");
 
   if(home){
-    const guard=`<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:38%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);box-shadow:0 0 14px rgba(95,131,179,.28);animation:mmPreliveBar .85s ease-in-out infinite alternate}@keyframes mmPreliveBar{to{width:78%}}</style>`;
+    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/card-compact-fix.css?v=002"><link rel="stylesheet" href="assets/css/dark-theme-final.css?v=002">`;
+    const guard=`${themeBoot}<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:38%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);box-shadow:0 0 14px rgba(95,131,179,.28);animation:mmPreliveBar .85s ease-in-out infinite alternate}@keyframes mmPreliveBar{to{width:78%}}html.mm-theme-dark body.mm-home{background:#202329!important;color:#f4f6f9!important}html.mm-theme-dark body.mm-home .topbar{background:rgba(31,34,39,.94)!important;border-color:rgba(255,255,255,.07)!important}html.mm-theme-dark body.mm-home .menu-tab,html.mm-theme-dark body.mm-home .icon-button{background:#2b3037!important;color:#f4f6f9!important;border-color:rgba(255,255,255,.10)!important}</style>`;
     html=html.replace(/<head>/i,"<head>"+guard);
   }
 
@@ -65,9 +66,17 @@ function stripDemoCatalog(source){
   return source;
 }
 
+function patchAppTheme(source){
+  return source.replace(
+    'function applyTheme(theme) {',
+    'function applyTheme(theme) {\n  document.documentElement.classList.remove("mm-theme-dark","mm-theme-light");\n  document.documentElement.classList.add(theme === "light" ? "mm-theme-light" : "mm-theme-dark");'
+  );
+}
+
 async function fetchFresh(request) {
   const destination=request.destination;
-  const options=destination==="document"?{cache:"no-cache"}:undefined;
+  const mustRevalidate=destination==="document"||destination==="script"||destination==="style";
+  const options=mustRevalidate?{cache:"no-cache"}:undefined;
   let response=await fetch(request,options);
 
   if(response.ok && destination==="document"){
@@ -78,7 +87,8 @@ async function fetchFresh(request) {
     const pathname=new URL(request.url).pathname;
 
     if(pathname.endsWith("/assets/js/app.js")){
-      const source=stripDemoCatalog(await response.text());
+      let source=stripDemoCatalog(await response.text());
+      source=patchAppTheme(source);
       return textResponse(source,response,"text/javascript; charset=utf-8");
     }
 
