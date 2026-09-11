@@ -1,5 +1,13 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+if(!document.querySelector('link[data-mm-gray-theme]')){
+  const theme=document.createElement('link');
+  theme.rel='stylesheet';
+  theme.href='assets/css/system-gray.css?v=001';
+  theme.dataset.mmGrayTheme='1';
+  document.head.append(theme);
+}
+
 const supabase=createClient(
   "https://fnyellunugdfesprmvzm.supabase.co",
   "sb_publishable_clf6HlhhxdftO1_XZU7YsA_pRmkCEJK",
