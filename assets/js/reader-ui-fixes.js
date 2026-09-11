@@ -46,8 +46,36 @@ document.addEventListener("click",event=>{
   location.href="./";
 },true);
 
-// The old cinematic hero was intentionally removed. The live context card from reader-runtime is the only top panel now.
-document.querySelector(".reader-cinematic-hero")?.remove();
-document.querySelector('link[data-reader-hero-style]')?.remove();
-document.querySelector('script[data-reader-hero]')?.remove();
+function loadCinematicHero(){
+  if(document.querySelector('script[data-reader-hero]')){
+    requestAnimationFrame(installReaderControlFixes);
+    return;
+  }
+  const script=document.createElement("script");
+  script.src="assets/js/reader-hero.js?v=002";
+  script.defer=true;
+  script.dataset.readerHero="true";
+  script.onload=()=>requestAnimationFrame(installReaderControlFixes);
+  document.body.append(script);
+}
+
+if(!document.querySelector('link[data-reader-hero-style]')){
+  const link=document.createElement("link");
+  link.rel="stylesheet";
+  link.href="assets/css/reader-hero.css?v=002";
+  link.dataset.readerHeroStyle="true";
+  link.onload=()=>{
+    loadCinematicHero();
+    requestAnimationFrame(installReaderControlFixes);
+  };
+  link.onerror=()=>{
+    loadCinematicHero();
+    requestAnimationFrame(installReaderControlFixes);
+  };
+  document.head.append(link);
+}else{
+  loadCinematicHero();
+  requestAnimationFrame(installReaderControlFixes);
+}
+
 window.addEventListener("resize",()=>requestAnimationFrame(installReaderControlFixes),{passive:true});
