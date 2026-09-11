@@ -1,8 +1,10 @@
-const CACHE = "mangamorph-v0.17.31";
+const CACHE = "mangamorph-v0.17.32";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./assets/css/navigation-speed.css",
+  "./assets/js/navigation-speed.js"
 ];
 
 self.addEventListener("install", event => {
@@ -10,7 +12,7 @@ self.addEventListener("install", event => {
     const cache=await caches.open(CACHE);
     for(const asset of OFFLINE_ASSETS){
       try{
-        const response=await fetch(asset,{cache:"reload"});
+        const response=await fetch(asset,{cache:"no-cache"});
         if(response.ok)await cache.put(asset,response.clone());
       }catch{}
     }
@@ -38,16 +40,19 @@ async function cleanDocument(request,response){
   const path=url.pathname;
   let html=await response.text();
 
+  const perf='<link rel="stylesheet" href="assets/css/navigation-speed.css?v=001"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
+  html=html.replace(/<\/head>/i,perf+'</head>');
+
   const home=path.endsWith("/")||path.endsWith("/index.html")||path.endsWith("/mangamorph/");
   const manga=path.endsWith("/manga.html");
 
   if(home){
-    const guard=`<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:before{content:'MangaMorph';position:fixed;inset:0;z-index:2147483645;display:grid;place-items:center;background:#eef1f5;color:#171b22;font:800 18px/1 system-ui,sans-serif;letter-spacing:-.03em}html.mm-prelive body.mm-home:after{content:'';position:fixed;z-index:2147483646;left:50%;top:calc(50% + 34px);width:30px;height:30px;margin:-15px;border:3px solid rgba(20,27,37,.12);border-top-color:#587dad;border-radius:50%;animation:mmPreliveSpin .7s linear infinite}@keyframes mmPreliveSpin{to{transform:rotate(360deg)}}</style>`;
+    const guard=`<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:38%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);box-shadow:0 0 14px rgba(95,131,179,.28);animation:mmPreliveBar .85s ease-in-out infinite alternate}@keyframes mmPreliveBar{to{width:78%}}</style>`;
     html=html.replace(/<head>/i,"<head>"+guard);
   }
 
   if(manga){
-    const guard=`<script>document.documentElement.classList.add('mm-manga-prelive')</script><style id="mmMangaDocumentGuard">html.mm-manga-prelive #mangaPage,html.mm-manga-prelive .footer{visibility:hidden!important}html.mm-manga-prelive body:before{content:'MangaMorph';position:fixed;inset:0;z-index:2147483645;display:grid;place-items:center;background:#eef1f5;color:#171b22;font:800 18px/1 system-ui,sans-serif}</style>`;
+    const guard=`<script>document.documentElement.classList.add('mm-manga-prelive')</script><style id="mmMangaDocumentGuard">html.mm-manga-prelive #mangaPage,html.mm-manga-prelive .footer{visibility:hidden!important}html.mm-manga-prelive body:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:45%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);animation:mmMangaBar .8s ease-in-out infinite alternate}@keyframes mmMangaBar{to{width:82%}}</style>`;
     html=html.replace(/<head>/i,"<head>"+guard);
   }
 
@@ -62,8 +67,8 @@ function stripDemoCatalog(source){
 
 async function fetchFresh(request) {
   const destination=request.destination;
-  const forceFresh=destination==="document"||destination==="script"||destination==="style";
-  let response=await fetch(request,forceFresh?{cache:"reload"}:undefined);
+  const options=destination==="document"?{cache:"no-cache"}:undefined;
+  let response=await fetch(request,options);
 
   if(response.ok && destination==="document"){
     response=await cleanDocument(request,response);
@@ -99,7 +104,7 @@ self.addEventListener("fetch", event => {
   const destination=event.request.destination;
   event.respondWith(
     fetchFresh(event.request).then(response=>{
-      if(response.ok && destination==="image"){
+      if(response.ok && (destination==="image" || new URL(event.request.url).pathname.includes('/assets/js/navigation-speed.js') || new URL(event.request.url).pathname.includes('/assets/css/navigation-speed.css'))){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
