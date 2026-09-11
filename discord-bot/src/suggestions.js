@@ -110,7 +110,7 @@ function buildSuggestionPanel(guild, client) {
     })
     .setTitle('💡 Central de Sugestões')
     .setDescription(
-      'O que você gostaria que o **MangaMorph** adicionasse, melhorasse ou ajustasse?\n\n' +
+      'O que você gostaria que o **MangaMorph** melhorasse ou ajustasse?\n\n' +
       'Sua opinião ajuda a evoluir a plataforma e a comunidade. Clique no botão abaixo e envie sua ideia de forma clara.'
     );
 
@@ -118,12 +118,12 @@ function buildSuggestionPanel(guild, client) {
     .setColor(0x2f3545)
     .setTitle('01  ·  O QUE VOCÊ PODE SUGERIR')
     .setDescription(
-      '📚 **Obras & catálogo** — títulos, capas, descrições e organização\n' +
-      '📖 **Leitor & capítulos** — navegação e experiência de leitura\n' +
+      '📖 **Leitor & experiência** — navegação, visualização e experiência de leitura\n' +
       '🌐 **Site & funções** — busca, filtros, favoritos, ranks e recursos\n' +
       '💬 **Servidor & comunidade** — canais, organização e eventos\n' +
       '🤖 **Bot & automações** — cargos, avisos, tickets e sistemas\n' +
-      '🎨 **Design & identidade** — visual, painéis, artes e interface'
+      '🎨 **Design & identidade** — visual, painéis, artes e interface\n' +
+      '⚙️ **Qualidade & usabilidade** — desempenho, organização e melhorias gerais'
     );
 
   const howItWorks = new EmbedBuilder()
@@ -154,7 +154,7 @@ function buildSuggestionModal() {
   const title = new TextInputBuilder()
     .setCustomId('suggestion_title')
     .setLabel('Título da sugestão')
-    .setPlaceholder('Ex.: Filtro por status no catálogo')
+    .setPlaceholder('Ex.: Melhorar filtros da biblioteca')
     .setStyle(TextInputStyle.Short)
     .setMaxLength(100)
     .setRequired(true);
@@ -162,7 +162,7 @@ function buildSuggestionModal() {
   const category = new TextInputBuilder()
     .setCustomId('suggestion_category')
     .setLabel('Área da sugestão')
-    .setPlaceholder('Ex.: site, leitor, obras, Discord, bot, design')
+    .setPlaceholder('Ex.: site, leitor, Discord, bot, design, usabilidade')
     .setStyle(TextInputStyle.Short)
     .setMaxLength(80)
     .setRequired(true);
@@ -170,7 +170,7 @@ function buildSuggestionModal() {
   const idea = new TextInputBuilder()
     .setCustomId('suggestion_idea')
     .setLabel('Explique sua ideia')
-    .setPlaceholder('O que deveria ser adicionado ou melhorado?')
+    .setPlaceholder('O que deveria ser melhorado ou ajustado?')
     .setStyle(TextInputStyle.Paragraph)
     .setMaxLength(1000)
     .setRequired(true);
