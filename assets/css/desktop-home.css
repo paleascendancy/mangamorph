@@ -1,0 +1,46 @@
+/* MangaMorph desktop layout — keep desktop proportional to the mobile design. */
+@media (min-width:981px){
+  html,body.mm-home{min-width:0!important;overflow-x:hidden!important}
+  body.mm-home main{width:min(1440px,100%)!important;margin:0 auto!important}
+  body.mm-home .topbar{width:100%!important;min-height:76px!important;padding:12px clamp(24px,4vw,64px)!important;gap:20px!important}
+  body.mm-home .header-brand{display:flex!important;align-items:center!important;gap:12px!important;min-width:230px!important}
+  body.mm-home .menu-tab{width:46px!important;height:46px!important;min-width:46px!important;border-radius:15px!important}
+  body.mm-home .brand-name{font-size:1.35rem!important;white-space:nowrap!important}
+  body.mm-home .desktop-nav{display:flex!important;align-items:center!important;justify-content:center!important;gap:clamp(18px,2.2vw,34px)!important;flex:1 1 auto!important;font-size:.82rem!important}
+  body.mm-home .topbar-actions{display:flex!important;align-items:center!important;gap:8px!important}
+  body.mm-home .topbar-actions .icon-button{width:44px!important;height:44px!important;min-width:44px!important;border-radius:14px!important}
+
+  body.mm-home .hero-feature{display:grid!important;grid-template-columns:minmax(260px,380px) minmax(0,650px)!important;justify-content:center!important;align-items:center!important;gap:clamp(42px,6vw,92px)!important;min-height:560px!important;padding:54px clamp(34px,6vw,88px)!important;text-align:left!important}
+  body.mm-home .featured-cover-wrap{display:flex!important;justify-content:center!important;width:auto!important;margin:0!important}
+  body.mm-home .featured-cover,body.mm-home .featured-cover[style*="background-image"]{width:clamp(250px,22vw,330px)!important;height:auto!important;aspect-ratio:2/3!important;border-radius:22px!important;box-shadow:0 28px 70px rgba(0,0,0,.24)!important}
+  body.mm-home .featured-content{display:flex!important;flex-direction:column!important;align-items:flex-start!important;max-width:650px!important;margin:0!important;text-align:left!important}
+  body.mm-home .featured-content h1{font-size:clamp(2.5rem,4.2vw,4.5rem)!important;line-height:.96!important;max-width:12ch!important}
+  body.mm-home .featured-meta,body.mm-home .featured-actions{justify-content:flex-start!important}
+  body.mm-home .featured-description{max-width:600px!important;font-size:1rem!important;line-height:1.62!important}
+  body.mm-home .featured-actions{display:grid!important;grid-template-columns:minmax(190px,1fr) minmax(190px,1fr)!important;width:min(500px,100%)!important;gap:12px!important}
+  body.mm-home .featured-actions .button{min-height:54px!important;border-radius:16px!important;font-size:.92rem!important}
+
+  body.mm-home .catalog-section,body.mm-home .releases-section{padding-left:clamp(34px,5vw,72px)!important;padding-right:clamp(34px,5vw,72px)!important}
+  body.mm-home .catalog-section{padding-top:52px!important;padding-bottom:52px!important}
+  body.mm-home .section-heading{align-items:center!important;margin-bottom:22px!important}
+  body.mm-home .section-heading h2{font-size:clamp(2rem,3vw,3rem)!important;line-height:1!important}
+  body.mm-home .section-description{font-size:.92rem!important;max-width:620px!important}
+  body.mm-home .rank-arrow-button{width:48px!important;height:48px!important;border-radius:16px!important;font-size:1.05rem!important}
+  body.mm-home .horizontal-rail{grid-auto-columns:clamp(176px,14vw,220px)!important;gap:16px!important;padding:4px 2px 12px!important}
+  body.mm-home .premium-manga-card,body.mm-home .manga-card{border-radius:18px!important;clip-path:inset(0 round 18px)!important}
+  body.mm-home .premium-manga-card .manga-cover,body.mm-home .manga-card .manga-cover{border-radius:17px 17px 0 0!important}
+  body.mm-home .manga-cover-title{font-size:14px!important}
+  body.mm-home .manga-info{height:42px!important;min-height:42px!important;padding:6px 8px!important}
+  body.mm-home .mm-card-favorite{width:30px!important;height:30px!important;min-width:30px!important}
+  body.mm-home .mm-card-chapter{height:30px!important;font-size:11px!important}
+
+  body.mm-home .releases-section{padding-top:62px!important;padding-bottom:70px!important}
+  body.mm-home .release-list{gap:10px!important}
+  body.mm-home .release-row{min-height:72px!important;padding:10px 14px!important}
+}
+
+@media (min-width:981px) and (max-width:1180px){
+  body.mm-home .desktop-nav{display:none!important}
+  body.mm-home .hero-feature{grid-template-columns:minmax(230px,310px) minmax(0,560px)!important;gap:42px!important}
+  body.mm-home .featured-cover,body.mm-home .featured-cover[style*="background-image"]{width:260px!important}
+}
