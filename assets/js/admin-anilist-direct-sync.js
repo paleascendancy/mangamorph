@@ -37,7 +37,7 @@ function countryInfo(code,format){
   return ({
     JP:{type:"Mangá",country:"Japão",language:"Japonês"},
     KR:{type:"Manhwa",country:"Coreia do Sul",language:"Coreano"},
-    CN:{type:"Manhua",country:"China",language:"Chinês"},
+    CN:{type:"Manhua",country:"China",language:"Chinês",},
     TW:{type:"Manhua",country:"Taiwan",language:"Chinês"}
   })[code]||{type:"Mangá",country:code||"",language:""};
 }
@@ -199,3 +199,5 @@ document.addEventListener("click",event=>{
   event.stopImmediatePropagation();
   syncExistingManga();
 },true);
+
+import("./admin-translate-ptbr.js?v=001").catch(error=>console.error("MangaMorph PT-BR translation:",error));
