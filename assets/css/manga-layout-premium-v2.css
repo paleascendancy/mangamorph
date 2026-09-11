@@ -89,8 +89,11 @@ body.light .mm-facts-card .detail-facts-grid dd{color:#263141!important}
   .mm-synopsis-card .detail-description{font-size:.69rem!important;line-height:1.52!important}
   .mm-synopsis-card .description-toggle{font-size:.56rem!important}
 
-  .mm-actions-bar{grid-template-columns:minmax(0,1fr) 2.55rem 2.55rem 2.55rem!important;gap:.36rem!important;padding:.42rem!important;border-radius:.78rem!important}
-  .mm-actions-bar .detail-main-action{min-height:2.55rem!important;padding:.45rem .58rem!important;border-radius:.62rem!important}
+  .mm-actions-bar{grid-template-columns:2.55rem 2.55rem minmax(0,1fr) 2.55rem!important;gap:.36rem!important;padding:.42rem!important;border-radius:.78rem!important}
+  .mm-actions-bar .detail-main-action{grid-column:1/-1!important;grid-row:1!important;min-height:2.55rem!important;padding:.45rem .58rem!important;border-radius:.62rem!important}
+  .mm-actions-bar #favoriteDetail{grid-column:1!important;grid-row:2!important}
+  .mm-actions-bar #markDetail{grid-column:2!important;grid-row:2!important}
+  .mm-actions-bar #shareDetail{grid-column:4!important;grid-row:2!important}
   .mm-actions-bar .detail-main-action>span:first-child{font-size:.75rem!important}
   .mm-actions-bar .detail-main-action small{font-size:.38rem!important}
   .mm-actions-bar .detail-main-action strong{font-size:.65rem!important}
@@ -116,6 +119,10 @@ body.light .mm-facts-card .detail-facts-grid dd{color:#263141!important}
   .mm-work-identity #mangaTitle{font-size:1.38rem!important}
   .mm-work-identity .hero-badges{grid-template-columns:max-content!important}
   .mm-stats-grid>span{padding:.5rem .46rem!important;font-size:.64rem!important}
-  .mm-actions-bar{grid-template-columns:minmax(0,1fr) 2.4rem 2.4rem 2.4rem!important}
+  .mm-actions-bar{grid-template-columns:2.4rem 2.4rem minmax(0,1fr) 2.4rem!important}
+  .mm-actions-bar .detail-main-action{grid-column:1/-1!important}
+  .mm-actions-bar #favoriteDetail{grid-column:1!important}
+  .mm-actions-bar #markDetail{grid-column:2!important}
+  .mm-actions-bar #shareDetail{grid-column:4!important}
   .mm-actions-bar #favoriteDetail,.mm-actions-bar #markDetail,.mm-actions-bar #shareDetail{width:2.4rem!important;min-width:2.4rem!important;height:2.4rem!important;min-height:2.4rem!important}
 }
