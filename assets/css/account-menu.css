@@ -1,76 +1,16 @@
-/* MangaMorph account drawer — matches the site's own side-menu language, not MangaStop */
+/* MangaMorph account drawer */
 body.mm-home .account-panel{z-index:190!important}
 body.mm-home .account-backdrop{background:rgba(21,28,38,.38)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}
-body.mm-home .account-hub{
-  position:absolute!important;inset:0 0 0 auto!important;
-  width:min(430px,92vw)!important;height:100dvh!important;max-height:none!important;
-  overflow-y:auto!important;padding:0 0 1rem!important;border:0!important;border-left:1px solid rgba(25,38,58,.08)!important;
-  border-radius:0!important;background:linear-gradient(180deg,#fbfcfe 0%,#f3f6fa 100%)!important;color:#131a24!important;
-  box-shadow:-20px 0 55px rgba(28,40,58,.16)!important;
-}
-body.mm-home .account-hub-header{
-  position:sticky!important;top:0!important;z-index:3!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
-  min-height:78px!important;padding:16px 18px!important;margin:0!important;border-bottom:1px solid rgba(28,42,62,.07)!important;
-  background:rgba(248,250,253,.92)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
-}
-body.mm-home .account-hub-kicker{margin:0!important;color:#7d8aa0!important;font-size:.58rem!important;font-weight:850!important;letter-spacing:.16em!important}
-body.mm-home .account-hub-header h2{margin:.08rem 0 0!important;font-size:1.28rem!important;letter-spacing:-.035em!important}
-body.mm-home .account-hub-subtitle{display:none!important}
-body.mm-home .account-hub-close{width:44px!important;height:44px!important;border:1px solid rgba(29,44,65,.08)!important;border-radius:14px!important;background:#fff!important;color:#1a2431!important;box-shadow:0 8px 22px rgba(35,49,69,.08)!important}
-
-body.mm-home .account-identity-card{
-  display:grid!important;grid-template-columns:68px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;
-  margin:16px!important;padding:16px!important;border:1px solid rgba(30,45,65,.08)!important;border-radius:20px!important;
-  background:linear-gradient(145deg,#fff,#f7f9fc)!important;box-shadow:0 12px 28px rgba(36,49,67,.07)!important;text-align:left!important;
-}
-body.mm-home .account-identity-avatar{width:68px!important;height:68px!important;min-width:68px!important;margin:0!important;border:3px solid #fff!important;border-radius:20px!important;overflow:hidden!important;background:#e9eef6!important;box-shadow:0 7px 18px rgba(30,45,65,.12)!important}
-body.mm-home .account-profile-image{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:17px!important}
-body.mm-home .account-identity-copy{display:block!important;min-width:0!important;text-align:left!important}
-body.mm-home .account-name-row{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:8px!important}
-body.mm-home #accountProfileName{color:#131a24!important;font-size:1rem!important;font-weight:850!important}
-body.mm-home .account-profile-handle{display:block!important;margin-top:2px!important;color:#6e84a2!important;font-size:.72rem!important;font-weight:700!important}
-body.mm-home #accountProfileBio{display:block!important;margin:.25rem 0 0!important;color:#7a8798!important;font-size:.68rem!important;line-height:1.35!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-body.mm-home .account-offline-badge{padding:.2rem .42rem!important;border:1px solid rgba(42,105,176,.10)!important;border-radius:999px!important;background:#edf4fb!important;color:#60738d!important;font-size:.52rem!important}
-body.mm-home .account-profile-stats{display:none!important}
-
-body.mm-home .account-auth-actions{margin:0 16px 12px!important}
-body.mm-home .account-profile-actions,
-body.mm-home .account-library-block{display:block!important;margin:0 16px!important;padding:0!important;border:1px solid rgba(31,45,64,.08)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 24px rgba(40,52,69,.05)!important;overflow:hidden!important}
-body.mm-home .account-library-block{margin-top:12px!important}
-body.mm-home .account-library-title{padding:12px 14px 8px!important;margin:0!important;color:#8b97a7!important;font-size:.55rem!important;font-weight:900!important;letter-spacing:.16em!important}
-body.mm-home .account-profile-action,
-body.mm-home .account-library-card>button{
-  display:grid!important;grid-template-columns:38px minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;
-  width:100%!important;min-height:58px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid rgba(31,45,64,.065)!important;
-  border-radius:0!important;background:#fff!important;color:#17202c!important;box-shadow:none!important;text-align:left!important;
-}
-body.mm-home .account-profile-action:last-child,
-body.mm-home .account-library-card>button:last-child{border-bottom:0!important}
-body.mm-home .account-profile-action:hover,
-body.mm-home .account-library-card>button:hover{background:#f6f9fc!important}
-body.mm-home .account-profile-action>span:first-child,
-body.mm-home .account-library-card>button>span:first-child{
-  display:grid!important;place-items:center!important;width:38px!important;height:38px!important;border-radius:12px!important;
-  background:#edf3f9!important;color:#5f7da5!important;font-size:1.05rem!important;
-}
-body.mm-home .account-profile-action strong,
-body.mm-home .account-library-card strong{display:block!important;color:#17202c!important;font-size:.82rem!important;font-weight:800!important}
-body.mm-home .account-profile-action small,
-body.mm-home .account-library-card small{display:block!important;margin-top:2px!important;color:#8390a0!important;font-size:.62rem!important;line-height:1.25!important}
-body.mm-home .account-profile-action::after{content:'›'!important;color:#8b96a5!important;font-size:1.3rem!important}
-body.mm-home .account-library-card b{display:none!important}
-body.mm-home .account-library-card i{display:block!important;color:#8b96a5!important;font-size:1.3rem!important;font-style:normal!important}
-body.mm-home #accountAvatarButton{display:none!important}
-body.mm-home .account-logout-button{display:block!important;width:calc(100% - 32px)!important;margin:12px 16px 0!important;min-height:52px!important;border:1px solid rgba(213,77,93,.14)!important;border-radius:16px!important;background:#fff7f8!important;color:#c84f60!important;font-weight:800!important}
-body.mm-home .account-hub-footer{margin:16px!important;padding:14px 2px 4px!important;border-top:1px solid rgba(31,45,64,.07)!important;color:#8b96a5!important;text-align:center!important;font-size:.64rem!important}
-body.mm-home .account-hub-footer a{color:#647a98!important;font-weight:700!important}
-
-@media(max-width:620px){
-  body.mm-home .account-hub{width:min(390px,94vw)!important}
-  body.mm-home .account-hub-header{min-height:70px!important;padding:13px 14px!important}
-  body.mm-home .account-identity-card{margin:12px!important;padding:14px!important;grid-template-columns:60px minmax(0,1fr)!important;border-radius:18px!important}
-  body.mm-home .account-identity-avatar{width:60px!important;height:60px!important;min-width:60px!important;border-radius:17px!important}
-  body.mm-home .account-profile-image{border-radius:14px!important}
-  body.mm-home .account-profile-actions,body.mm-home .account-library-block{margin-left:12px!important;margin-right:12px!important}
-  body.mm-home .account-logout-button{width:calc(100% - 24px)!important;margin-left:12px!important;margin-right:12px!important}
-}
+body.mm-home .account-hub{position:absolute!important;inset:0 0 0 auto!important;width:min(430px,92vw)!important;height:100dvh!important;max-height:none!important;overflow-y:auto!important;padding:0 0 1rem!important;border:0!important;border-left:1px solid rgba(25,38,58,.08)!important;border-radius:0!important;background:linear-gradient(180deg,#fbfcfe 0%,#f3f6fa 100%)!important;color:#131a24!important;box-shadow:-20px 0 55px rgba(28,40,58,.16)!important}
+body.mm-home .account-hub-header{position:sticky!important;top:0!important;z-index:3!important;display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:78px!important;padding:16px 18px!important;margin:0!important;border-bottom:1px solid rgba(28,42,62,.07)!important;background:rgba(248,250,253,.92)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important}
+body.mm-home .account-hub-kicker{margin:0!important;color:#7d8aa0!important;font-size:.58rem!important;font-weight:850!important;letter-spacing:.16em!important}body.mm-home .account-hub-header h2{margin:.08rem 0 0!important;font-size:1.28rem!important;letter-spacing:-.035em!important}body.mm-home .account-hub-subtitle{display:none!important}body.mm-home .account-hub-close{width:44px!important;height:44px!important;border:1px solid rgba(29,44,65,.08)!important;border-radius:14px!important;background:#fff!important;color:#1a2431!important;box-shadow:0 8px 22px rgba(35,49,69,.08)!important}
+body.mm-home .account-identity-card{display:grid!important;grid-template-columns:68px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;margin:16px!important;padding:16px!important;border:1px solid rgba(30,45,65,.08)!important;border-radius:20px!important;background:linear-gradient(145deg,#fff,#f7f9fc)!important;box-shadow:0 12px 28px rgba(36,49,67,.07)!important;text-align:left!important}body.mm-home .account-identity-avatar{width:68px!important;height:68px!important;min-width:68px!important;margin:0!important;border:3px solid #fff!important;border-radius:20px!important;overflow:hidden!important;background:#e9eef6!important}body.mm-home .account-profile-image{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:17px!important}body.mm-home .account-identity-copy{display:block!important;min-width:0!important;text-align:left!important}body.mm-home .account-name-row{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:8px!important}body.mm-home #accountProfileName{color:#131a24!important;font-size:1rem!important;font-weight:850!important}body.mm-home .account-profile-handle{display:block!important;margin-top:2px!important;color:#6e84a2!important;font-size:.72rem!important;font-weight:700!important}body.mm-home #accountProfileBio{display:block!important;margin:.25rem 0 0!important;color:#7a8798!important;font-size:.68rem!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}body.mm-home .account-profile-stats{display:none!important}
+body.mm-home .account-auth-actions{margin:0 16px 12px!important}body.mm-home .account-profile-actions,body.mm-home .account-library-block{display:block!important;margin:0 16px!important;padding:0!important;border:1px solid rgba(31,45,64,.08)!important;border-radius:18px!important;background:#fff!important;overflow:hidden!important}body.mm-home .account-library-block{margin-top:12px!important}body.mm-home .account-library-title{padding:12px 14px 8px!important;margin:0!important;color:#8b97a7!important;font-size:.55rem!important;font-weight:900!important;letter-spacing:.16em!important}
+body.mm-home .account-profile-action,body.mm-home .account-library-card>button{display:grid!important;grid-template-columns:38px minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;width:100%!important;min-height:58px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid rgba(31,45,64,.065)!important;border-radius:0!important;background:#fff!important;color:#17202c!important;box-shadow:none!important;text-align:left!important}body.mm-home .account-profile-action:last-child,body.mm-home .account-library-card>button:last-child{border-bottom:0!important}body.mm-home .account-profile-action>span:first-child,body.mm-home .account-library-card>button>span:first-child{display:grid!important;place-items:center!important;width:38px!important;height:38px!important;border-radius:12px!important;background:#edf3f9!important;color:#5f7da5!important;font-size:1.05rem!important}body.mm-home .account-profile-action strong,body.mm-home .account-library-card strong{display:block!important;color:#17202c!important;font-size:.82rem!important;font-weight:800!important}body.mm-home .account-profile-action small,body.mm-home .account-library-card small{display:block!important;margin-top:2px!important;color:#8390a0!important;font-size:.62rem!important}body.mm-home .account-profile-action::after{content:'›'!important;color:#8b96a5!important;font-size:1.3rem!important}body.mm-home .account-library-card b{display:none!important}body.mm-home .account-library-card i{display:block!important;color:#8b96a5!important;font-size:1.3rem!important;font-style:normal!important}body.mm-home #accountAvatarButton{display:none!important}body.mm-home .account-logout-button{display:block!important;width:calc(100% - 32px)!important;margin:12px 16px 0!important;min-height:52px!important;border-radius:16px!important;font-weight:800!important}
+/* Dark theme: every account surface follows the site palette */
+body.mm-home.mm-theme-gray .account-hub,body.mm-home:not(.light) .account-hub,body.mm-home.dark .account-hub{background:linear-gradient(180deg,#1b1e23,#15181d)!important;color:#f4f6f9!important;border-left-color:rgba(255,255,255,.08)!important;box-shadow:-20px 0 55px rgba(0,0,0,.42)!important}
+body.mm-home.mm-theme-gray .account-hub-header,body.mm-home:not(.light) .account-hub-header,body.mm-home.dark .account-hub-header{background:rgba(25,28,33,.94)!important;border-bottom-color:rgba(255,255,255,.07)!important}body.mm-home.mm-theme-gray .account-hub-header h2,body.mm-home:not(.light) .account-hub-header h2,body.mm-home.dark .account-hub-header h2{color:#f5f7fa!important}body.mm-home.mm-theme-gray .account-hub-kicker,body.mm-home:not(.light) .account-hub-kicker{color:#9da8b8!important}
+body.mm-home.mm-theme-gray .account-hub-close,body.mm-home:not(.light) .account-hub-close{background:#292e35!important;color:#f5f7fa!important;border-color:rgba(255,255,255,.11)!important}
+body.mm-home.mm-theme-gray .account-identity-card,body.mm-home:not(.light) .account-identity-card{background:linear-gradient(145deg,#292d34,#20242a)!important;border-color:rgba(255,255,255,.10)!important;box-shadow:0 12px 28px rgba(0,0,0,.22)!important}body.mm-home.mm-theme-gray #accountProfileName,body.mm-home:not(.light) #accountProfileName{color:#f5f7fa!important}body.mm-home.mm-theme-gray .account-profile-handle,body.mm-home:not(.light) .account-profile-handle{color:#aeb9c8!important}body.mm-home.mm-theme-gray #accountProfileBio,body.mm-home:not(.light) #accountProfileBio{color:#929dac!important}
+body.mm-home.mm-theme-gray .account-profile-actions,body.mm-home.mm-theme-gray .account-library-block,body.mm-home:not(.light) .account-profile-actions,body.mm-home:not(.light) .account-library-block{background:#22262c!important;border-color:rgba(255,255,255,.09)!important}body.mm-home.mm-theme-gray .account-profile-action,body.mm-home.mm-theme-gray .account-library-card>button,body.mm-home:not(.light) .account-profile-action,body.mm-home:not(.light) .account-library-card>button{background:#252a31!important;color:#f4f6f9!important;border-bottom-color:rgba(255,255,255,.07)!important}body.mm-home.mm-theme-gray .account-profile-action strong,body.mm-home.mm-theme-gray .account-library-card strong,body.mm-home:not(.light) .account-profile-action strong,body.mm-home:not(.light) .account-library-card strong{color:#f4f6f9!important}body.mm-home.mm-theme-gray .account-profile-action small,body.mm-home.mm-theme-gray .account-library-card small,body.mm-home:not(.light) .account-profile-action small,body.mm-home:not(.light) .account-library-card small{color:#9ba5b3!important}body.mm-home.mm-theme-gray .account-profile-action>span:first-child,body.mm-home.mm-theme-gray .account-library-card>button>span:first-child,body.mm-home:not(.light) .account-profile-action>span:first-child,body.mm-home:not(.light) .account-library-card>button>span:first-child{background:#30363f!important;color:#b8c7dc!important}body.mm-home.mm-theme-gray .account-library-title,body.mm-home:not(.light) .account-library-title{color:#a6afbc!important;background:#22262c!important}body.mm-home.mm-theme-gray .account-logout-button,body.mm-home:not(.light) .account-logout-button{background:#292e35!important;color:#f0b3bc!important;border:1px solid rgba(218,107,121,.20)!important}
+@media(max-width:620px){body.mm-home .account-hub{width:min(390px,94vw)!important}body.mm-home .account-hub-header{min-height:70px!important;padding:13px 14px!important}body.mm-home .account-identity-card{margin:12px!important;padding:14px!important;grid-template-columns:60px minmax(0,1fr)!important}body.mm-home .account-identity-avatar{width:60px!important;height:60px!important;min-width:60px!important}body.mm-home .account-profile-actions,body.mm-home .account-library-block{margin-left:12px!important;margin-right:12px!important}body.mm-home .account-logout-button{width:calc(100% - 24px)!important;margin-left:12px!important;margin-right:12px!important}}
