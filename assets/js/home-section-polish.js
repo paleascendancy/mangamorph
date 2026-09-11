@@ -50,6 +50,49 @@ body.mm-home .premium-manga-card .manga-cover{background-size:cover!important;ba
 body.mm-home .premium-manga-card .manga-cover-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;object-fit:cover!important;object-position:center center!important;background:transparent!important;transform:none!important}
 body.mm-home .premium-manga-card:hover .manga-cover-image{transform:none!important}
 
+/* Profile drawer — compact account menu inspired by the reference */
+body.mm-home .account-panel{z-index:180!important}
+body.mm-home .account-backdrop{background:rgba(7,10,16,.72)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
+body.mm-home .account-hub{position:absolute!important;top:0!important;right:0!important;bottom:0!important;left:auto!important;width:min(480px,91vw)!important;height:100svh!important;max-height:none!important;overflow-y:auto!important;padding:1.2rem 0 1.3rem!important;border:0!important;border-left:1px solid rgba(136,153,211,.34)!important;border-radius:0!important;background:#4a4e63!important;color:#fff!important;box-shadow:-22px 0 70px rgba(0,0,0,.28)!important}
+body.mm-home .account-hub-header{position:relative!important;min-height:2.7rem!important;margin:0!important;padding:0 1rem!important;border:0!important;background:transparent!important}
+body.mm-home .account-hub-header>div{display:none!important}
+body.mm-home .account-hub-close{position:absolute!important;top:0!important;right:1rem!important;width:2.55rem!important;height:2.55rem!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:.8rem!important;background:rgba(255,255,255,.08)!important;color:#fff!important;box-shadow:none!important;font-size:1.15rem!important}
+body.mm-home .account-identity-card{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:.5rem!important;margin:.1rem 0 1.1rem!important;padding:0 1rem 1.05rem!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;text-align:center!important}
+body.mm-home .account-identity-avatar{position:relative!important;width:5.4rem!important;height:5.4rem!important;min-width:5.4rem!important;margin:0 auto .28rem!important;border:4px solid #7c8ee8!important;border-radius:50%!important;background:#34384a!important;box-shadow:0 0 0 3px rgba(255,255,255,.10),0 10px 25px rgba(0,0,0,.24)!important;overflow:visible!important}
+body.mm-home .account-profile-image{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;object-position:center!important}
+body.mm-home .account-identity-copy{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important}
+body.mm-home .account-name-row{display:flex!important;align-items:center!important;justify-content:center!important;gap:.45rem!important}
+body.mm-home #accountProfileName{color:#fff!important;font-size:1.1rem!important;font-weight:850!important;line-height:1.1!important}
+body.mm-home .account-profile-handle{display:block!important;margin-top:.2rem!important;color:#c7ccda!important;font-size:.76rem!important;font-weight:500!important}
+body.mm-home #accountProfileBio{display:none!important}
+body.mm-home .account-offline-badge{padding:.2rem .42rem!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:.45rem!important;background:rgba(255,255,255,.07)!important;color:#d9deec!important;font-size:.52rem!important}
+body.mm-home .account-offline-badge>span{width:.38rem!important;height:.38rem!important}
+body.mm-home .account-profile-stats{display:none!important}
+body.mm-home .account-auth-actions,body.mm-home .account-auth-message{margin-inline:1rem!important}
+body.mm-home .account-logout-button{display:none!important}
+body.mm-home .account-profile-actions,body.mm-home .account-library-block{display:block!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+body.mm-home .account-library-title{display:none!important}
+body.mm-home .account-profile-action,body.mm-home .account-library-card button{display:grid!important;grid-template-columns:2.4rem minmax(0,1fr) auto!important;align-items:center!important;gap:.45rem!important;width:100%!important;min-height:3.85rem!important;margin:0!important;padding:.55rem 1.25rem!important;border:0!important;border-radius:0!important;background:transparent!important;color:#fff!important;box-shadow:none!important;text-align:left!important}
+body.mm-home .account-profile-action:hover,body.mm-home .account-library-card button:hover{background:rgba(255,255,255,.055)!important}
+body.mm-home .account-profile-action>span:first-child,body.mm-home .account-library-card button>span:first-child{display:grid!important;place-items:center!important;width:2.1rem!important;height:2.1rem!important;border:0!important;border-radius:0!important;background:transparent!important;color:#fff!important;font-size:1.35rem!important}
+body.mm-home .account-profile-action>span:nth-child(2),body.mm-home .account-library-card button>span:nth-child(2){min-width:0!important}
+body.mm-home .account-profile-action strong,body.mm-home .account-library-card button strong{display:block!important;color:#fff!important;font-size:.93rem!important;font-weight:800!important}
+body.mm-home .account-profile-action small,body.mm-home .account-library-card button small{display:none!important}
+body.mm-home .account-profile-action::after,body.mm-home .account-library-card button i{content:'›'!important;display:block!important;grid-column:3!important;color:#c9cedb!important;font-style:normal!important;font-size:1.65rem!important;font-weight:400!important}
+body.mm-home .account-library-card{display:block!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+body.mm-home .account-library-card b{display:none!important}
+body.mm-home #accountPublicProfile,body.mm-home #accountAvatarButton{display:none!important}
+body.mm-home .account-profile-actions{padding-top:.4rem!important;border-top:1px solid rgba(146,162,221,.46)!important}
+body.mm-home .account-library-block{padding-bottom:.4rem!important;border-bottom:1px solid rgba(146,162,221,.46)!important}
+body.mm-home .account-hub-footer{margin-top:auto!important;padding:1.2rem 1rem .2rem!important;border:0!important;color:#c5cad8!important;text-align:center!important}
+body.mm-home .account-hub-footer span:first-child{display:none!important}
+body.mm-home .account-hub-footer span:last-child{display:block!important;margin:auto!important;font-size:.7rem!important}
+body.mm-home .account-hub-footer span:last-child::before{content:'MangaMorph ';font-weight:500}
+body.mm-home .account-hub.admin-active .account-profile-actions{border-bottom:0!important}
+body.mm-home .account-logout-inline{display:grid!important;grid-template-columns:2.4rem minmax(0,1fr) auto!important;align-items:center!important;gap:.45rem!important;width:100%!important;min-height:3.85rem!important;padding:.55rem 1.25rem!important;border:0!important;background:transparent!important;color:#ff7d87!important;text-align:left!important;font-size:.93rem!important;font-weight:800!important}
+body.mm-home .account-logout-inline:hover{background:rgba(255,255,255,.055)!important}
+body.mm-home .account-logout-inline .ico{display:grid!important;place-items:center!important;width:2.1rem!important;height:2.1rem!important;font-size:1.25rem!important}
+body.mm-home .account-logout-inline .chev{color:#ff9da4!important;font-size:1.4rem!important}
 @media(max-width:620px){
  .catalog-section .section-heading>div:first-child{padding-left:2.7rem;min-height:2.35rem}
  .catalog-section .section-heading>div:first-child::before{width:2rem;height:2rem;border-radius:.7rem;font-size:.86rem}
@@ -64,6 +107,7 @@ body.mm-home .premium-manga-card:hover .manga-cover-image{transform:none!importa
  body.mm-home .premium-manga-card .manga-info{padding:.38rem .42rem!important;gap:.28rem!important}
  body.mm-home .premium-card-chip.chapter{height:1.26rem!important;padding:0 .36rem!important;font-size:.46rem!important}
  body.mm-home .premium-manga-card .favorite-button{width:1.4rem!important;height:1.4rem!important;min-width:1.4rem!important;font-size:.68rem!important}
+ body.mm-home .account-hub{width:91vw!important}
 }
 `;
 document.head.append(style);
@@ -124,4 +168,39 @@ document.head.append(style);
       });
     });
   });
+})();
+
+/* Recompose the account panel without breaking the existing account event handlers. */
+(function redesignAccountDrawer(){
+  const hub=document.querySelector('#accountPanel .account-hub');
+  if(!hub)return;
+  const profile=document.querySelector('#accountProfile');
+  const profileLabel=profile?.querySelector('strong');
+  if(profileLabel)profileLabel.textContent='Meu Perfil';
+  const profileIcon=profile?.querySelector('span:first-child');
+  if(profileIcon)profileIcon.textContent='♙';
+
+  const favorites=document.querySelector('#accountFavorites');
+  const history=document.querySelector('#accountHistory');
+  const list=document.querySelector('#accountReadingList');
+  if(favorites){const s=favorites.querySelector('strong');if(s)s.textContent='Meus Favoritos';const i=favorites.querySelector('span:first-child');if(i)i.textContent='♡';}
+  if(list){const s=list.querySelector('strong');if(s)s.textContent='Minha Lista';const i=list.querySelector('span:first-child');if(i)i.textContent='☷';}
+  if(history){const s=history.querySelector('strong');if(s)s.textContent='Meus Históricos';const i=history.querySelector('span:first-child');if(i)i.textContent='◷';}
+
+  const publicProfile=document.querySelector('#accountPublicProfile');
+  publicProfile?.setAttribute('aria-hidden','true');
+
+  let logout=hub.querySelector('.account-logout-inline');
+  if(!logout){
+    logout=document.createElement('button');
+    logout.type='button';
+    logout.className='account-logout-inline';
+    logout.innerHTML='<span class="ico">↪</span><span>Sair da conta</span><span class="chev">›</span>';
+    const library=document.querySelector('#accountLibraryBlock');
+    library?.insertAdjacentElement('afterend',logout);
+    logout.addEventListener('click',()=>document.querySelector('#accountLogout')?.click());
+  }
+
+  const footer=hub.querySelector('.account-hub-footer span:last-child');
+  if(footer)footer.textContent='v0.16';
 })();
