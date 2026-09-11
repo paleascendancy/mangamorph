@@ -76,5 +76,14 @@ readButton?.addEventListener("click",event=>{
   location.href="reader.html?id="+mangaId+"&chapter="+encodeURIComponent(String(firstChapter));
 },true);
 
+if(!document.querySelector('link[data-mm-manga-layout-v2]')){
+  const layoutCss=document.createElement("link");
+  layoutCss.rel="stylesheet";
+  layoutCss.href="assets/css/manga-layout-premium-v2.css?v=001";
+  layoutCss.dataset.mmMangaLayoutV2="true";
+  document.head.append(layoutCss);
+}
+
+import("./manga-layout-premium-v2.js?v=001").catch(error=>console.error("MangaMorph organized layout:",error));
 import("./manga-chapter-source.js?v=002").catch(error=>console.error("MangaMorph chapter source:",error));
 import("./manga-page-comments.js?v=002").catch(error=>console.error("MangaMorph page comments:",error));
