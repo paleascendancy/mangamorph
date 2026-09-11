@@ -36,6 +36,13 @@ body.mm-home .premium-card-footer{display:flex!important;align-items:center!impo
 body.mm-home .premium-card-stat{display:none!important}
 body.mm-home .premium-manga-card .favorite-button{width:1.48rem!important;height:1.48rem!important;min-width:1.48rem!important;border-radius:.48rem!important;font-size:.72rem!important}
 
+/* Fix the thin broken rim above cards caused by layered legacy card styles. */
+body.mm-home .premium-manga-card{position:relative!important;overflow:hidden!important;isolation:isolate!important;border:1px solid rgba(50,67,91,.08)!important;border-radius:1rem!important;background:#fff!important;background-clip:padding-box!important;box-shadow:0 10px 24px rgba(50,65,87,.09)!important;clip-path:inset(0 round 1rem)!important}
+body.mm-home .premium-manga-card::before,body.mm-home .premium-manga-card::after{content:none!important;display:none!important}
+body.mm-home .premium-manga-card .manga-cover{width:100%!important;margin:0!important;border:0!important;outline:0!important;border-radius:1rem 1rem 0 0!important;box-shadow:none!important;clip-path:inset(0 round 1rem 1rem 0 0)!important}
+body.mm-home .premium-manga-card .manga-cover::after{inset:0!important;border:0!important;border-radius:inherit!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important}
+body.mm-home .premium-manga-card .manga-info{margin:0!important;border:0!important;border-radius:0 0 1rem 1rem!important;box-shadow:none!important}
+
 @media(max-width:620px){
  .catalog-section .section-heading>div:first-child{padding-left:2.7rem;min-height:2.35rem}
  .catalog-section .section-heading>div:first-child::before{width:2rem;height:2rem;border-radius:.7rem;font-size:.86rem}
@@ -45,7 +52,8 @@ body.mm-home .premium-manga-card .favorite-button{width:1.48rem!important;height
  body.mm-home .catalog-section{padding:1rem .78rem!important;margin:0!important}
  body.mm-home .catalog-section+.catalog-section{margin-top:0!important}
  body.mm-home .horizontal-rail{padding:.18rem 0 .32rem!important;gap:.62rem!important}
- body.mm-home .premium-manga-card{align-self:start!important}
+ body.mm-home .premium-manga-card{align-self:start!important;border-radius:1rem!important;clip-path:inset(0 round 1rem)!important;transform:translateZ(0)!important;-webkit-mask-image:-webkit-radial-gradient(white,black)!important}
+ body.mm-home .premium-manga-card .manga-cover{border-radius:1rem 1rem 0 0!important;clip-path:inset(0 round 1rem 1rem 0 0)!important}
  body.mm-home .premium-manga-card .manga-info{padding:.38rem .42rem!important;gap:.28rem!important}
  body.mm-home .premium-card-chip.chapter{height:1.26rem!important;padding:0 .36rem!important;font-size:.46rem!important}
  body.mm-home .premium-manga-card .favorite-button{width:1.4rem!important;height:1.4rem!important;min-width:1.4rem!important;font-size:.68rem!important}
