@@ -1,0 +1,121 @@
+/* MangaMorph — organized premium work page */
+.manga-page{max-width:1180px;margin:0 auto;padding-top:.8rem!important}
+.manga-hero-premium.mm-organized-hero{display:grid;gap:.75rem;padding:1rem!important;border-radius:1.35rem!important;background:linear-gradient(145deg,#0f1620,#0a1017)!important;border:1px solid rgba(135,171,221,.09)!important;box-shadow:0 22px 56px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.035)!important}
+.mm-organized-hero .hero-glow{opacity:.72}
+.mm-organized-hero .hero-top{display:grid!important;grid-template-columns:164px minmax(0,1fr)!important;gap:1rem!important;align-items:center!important;padding:.15rem!important}
+.mm-organized-hero .compact-cover{width:164px!important;aspect-ratio:3/4.18!important;border-radius:1rem!important;box-shadow:0 16px 34px rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.1)!important}
+.mm-work-identity{display:grid;align-content:center;gap:.35rem;min-width:0}
+.mm-work-identity>.eyebrow{margin:0!important;color:#718198!important;font-size:.58rem!important;letter-spacing:.18em!important}
+.mm-work-identity #mangaTitle{margin:0!important;max-width:15ch;font-size:clamp(2rem,4.5vw,3.55rem)!important;line-height:.96!important;letter-spacing:-.055em!important}
+.mm-work-identity #mangaAltTitle{margin:0!important;color:#8895a8!important;font-size:.78rem!important;line-height:1.4!important}
+.mm-work-identity .hero-badges{margin:.25rem 0 0!important;gap:.35rem!important}
+.mm-work-identity .hero-badges>span{min-height:1.8rem!important;padding:0 .6rem!important;border-radius:999px!important;background:#111a25!important;border-color:rgba(255,255,255,.055)!important;font-size:.61rem!important}
+.mm-work-identity .publication-badge{color:#cbd5e2!important}
+
+.mm-stats-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.55rem!important;margin:0!important;padding:0!important}
+.mm-stats-grid>span{position:relative!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important;min-height:3.7rem!important;padding:.72rem .8rem .62rem!important;border:1px solid rgba(255,255,255,.055)!important;border-radius:.85rem!important;background:#0e151e!important;color:#eef3f9!important;font-size:.82rem!important;font-weight:840!important;text-align:left!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important}
+.mm-stats-grid>span::before{display:block;margin-bottom:.16rem;color:#6d7b8e;font-size:.49rem;font-weight:780;letter-spacing:.08em;text-transform:uppercase}
+.mm-stats-grid #mangaRating::before{content:'Nota'}
+.mm-stats-grid #mangaReads::before{content:'Leituras'}
+.mm-stats-grid #mangaFavorites::before{content:'Favoritos'}
+
+.mm-synopsis-card{display:grid;gap:.45rem;padding:.8rem .85rem;border:1px solid rgba(255,255,255,.055);border-radius:.9rem;background:#0e151e;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.mm-block-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.mm-block-heading>span{font-size:.68rem;font-weight:820;color:#dce5f0}
+.mm-block-heading>small{font-size:.52rem;color:#66768a}
+.mm-synopsis-card .detail-description{max-width:none!important;margin:0!important;color:#a6b1c0!important;font-size:.76rem!important;line-height:1.58!important}
+.mm-synopsis-card .description-toggle{justify-self:start;margin:0!important;padding:.22rem 0!important;font-size:.61rem!important;color:#72a9f4!important}
+
+.mm-actions-bar{display:grid!important;grid-template-columns:minmax(0,1fr) 2.8rem 2.8rem 2.8rem!important;gap:.48rem!important;margin:0!important;padding:.55rem!important;border:1px solid rgba(255,255,255,.055)!important;border-radius:.9rem!important;background:#0d141d!important}
+.mm-actions-bar .detail-main-action{width:100%!important;min-width:0!important;min-height:2.8rem!important;padding:.55rem .72rem!important;border-radius:.72rem!important;background:linear-gradient(180deg,#f3f6fa,#dfe7f0)!important;border-color:rgba(255,255,255,.55)!important;box-shadow:0 7px 18px rgba(0,0,0,.14)!important}
+.mm-actions-bar .detail-main-action small{font-size:.43rem!important}
+.mm-actions-bar .detail-main-action strong{font-size:.72rem!important}
+.mm-actions-bar #favoriteDetail,.mm-actions-bar #markDetail,.mm-actions-bar #shareDetail{width:2.8rem!important;min-width:2.8rem!important;height:2.8rem!important;min-height:2.8rem!important;border-radius:.72rem!important;background:#141d28!important;border:1px solid rgba(255,255,255,.06)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important}
+.mm-actions-bar #favoriteDetail:hover,.mm-actions-bar #markDetail:hover,.mm-actions-bar #shareDetail:hover{background:#182333!important;border-color:rgba(100,151,224,.16)!important}
+
+.mm-details-bottom{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(250px,340px)!important;gap:.55rem!important;align-items:stretch!important;margin:0!important;padding:.55rem!important;border:1px solid rgba(255,255,255,.055)!important;border-radius:.9rem!important;background:#0d141d!important}
+.mm-details-bottom .detail-tags{align-content:center!important;gap:.34rem!important;padding:.12rem!important}
+.mm-details-bottom .detail-tags::before{content:'Gêneros e tags';width:100%;margin:0 0 .15rem;color:#6f7d90;font-size:.5rem;font-weight:780;letter-spacing:.08em;text-transform:uppercase}
+.mm-details-bottom .detail-tags span{padding:.3rem .5rem!important;border-radius:999px!important;background:#111a25!important;color:#cbd4df!important;font-size:.58rem!important}
+.mm-details-bottom .status-picker{display:flex;align-items:stretch!important}
+.mm-details-bottom .status-inline-button{min-height:100%!important;border-radius:.72rem!important;background:#111a25!important;padding:.62rem .72rem!important}
+.mm-details-bottom .status-current{margin-left:auto!important}
+
+.mm-facts-card{margin:.72rem 0 1rem;padding:.75rem;border:1px solid rgba(255,255,255,.055);border-radius:1rem;background:#0c1219;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.mm-facts-heading{display:flex;align-items:end;justify-content:space-between;margin:0 0 .55rem;padding:0 .15rem}
+.mm-facts-heading .eyebrow{display:block;margin:0 0 .1rem!important;color:#66758a!important;font-size:.48rem!important;letter-spacing:.16em!important}
+.mm-facts-heading strong{font-size:.86rem;color:#dfe7f1}
+.mm-facts-card .detail-facts-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.45rem!important;margin:0!important}
+.mm-facts-card .detail-facts-grid div{min-height:3.4rem!important;padding:.62rem .68rem!important;border-radius:.72rem!important;background:#101821!important;border:1px solid rgba(255,255,255,.045)!important}
+.mm-facts-card .detail-facts-grid dt{font-size:.48rem!important;color:#677589!important}
+.mm-facts-card .detail-facts-grid dd{margin:.12rem 0 0!important;font-size:.68rem!important;line-height:1.3!important;color:#d7e0eb!important}
+
+body.light .manga-hero-premium.mm-organized-hero{background:linear-gradient(145deg,#f9fbfe,#edf2f7)!important;border-color:rgba(25,43,67,.075)!important;box-shadow:0 20px 48px rgba(31,45,67,.10),inset 0 1px 0 #fff!important}
+body.light .mm-work-identity #mangaAltTitle{color:#6d7888!important}
+body.light .mm-work-identity .hero-badges>span{background:#f5f8fc!important;border-color:rgba(15,23,42,.07)!important;color:#536174!important}
+body.light .mm-stats-grid>span,body.light .mm-synopsis-card,body.light .mm-details-bottom,body.light .mm-facts-card{background:#fff!important;border-color:rgba(15,23,42,.07)!important;box-shadow:0 7px 18px rgba(45,59,80,.045),inset 0 1px 0 #fff!important}
+body.light .mm-stats-grid>span{color:#111827!important}
+body.light .mm-stats-grid>span::before{color:#8792a1!important}
+body.light .mm-synopsis-card .detail-description{color:#586576!important}
+body.light .mm-block-heading>span{color:#18212d}
+body.light .mm-block-heading>small{color:#8994a4}
+body.light .mm-actions-bar{background:#f7f9fc!important;border-color:rgba(15,23,42,.07)!important}
+body.light .mm-actions-bar #favoriteDetail,body.light .mm-actions-bar #markDetail,body.light .mm-actions-bar #shareDetail{background:#fff!important;color:#192330!important;border-color:rgba(15,23,42,.075)!important;box-shadow:0 5px 14px rgba(44,57,76,.06)!important}
+body.light .mm-details-bottom .detail-tags span,body.light .mm-details-bottom .status-inline-button{background:#f6f8fb!important;border-color:rgba(15,23,42,.065)!important;color:#3d4a5c!important}
+body.light .mm-facts-heading strong{color:#17202c}
+body.light .mm-facts-card .detail-facts-grid div{background:#f7f9fc!important;border-color:rgba(15,23,42,.055)!important}
+body.light .mm-facts-card .detail-facts-grid dd{color:#263141!important}
+
+@media(max-width:760px){
+  .manga-page{padding-left:.72rem!important;padding-right:.72rem!important}
+  .manga-hero-premium.mm-organized-hero{gap:.58rem!important;padding:.72rem!important;border-radius:1.12rem!important}
+  .mm-organized-hero .hero-top{grid-template-columns:108px minmax(0,1fr)!important;gap:.72rem!important;align-items:start!important}
+  .mm-organized-hero .compact-cover{width:108px!important;border-radius:.82rem!important;box-shadow:0 10px 24px rgba(0,0,0,.18)!important}
+  .mm-work-identity{gap:.22rem!important;padding-top:.08rem}
+  .mm-work-identity>.eyebrow{font-size:.47rem!important}
+  .mm-work-identity #mangaTitle{max-width:none!important;font-size:clamp(1.48rem,7.4vw,2.05rem)!important;line-height:.98!important;letter-spacing:-.052em!important}
+  .mm-work-identity #mangaAltTitle{font-size:.64rem!important;line-height:1.32!important}
+  .mm-work-identity .hero-badges{display:grid!important;grid-template-columns:max-content max-content!important;gap:.28rem!important;margin-top:.16rem!important}
+  .mm-work-identity .hero-badges>span{min-height:1.5rem!important;padding:0 .43rem!important;font-size:.51rem!important}
+  .mm-work-identity .hero-badges .year-badge{grid-column:auto!important}
+
+  .mm-stats-grid{gap:.36rem!important}
+  .mm-stats-grid>span{min-height:3.25rem!important;padding:.57rem .58rem .5rem!important;border-radius:.72rem!important;font-size:.7rem!important}
+  .mm-stats-grid>span::before{font-size:.42rem!important;margin-bottom:.1rem}
+
+  .mm-synopsis-card{gap:.34rem;padding:.68rem .72rem;border-radius:.78rem}
+  .mm-block-heading>span{font-size:.62rem}
+  .mm-block-heading>small{font-size:.47rem}
+  .mm-synopsis-card .detail-description{font-size:.69rem!important;line-height:1.52!important}
+  .mm-synopsis-card .description-toggle{font-size:.56rem!important}
+
+  .mm-actions-bar{grid-template-columns:minmax(0,1fr) 2.55rem 2.55rem 2.55rem!important;gap:.36rem!important;padding:.42rem!important;border-radius:.78rem!important}
+  .mm-actions-bar .detail-main-action{min-height:2.55rem!important;padding:.45rem .58rem!important;border-radius:.62rem!important}
+  .mm-actions-bar .detail-main-action>span:first-child{font-size:.75rem!important}
+  .mm-actions-bar .detail-main-action small{font-size:.38rem!important}
+  .mm-actions-bar .detail-main-action strong{font-size:.65rem!important}
+  .mm-actions-bar #favoriteDetail,.mm-actions-bar #markDetail,.mm-actions-bar #shareDetail{width:2.55rem!important;min-width:2.55rem!important;height:2.55rem!important;min-height:2.55rem!important;border-radius:.62rem!important}
+
+  .mm-details-bottom{grid-template-columns:1fr!important;gap:.42rem!important;padding:.45rem!important;border-radius:.8rem!important}
+  .mm-details-bottom .detail-tags{padding:.08rem .12rem .16rem!important}
+  .mm-details-bottom .detail-tags span{font-size:.52rem!important;padding:.26rem .42rem!important}
+  .mm-details-bottom .status-inline-button{min-height:2.55rem!important;padding:.5rem .62rem!important}
+  .mm-details-bottom .status-inline-button>span{font-size:.58rem!important}
+
+  .mm-facts-card{margin:.58rem 0 .82rem;padding:.58rem;border-radius:.86rem}
+  .mm-facts-heading{margin-bottom:.42rem}
+  .mm-facts-card .detail-facts-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.34rem!important}
+  .mm-facts-card .detail-facts-grid div{min-height:3.1rem!important;padding:.52rem .56rem!important;border-radius:.64rem!important}
+  .mm-facts-card .detail-facts-grid dt{font-size:.43rem!important}
+  .mm-facts-card .detail-facts-grid dd{font-size:.61rem!important}
+}
+
+@media(max-width:390px){
+  .mm-organized-hero .hero-top{grid-template-columns:96px minmax(0,1fr)!important;gap:.6rem!important}
+  .mm-organized-hero .compact-cover{width:96px!important}
+  .mm-work-identity #mangaTitle{font-size:1.38rem!important}
+  .mm-work-identity .hero-badges{grid-template-columns:max-content!important}
+  .mm-stats-grid>span{padding:.5rem .46rem!important;font-size:.64rem!important}
+  .mm-actions-bar{grid-template-columns:minmax(0,1fr) 2.4rem 2.4rem 2.4rem!important}
+  .mm-actions-bar #favoriteDetail,.mm-actions-bar #markDetail,.mm-actions-bar #shareDetail{width:2.4rem!important;min-width:2.4rem!important;height:2.4rem!important;min-height:2.4rem!important}
+}
