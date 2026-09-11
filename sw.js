@@ -1,64 +1,35 @@
-const CACHE = "mangamorph-v0.17.28";
-const ASSETS = [
-  "./assets/css/ui-repair.css?v=001",
+const CACHE = "mangamorph-v0.17.29";
+const OFFLINE_ASSETS = [
   "./",
   "./index.html",
-  "./manga.html",
-  "./reader.html",
-  "./admin.html",
-  "./profile.html",
-  "./terms.html",
-  "./privacy.html",
-  "./assets/css/style.css?v=045",
-  "./assets/css/auth.css?v=002",
-  "./assets/css/settings.css?v=002",
-  "./assets/css/manga.css?v=016",
-  "./assets/css/reader.css?v=008",
-  "./assets/css/reader-hero.css?v=001",
-  "./assets/css/admin.css?v=004",
-  "./assets/css/admin-blue.css?v=001",
-  "./assets/css/public-profile.css?v=001",
-  "./assets/js/app.js?v=045",
-  "./assets/js/catalog-runtime.js?v=004",
-  "./assets/js/home-premium-cards-v2.js?v=001",
-  "./assets/js/home-section-polish.js?v=002",
-  "./assets/js/account-sync.js?v=004",
-  "./assets/js/notifications.js?v=001",
-  "./assets/js/admin.js?v=004",
-  "./assets/js/admin-import.js?v=003",
-  "./assets/js/admin-archive-import.js?v=001",
-  "./assets/js/admin-partners.js?v=002",
-  "./assets/js/admin-anilist-cover.js?v=002",
-  "./assets/js/public-profile.js?v=001",
-  "./assets/js/auth.js?v=004",
-  "./assets/js/manga.js?v=017",
-  "./assets/js/manga-runtime.js?v=004",
-  "./assets/js/manga-ui-fixes.js?v=001",
-  "./assets/js/manga-actions-fixes.js?v=001",
-  "./assets/js/manga-chapter-source.js?v=001",
-  "./assets/js/manga-ratings.js?v=001",
-  "./assets/js/reader.js?v=008",
-  "./assets/js/reader-runtime.js?v=006",
-  "./assets/js/reader-ui-fixes.js?v=002",
-  "./assets/js/reader-hero.js?v=001",
-  "./assets/js/reader-community.js?v=003",
   "./manifest.webmanifest"
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    for(const asset of OFFLINE_ASSETS){
+      try{
+        const response=await fetch(asset,{cache:"reload"});
+        if(response.ok)await cache.put(asset,response.clone());
+      }catch{}
+    }
+  })());
   self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))));
-  self.clients.claim();
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
 async function fetchFresh(request) {
   const destination=request.destination;
-  const revalidate=destination === "document" || destination === "script" || destination === "style" || destination === "image";
-  const response=await fetch(request,revalidate?{cache:"no-cache"}:undefined);
+  const forceFresh=destination==="document"||destination==="script"||destination==="style";
+  const response=await fetch(request,forceFresh?{cache:"reload"}:undefined);
 
   if(response.ok && destination === "script"){
     const pathname=new URL(request.url).pathname;
@@ -84,14 +55,20 @@ async function fetchFresh(request) {
 }
 
 self.addEventListener("fetch", event => {
-  if(event.request.method !== "GET")return;
+  if(event.request.method!=="GET")return;
+  const destination=event.request.destination;
   event.respondWith(
     fetchFresh(event.request).then(response=>{
-      if(response.ok){
+      if(response.ok && (destination==="document"||destination==="image")){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
       return response;
-    }).catch(()=>caches.match(event.request).then(cached=>cached||caches.match("./index.html")))
+    }).catch(async()=>{
+      const cached=await caches.match(event.request);
+      if(cached)return cached;
+      if(destination==="document")return caches.match("./index.html");
+      throw new Error("offline");
+    })
   );
 });
