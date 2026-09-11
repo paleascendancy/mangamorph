@@ -1,12 +1,21 @@
 (()=>{
-  // Load the current account/profile drawer styling only.
-  if(!document.querySelector('link[data-account-menu-style]')){
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='assets/css/account-menu.css?v=002';
-    link.dataset.accountMenuStyle='true';
-    document.head.appendChild(link);
-  }
+  const ensureStyle=(href,key)=>{
+    let link=document.querySelector('link[data-'+key+']');
+    if(!link){
+      link=document.createElement('link');
+      link.rel='stylesheet';
+      link.dataset[key]='true';
+      document.head.appendChild(link);
+    }
+    link.href=href;
+    requestAnimationFrame(()=>document.head.appendChild(link));
+    setTimeout(()=>document.head.appendChild(link),250);
+    setTimeout(()=>document.head.appendChild(link),900);
+  };
+
+  // Current MangaMorph-native profile drawer + final home guardrails.
+  ensureStyle('assets/css/account-menu.css?v=002','accountMenuStyle');
+  ensureStyle('assets/css/home-final-fixes.css?v=001','homeFinalFixes');
 
   // Remove settings that no longer belong to the current product before the
   // settings sheet can ever be opened. This replaces the old "render then hide"
@@ -86,6 +95,8 @@
     const actions=document.querySelector('.featured-actions');
     if(actions)actions.style.visibility='';
     document.querySelector('#mmNoLegacyFlash')?.remove();
+    const finalLink=document.querySelector('link[data-home-final-fixes]');
+    if(finalLink)document.head.appendChild(finalLink);
   };
 
   window.addEventListener('mangamorph:catalog-loaded',()=>requestAnimationFrame(revealLive),{once:true});
