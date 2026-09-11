@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap');
+
+:root{
+  --mm-bg:#e5e7eb;
+  --mm-bg-soft:#eceef1;
+  --mm-surface:#f7f8fa;
+  --mm-surface-strong:#ffffff;
+  --mm-surface-muted:#dde1e6;
+  --mm-text:#16191f;
+  --mm-text-soft:#69717e;
+  --mm-text-faint:#8d95a1;
+  --mm-border:rgba(22,25,31,.09);
+  --mm-border-strong:rgba(22,25,31,.14);
+  --mm-accent:#5d769c;
+  --mm-accent-strong:#435f89;
+  --mm-accent-soft:#e3e9f1;
+  --mm-success:#4c8c70;
+  --mm-warning:#a67b42;
+  --mm-danger:#b45d66;
+  --mm-radius-sm:12px;
+  --mm-radius:18px;
+  --mm-radius-lg:26px;
+  --mm-shadow-sm:0 4px 14px rgba(27,31,38,.05);
+  --mm-shadow:0 12px 32px rgba(27,31,38,.08);
+  --mm-shadow-lg:0 22px 52px rgba(27,31,38,.11);
+  --mm-font:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mm-display:'Manrope','Inter',system-ui,sans-serif;
+}
+
+html{background:var(--mm-bg)!important;color-scheme:light}
+body,button,input,textarea,select{font-family:var(--mm-font)!important}
+body{
+  background:
+    radial-gradient(circle at 18% -8%,rgba(93,118,156,.09),transparent 30rem),
+    linear-gradient(180deg,#eceef1 0%,var(--mm-bg) 52%,#dfe2e6 100%)!important;
+  color:var(--mm-text)!important;
+  letter-spacing:-.008em;
+}
+h1,h2,h3,h4,.brand-name,.reader-brand,.public-brand,.admin-brand strong,.side-menu-brand{
+  font-family:var(--mm-display)!important;
+  letter-spacing:-.035em!important;
+}
+p,small,.section-description,.detail-description{color:var(--mm-text-soft)}
+a{color:var(--mm-accent-strong)}
+::selection{background:rgba(93,118,156,.2)}
+
+/* Top-level navigation */
+.topbar,.manga-topbar,.public-topbar,.reader-header{
+  background:rgba(244,246,248,.9)!important;
+  border-color:var(--mm-border)!important;
+  box-shadow:0 8px 24px rgba(30,34,40,.05)!important;
+  backdrop-filter:blur(18px) saturate(120%);
+}
+.brand-name,.public-brand,.reader-brand,.reader-heading strong{color:var(--mm-text)!important}
+.brand-name>span,.public-brand>span{color:#7b8491!important}
+.icon-button,.header-action-button,.menu-tab,.manga-header-back,.manga-theme-toggle,.reader-icon-button,.public-back{
+  background:var(--mm-surface-strong)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+  box-shadow:var(--mm-shadow-sm)!important;
+}
+.desktop-nav a,.side-menu-nav button{color:var(--mm-text-soft)!important}
+
+/* Main gray rhythm */
+main,.manga-page,.public-profile-page{color:var(--mm-text)}
+.catalog-section,.releases-section,.community-section,.ratings-only-section,.chapters-section,.related-section,.public-section{
+  background:transparent!important;
+}
+.section-heading h2,.chapters-heading h2,.community-heading h2,.public-section-head h2{color:var(--mm-text)!important}
+.eyebrow,.public-kicker,.admin-topbar span,.admin-card-head>div>span,.chapter-community-head>div>span{
+  color:#778391!important;
+  font-weight:800!important;
+  letter-spacing:.17em!important;
+}
+
+/* Surfaces and cards */
+.manga-card,.catalog-card,.rank-card,.release-item,.chapter-row,.related-card,.rating-score-card,.rating-editor-card,
+.public-profile-card,.public-stats article,.public-activity-row,.account-hub,.account-identity-card,
+.notifications-drawer,.side-menu,.reader-finish,.chapter-community,.chapter-comment-composer,.reader-sheet-panel,
+.admin-card,.admin-stats article,.partner-site-card,.partner-work-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(246,247,249,.98))!important;
+  border:1px solid var(--mm-border)!important;
+  box-shadow:var(--mm-shadow)!important;
+  color:var(--mm-text)!important;
+}
+.manga-card,.catalog-card,.rank-card,.release-item,.related-card,.public-profile-card,.chapter-community,.admin-card{
+  border-radius:var(--mm-radius-lg)!important;
+}
+
+/* Home cards */
+.horizontal-rail{gap:1rem!important}
+.rank-card,.catalog-card,.manga-card{box-shadow:0 10px 26px rgba(34,38,45,.08)!important}
+.rank-card:hover,.catalog-card:hover,.manga-card:hover{transform:translateY(-3px);box-shadow:var(--mm-shadow-lg)!important}
+.rank-card-body,.manga-card-body,.catalog-card-body{background:linear-gradient(180deg,#fbfbfc,#f0f2f5)!important}
+.rank-card-title,.manga-card-title,.catalog-card-title{font-family:var(--mm-display)!important}
+.rank-badge,.card-rank{background:rgba(27,31,38,.78)!important;color:#fff!important;border-color:rgba(255,255,255,.16)!important}
+.pill,.tag-pill,.detail-tags span,.meta-pill,.chapter-source-badge,.page-indicator{
+  background:#f1f3f6!important;
+  color:#4f5968!important;
+  border:1px solid var(--mm-border)!important;
+}
+.rank-arrow-button,.pagination-arrow,.pagination button{
+  background:var(--mm-surface-strong)!important;
+  color:var(--mm-text)!important;
+  border:1px solid var(--mm-border)!important;
+  box-shadow:var(--mm-shadow-sm)!important;
+}
+
+/* Manga details */
+.manga-hero-premium,.manga-hero-premium.mm-organized-hero,.mm-facts-card{
+  background:linear-gradient(145deg,#f8f9fb,#edf0f3)!important;
+  border-color:var(--mm-border)!important;
+  box-shadow:var(--mm-shadow-lg)!important;
+}
+#mangaTitle,.mm-work-identity #mangaTitle,.detail-facts dd{color:var(--mm-text)!important}
+.detail-alt-title,.detail-description,.chapters-heading p,.community-heading p{color:var(--mm-text-soft)!important}
+.mm-stats-grid>span,.mm-synopsis-card,.mm-details-bottom,.mm-facts-card .detail-facts-grid div,.detail-meta>span,
+.status-inline-button,.chapter-toolbar,.manga-tabs{
+  background:var(--mm-surface-strong)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+  box-shadow:var(--mm-shadow-sm)!important;
+}
+.mm-actions-bar{background:#eceff3!important;border-color:var(--mm-border)!important}
+.mm-actions-bar #favoriteDetail,.mm-actions-bar #markDetail,.mm-actions-bar #shareDetail,
+.detail-secondary-action,.detail-icon-action{
+  background:var(--mm-surface-strong)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+}
+.mm-actions-bar .detail-main-action,.detail-main-action,.button-primary{
+  background:linear-gradient(180deg,#687fa3,#4f688e)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:0 10px 24px rgba(67,95,137,.22)!important;
+}
+.description-toggle,.text-link{color:var(--mm-accent-strong)!important}
+
+/* Forms, overlays and controls */
+input,textarea,select{
+  background:#f8f9fb!important;
+  color:var(--mm-text)!important;
+  border:1px solid var(--mm-border-strong)!important;
+  border-radius:14px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75)!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(93,118,156,.48)!important;
+  box-shadow:0 0 0 3px rgba(93,118,156,.11)!important;
+  outline:0!important;
+}
+button,.button{transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
+button:active,.button:active{transform:translateY(1px)}
+.button-secondary,.account-auth-button.secondary{background:#eef1f4!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important}
+.account-auth-button.primary,.reader-comment-submit,.chapter-comment-composer>button{
+  background:var(--mm-accent-strong)!important;color:#fff!important;border-color:transparent!important
+}
+
+/* Reader */
+.reader-body,.light-reader{
+  background:#d8dadd!important;
+  color:var(--mm-text)!important;
+}
+.reader-main{background:transparent!important}
+.reader-progress-shell,.reader-bottom-bar{
+  background:rgba(246,247,249,.94)!important;
+  border-color:var(--mm-border)!important;
+  box-shadow:0 8px 28px rgba(30,34,40,.08)!important;
+}
+.reader-progress-track{background:#cfd3d9!important}
+.reader-progress-track span{background:var(--mm-accent)!important}
+.chapter-reactions button,.reader-finish button,.reader-bottom-bar button,.reader-setting-row{
+  background:var(--mm-surface-strong)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+}
+
+/* Public profile */
+.public-profile-copy h1,.public-stats strong,.public-section h2{color:var(--mm-text)!important}
+.public-profile-copy p,.public-activity-row span,.public-stats span{color:var(--mm-text-soft)!important}
+.public-score{color:var(--mm-accent-strong)!important}
+
+/* Administration: graphite gray, same system */
+.admin-app,.admin-main,.admin-auth{
+  background:#181b20!important;
+  color:#edf0f3!important;
+}
+.admin-sidebar,.admin-topbar{
+  background:#20242a!important;
+  border-color:rgba(255,255,255,.07)!important;
+}
+.admin-card,.admin-stats article,.partner-site-card,.partner-work-card{
+  background:linear-gradient(180deg,#24282f,#20242a)!important;
+  border-color:rgba(255,255,255,.075)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.18)!important;
+  color:#edf0f3!important;
+}
+.admin-card h1,.admin-card h2,.admin-card h3,.admin-list strong,.partner-site-card strong,.partner-work-card strong{color:#f2f4f6!important}
+.admin-card p,.admin-helper,.admin-list span,.admin-list small,.partner-site-card span,.partner-work-card span{color:#9fa8b3!important}
+.admin-form input,.admin-form textarea,.admin-form select,.admin-search,.partner-form input,.partner-form select{
+  background:#1b1f25!important;
+  color:#eef1f4!important;
+  border-color:rgba(255,255,255,.085)!important;
+}
+.admin-form input:focus,.admin-form textarea:focus,.admin-form select:focus,.admin-search:focus{
+  border-color:rgba(130,157,195,.55)!important;
+  box-shadow:0 0 0 3px rgba(130,157,195,.11)!important;
+}
+.admin-card button,.admin-topbar button,.admin-sidebar button{
+  border-color:rgba(255,255,255,.08)!important;
+}
+.admin-card button.primary,.admin-form-actions .primary{
+  background:linear-gradient(180deg,#7188aa,#567098)!important;
+  color:#fff!important;
+}
+
+/* Dark theme remains gray, not blue/black */
+body:not(.light),body.dark,.reader-body:not(.light-reader){
+  --mm-bg:#17191d;
+  --mm-bg-soft:#1b1e23;
+  --mm-surface:#20242a;
+  --mm-surface-strong:#262a31;
+  --mm-surface-muted:#30353d;
+  --mm-text:#f0f2f4;
+  --mm-text-soft:#a7afb9;
+  --mm-text-faint:#838d99;
+  --mm-border:rgba(255,255,255,.075);
+  --mm-border-strong:rgba(255,255,255,.12);
+  --mm-accent:#829dc3;
+  --mm-accent-strong:#9bb1d0;
+  --mm-accent-soft:#293242;
+  background:linear-gradient(180deg,#1b1e23,#15171b)!important;
+  color:var(--mm-text)!important;
+  color-scheme:dark;
+}
+body:not(.light) .topbar,body.dark .topbar,body:not(.light) .manga-topbar,body:not(.light) .public-topbar,
+body:not(.light) .manga-card,body:not(.light) .catalog-card,body:not(.light) .rank-card,body:not(.light) .release-item,
+body:not(.light) .manga-hero-premium,body:not(.light) .mm-facts-card,body:not(.light) .chapter-row,body:not(.light) .related-card{
+  background:#22262c!important;
+  border-color:var(--mm-border)!important;
+  color:var(--mm-text)!important;
+}
+body:not(.light) input,body:not(.light) textarea,body:not(.light) select{background:#1c2026!important;color:#eef1f4!important}
+
+@media(max-width:760px){
+  :root{--mm-radius-lg:22px;--mm-radius:16px}
+  body{background:linear-gradient(180deg,#e9ebee 0%,#e1e4e8 55%,#dcdfe3 100%)!important}
+  .topbar,.manga-topbar,.reader-header{box-shadow:0 6px 18px rgba(30,34,40,.045)!important}
+  .catalog-section,.releases-section,.manga-page,.public-profile-page{padding-left:max(.8rem,env(safe-area-inset-left));padding-right:max(.8rem,env(safe-area-inset-right))}
+  .section-heading h2,.chapters-heading h2{letter-spacing:-.045em!important}
+}
