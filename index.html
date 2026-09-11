@@ -190,7 +190,6 @@
     </section>
   </main>
 
-
   <div class="notifications-panel" id="notificationsPanel" hidden>
     <div class="notifications-backdrop" data-close-notifications></div>
     <aside class="notifications-drawer" role="dialog" aria-modal="true" aria-labelledby="notificationsTitle">
@@ -254,50 +253,36 @@
         </button>
         <label class="account-profile-action" id="accountAvatarButton" for="accountAvatarInput">
           <span>＋</span>
-          <span><strong id="accountAvatarButtonLabel">Adicionar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
+          <span><strong>Trocar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
           <input id="accountAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
         </label>
         <a class="account-profile-action" id="accountPublicProfile" href="profile.html">
-          <span>◎</span>
+          <span>⊙</span>
           <span><strong>Perfil público</strong><small>Ver como outros leitores enxergam você</small></span>
         </a>
-        <a class="account-profile-action admin-profile-link" id="accountAdminLink" href="admin.html" hidden>
-          <span>⌘</span>
-          <span><strong>Administração</strong><small>Obras, capítulos e moderação</small></span>
-        </a>
       </div>
 
-      <div class="account-hub-section-label" id="accountLibraryLabel">Biblioteca</div>
-      <div class="account-hub-list">
-        <button class="account-hub-row" id="accountFavorites" type="button">
-          <span class="account-hub-icon">☆</span>
-          <span class="account-hub-copy"><strong>Favoritos</strong><small>Obras que você marcou</small></span>
-          <span class="account-hub-value" id="accountFavoritesCount">0</span>
-          <span class="account-hub-chevron">›</span>
-        </button>
+      <section class="account-library-block" id="accountLibraryBlock" hidden>
+        <div class="account-library-title">BIBLIOTECA</div>
+        <div class="account-library-card">
+          <button type="button" data-account-scroll="#favoritadas">
+            <span>☆</span><span><strong>Favoritos</strong><small>Obras que você marcou</small></span><b id="accountFavoriteCount">0</b><i>›</i>
+          </button>
+          <button type="button" data-account-scroll="#recentes">
+            <span>◷</span><span><strong>Histórico</strong><small>Últimas obras abertas</small></span><b id="accountHistoryCount">0</b><i>›</i>
+          </button>
+          <button type="button" data-account-scroll="#novas">
+            <span>＋</span><span><strong>Minha lista</strong><small>Obras salvas para acompanhar</small></span><b id="accountListCount">0</b><i>›</i>
+          </button>
+        </div>
+      </section>
 
-        <button class="account-hub-row" id="accountHistory" type="button">
-          <span class="account-hub-icon">◷</span>
-          <span class="account-hub-copy"><strong>Histórico</strong><small>Últimas obras abertas</small></span>
-          <span class="account-hub-value" id="accountHistoryCount">0</span>
-          <span class="account-hub-chevron">›</span>
-        </button>
-
-        <button class="account-hub-row" id="accountReadingList" type="button">
-          <span class="account-hub-icon">＋</span>
-          <span class="account-hub-copy"><strong>Minha lista</strong><small>Obras salvas para acompanhar</small></span>
-          <span class="account-hub-value" id="accountReadingListCount">0</span>
-          <span class="account-hub-chevron">›</span>
-        </button>
-      </div>
-
-      <div class="account-hub-footer">
+      <footer class="account-hub-footer">
         <span>MangaMorph · <a href="terms.html">Termos</a> · <a href="privacy.html">Privacidade</a></span>
         <span>v0.15</span>
-      </div>
+      </footer>
     </section>
   </div>
-
 
   <div class="auth-panel" id="loginPanel" hidden>
     <div class="auth-backdrop" data-close-login></div>
@@ -379,30 +364,24 @@
         <div>
           <p class="auth-kicker">NOVO MANGAMORPH ID</p>
           <h2 id="registerTitle">Criar conta</h2>
-          <p>Cadastre seus dados para criar seu perfil.</p>
+          <p>Crie sua conta para sincronizar favoritos, histórico e perfil.</p>
         </div>
         <button class="auth-close" id="registerClose" type="button" aria-label="Fechar">×</button>
       </header>
 
       <div class="auth-social">
         <button class="auth-social-button google" id="authGoogleRegister" type="button">
-          <span class="auth-social-icon">G</span><span>Cadastrar com Google</span>
+          <span class="auth-social-icon">G</span><span>Criar com Google</span>
         </button>
       </div>
 
       <div class="auth-divider"><span>ou cadastre com e-mail</span></div>
 
       <form class="auth-form" id="authRegisterForm">
-        <div class="auth-two-cols">
-          <label>
-            <span>Nome</span>
-            <input id="authRegisterName" type="text" autocomplete="name" maxlength="32" placeholder="Seu nome" required>
-          </label>
-          <label>
-            <span>@usuário</span>
-            <input id="authRegisterUsername" type="text" autocomplete="username" maxlength="20" placeholder="usuario" required>
-          </label>
-        </div>
+        <label>
+          <span>Nome</span>
+          <input id="authRegisterName" type="text" maxlength="32" autocomplete="name" placeholder="Seu nome" required>
+        </label>
         <label>
           <span>E-mail</span>
           <input id="authRegisterEmail" type="email" autocomplete="email" placeholder="voce@email.com" required>
@@ -414,17 +393,10 @@
             <button type="button" data-toggle-password="authRegisterPassword">Mostrar</button>
           </div>
         </label>
-        <label>
-          <span>Confirmar senha</span>
-          <div class="auth-password-field">
-            <input id="authRegisterPasswordConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Repita sua senha" required>
-            <button type="button" data-toggle-password="authRegisterPasswordConfirm">Mostrar</button>
-          </div>
+        <label class="auth-consent-row">
+          <input id="authRegisterConsent" type="checkbox" required>
+          <span>Li e aceito os <a href="terms.html">Termos</a> e a <a href="privacy.html">Política de Privacidade</a>.</span>
         </label>
-        <div class="auth-password-rules">
-          <span>• mínimo de 8 caracteres</span>
-          <span>• use uma senha exclusiva</span>
-        </div>
         <button class="auth-primary" type="submit">Criar conta</button>
       </form>
 
@@ -519,43 +491,40 @@
           <span class="settings-row-end"><span id="themeValue">Escuro</span><span class="settings-chevron">›</span></span>
         </button>
         <div class="settings-submenu" id="themeMenu" hidden>
-          <button class="settings-option active" type="button" data-theme="dark">Escuro</button>
-          <button class="settings-option" type="button" data-theme="light">Claro</button>
+          <button class="settings-choice active" type="button" data-theme="dark"><span>Escuro</span><small>Ideal para leitura noturna</small></button>
+          <button class="settings-choice" type="button" data-theme="light"><span>Claro</span><small>Visual claro e editorial</small></button>
         </div>
 
-        <button class="settings-row" type="button" data-settings-section="filter">
-          <span class="settings-row-icon" aria-hidden="true">⌁</span>
-          <span class="settings-row-copy"><strong>Filtrar por tipo</strong><span>Escolha o tipo de obra exibido</span></span>
-          <span class="settings-row-end"><span id="filterValue">Padrão</span><span class="settings-chevron">›</span></span>
+        <button class="settings-row" type="button" data-settings-section="language">
+          <span class="settings-row-icon" aria-hidden="true">文</span>
+          <span class="settings-row-copy"><strong>Idioma</strong><span>Idioma da interface</span></span>
+          <span class="settings-row-end"><span id="languageValue">Português</span><span class="settings-chevron">›</span></span>
         </button>
-        <div class="settings-submenu type-filter-menu" id="filterMenu" hidden>
-          <button class="settings-option settings-type-option active" type="button" data-filter="Padrão">
-            <span class="settings-type-flag settings-type-globe" aria-hidden="true">◉</span>
-            <span class="settings-type-copy"><strong>Padrão</strong><small>Todas as obras</small></span>
-            <span class="settings-type-radio" aria-hidden="true"></span>
-          </button>
-          <button class="settings-option settings-type-option" type="button" data-filter="Mangá">
-            <span class="settings-type-flag" aria-hidden="true">🇯🇵</span>
-            <span class="settings-type-copy"><strong>Mangá</strong><small>Japão</small></span>
-            <span class="settings-type-radio" aria-hidden="true"></span>
-          </button>
-          <button class="settings-option settings-type-option" type="button" data-filter="Manhwa">
-            <span class="settings-type-flag" aria-hidden="true">🇰🇷</span>
-            <span class="settings-type-copy"><strong>Manhwa</strong><small>Coreia</small></span>
-            <span class="settings-type-radio" aria-hidden="true"></span>
-          </button>
-          <button class="settings-option settings-type-option" type="button" data-filter="Manhua">
-            <span class="settings-type-flag" aria-hidden="true">🇨🇳</span>
-            <span class="settings-type-copy"><strong>Manhua</strong><small>China</small></span>
-            <span class="settings-type-radio" aria-hidden="true"></span>
-          </button>
+        <div class="settings-submenu" id="languageMenu" hidden>
+          <button class="settings-choice active" type="button" data-language="pt-BR"><span>Português (Brasil)</span><small>Idioma atual</small></button>
+          <button class="settings-choice" type="button" data-language="en"><span>English</span><small>Em breve</small></button>
+          <button class="settings-choice" type="button" data-language="es"><span>Español</span><small>Em breve</small></button>
         </div>
 
-        <button class="settings-row" id="notificationToggle" type="button" aria-pressed="false">
+        <button class="settings-row" type="button" data-settings-section="notifications">
           <span class="settings-row-icon" aria-hidden="true">♢</span>
-          <span class="settings-row-copy"><strong>Notificações</strong><span>Alertas de novos capítulos</span></span>
-          <span class="settings-row-end"><span class="settings-toggle" id="notificationSwitch" aria-hidden="true"></span></span>
+          <span class="settings-row-copy"><strong>Notificações</strong><span>Novos capítulos das favoritas</span></span>
+          <span class="settings-row-end"><span id="notificationsValue">Ativadas</span><span class="settings-chevron">›</span></span>
         </button>
+        <div class="settings-submenu" id="notificationsMenu" hidden>
+          <button class="settings-choice active" type="button" data-notifications="on"><span>Ativadas</span><small>Receber alertas de novos capítulos</small></button>
+          <button class="settings-choice" type="button" data-notifications="off"><span>Desativadas</span><small>Não receber alertas</small></button>
+        </div>
+
+        <button class="settings-row" type="button" data-settings-section="reading">
+          <span class="settings-row-icon" aria-hidden="true">Aa</span>
+          <span class="settings-row-copy"><strong>Preferências de leitura</strong><span>Configure o leitor</span></span>
+          <span class="settings-row-end"><span class="settings-chevron">›</span></span>
+        </button>
+        <div class="settings-submenu" id="readingMenu" hidden>
+          <button class="settings-choice active" type="button" data-reading="vertical"><span>Rolagem vertical</span><small>Leitura contínua</small></button>
+          <button class="settings-choice" type="button" data-reading="paged"><span>Página por página</span><small>Em breve</small></button>
+        </div>
 
         <button class="settings-row" type="button" data-settings-section="about">
           <span class="settings-row-icon" aria-hidden="true">i</span>
@@ -648,7 +617,7 @@
   <script src="assets/js/app.js?v=044" defer></script>
   <script type="module" src="assets/js/catalog-runtime.js?v=003"></script>
   <script type="module" src="assets/js/home-premium-cards-v2.js?v=001"></script>
-  <script type="module" src="assets/js/account-sync.js?v=003"></script>
+  <script type="module" src="assets/js/account-sync.js?v=004"></script>
   <script type="module" src="assets/js/notifications.js?v=001"></script>
   <script type="module" src="assets/js/auth.js?v=004"></script>
 </body>
