@@ -69,3 +69,64 @@ body.mm-home #accountGuestAvatar[hidden],body.mm-home #headerGuestIcon[hidden],b
 @media(max-width:900px){body.mm-admin .admin-app{grid-template-rows:auto 1fr!important;align-content:start!important}body.mm-admin .admin-sidebar{align-self:start!important;min-height:0!important}}
 @media(max-width:620px){body.mm-home .account-hub{left:auto!important;right:8px!important;width:calc(100% - 16px)!important;min-width:0!important}}
 body.mm-home #accountProfileInitials:not([hidden])~svg,body.mm-home #headerProfileInitials:not([hidden])~svg{display:none!important}
+
+/* ===== Home stability pass: one mobile geometry, no legacy flash ===== */
+html,body.mm-home{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+body.mm-home *{box-sizing:border-box}
+body.mm-home #mangamorphCatalogBoot{display:none!important}
+body.mm-home main,body.mm-home .topbar,body.mm-home .hero-feature,body.mm-home .catalog-section,body.mm-home .releases-section{width:100%!important;max-width:100%!important;min-width:0!important}
+body.mm-home .header-brand,body.mm-home .brand,body.mm-home .topbar-actions,body.mm-home .featured-content,body.mm-home .section-heading,body.mm-home .section-heading>*{min-width:0!important}
+
+/* Current settings options must never inherit raw browser button rendering. */
+body.mm-home .settings-submenu{overflow:hidden!important;padding:.42rem!important;gap:.34rem!important}
+body.mm-home .settings-choice{
+ -webkit-appearance:none!important;appearance:none!important;display:grid!important;
+ grid-template-columns:minmax(0,1fr) 18px!important;grid-template-rows:auto auto!important;
+ width:100%!important;min-height:52px!important;margin:0!important;padding:9px 11px!important;
+ border:1px solid transparent!important;border-radius:13px!important;background:transparent!important;
+ color:#17202c!important;font:inherit!important;text-align:left!important;box-shadow:none!important;outline:0!important;
+}
+body.mm-home .settings-choice>span{grid-column:1!important;grid-row:1!important;display:block!important;font-size:13px!important;font-weight:800!important;line-height:1.2!important;color:#17202c!important}
+body.mm-home .settings-choice>small{grid-column:1!important;grid-row:2!important;display:block!important;margin-top:2px!important;font-size:10px!important;font-weight:600!important;line-height:1.25!important;color:#7b8797!important}
+body.mm-home .settings-choice::after{content:""!important;grid-column:2!important;grid-row:1 / span 2!important;align-self:center!important;width:16px!important;height:16px!important;border:2px solid #c3ccd8!important;border-radius:50%!important;background:transparent!important}
+body.mm-home .settings-choice.active{background:#eef4fb!important;border-color:rgba(70,112,170,.14)!important}
+body.mm-home .settings-choice.active::after{border-color:#5e80ad!important;background:#5e80ad!important;box-shadow:inset 0 0 0 3px #eef4fb!important}
+
+/* Artwork geometry wins over runtime-injected legacy card CSS. */
+html body.mm-home .featured-cover,html body.mm-home .featured-cover[style*="background-image"]{padding:0!important;overflow:hidden!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;transform:none!important}
+html body.mm-home .premium-manga-card .manga-cover{position:relative!important;width:100%!important;aspect-ratio:2/3!important;margin:0!important;padding:0!important;overflow:hidden!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+html body.mm-home .premium-manga-card .manga-cover-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;display:block!important;object-fit:cover!important;object-position:center center!important;transform:none!important}
+html body.mm-home .premium-manga-card:hover .manga-cover-image{transform:none!important}
+html body.mm-home .premium-manga-card .manga-info{min-height:0!important;padding:7px 8px!important;gap:4px!important}
+html body.mm-home .premium-card-chip:not(.chapter),html body.mm-home .premium-card-stat{display:none!important}
+html body.mm-home .premium-card-chips,html body.mm-home .premium-card-footer{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important}
+html body.mm-home .premium-card-chip.chapter{height:22px!important;padding:0 7px!important;font-size:8px!important;line-height:1!important}
+html body.mm-home .premium-manga-card .favorite-button{width:24px!important;height:24px!important;min-width:24px!important;border-radius:8px!important;font-size:12px!important}
+
+@media(max-width:620px){
+ html body.mm-home .topbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;min-height:74px!important;padding:10px 10px!important;overflow:hidden!important}
+ html body.mm-home .header-brand{display:flex!important;align-items:center!important;gap:8px!important;overflow:hidden!important}
+ html body.mm-home .menu-tab{flex:0 0 44px!important;width:44px!important;height:44px!important;min-width:44px!important;border-radius:14px!important}
+ html body.mm-home .menu-tab span{width:22px!important;height:2px!important}
+ html body.mm-home .brand{overflow:hidden!important;max-width:132px!important}
+ html body.mm-home .brand-name{display:block!important;max-width:132px!important;overflow:hidden!important;text-overflow:clip!important;white-space:nowrap!important;font-size:1.28rem!important;line-height:1!important}
+ html body.mm-home .topbar-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;flex:0 0 auto!important}
+ html body.mm-home .topbar-actions>.icon-button,html body.mm-home .topbar-actions>.header-action-button{flex:0 0 40px!important;width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important;padding:0!important;border-radius:13px!important}
+ html body.mm-home .account-button{flex-basis:40px!important;max-width:40px!important}
+
+ html body.mm-home .hero-feature{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;min-height:0!important;padding:18px 14px 22px!important;overflow:hidden!important;text-align:center!important}
+ html body.mm-home .featured-cover-wrap{display:flex!important;justify-content:center!important;width:100%!important;margin:0 0 13px!important}
+ html body.mm-home .featured-cover,html body.mm-home .featured-cover[style*="background-image"]{width:124px!important;min-width:124px!important;max-width:124px!important;height:186px!important;min-height:186px!important;max-height:186px!important;aspect-ratio:auto!important;border-radius:16px!important}
+ html body.mm-home .featured-content{display:flex!important;flex-direction:column!important;align-items:center!important;width:100%!important;max-width:460px!important;margin:0 auto!important}
+ html body.mm-home .featured-content .eyebrow{margin:0 0 7px!important;font-size:9px!important;letter-spacing:.2em!important}
+ html body.mm-home #featuredTitle{width:100%!important;max-width:16ch!important;margin:0 auto!important;font-size:clamp(1.45rem,7vw,1.9rem)!important;line-height:1!important;letter-spacing:-.045em!important;white-space:normal!important;overflow-wrap:anywhere!important}
+ html body.mm-home .featured-meta{display:flex!important;justify-content:center!important;gap:9px!important;margin-top:10px!important;font-size:12px!important;line-height:1.2!important}
+ html body.mm-home .featured-description{width:100%!important;max-width:34rem!important;margin:13px auto 0!important;font-size:13px!important;line-height:1.45!important;text-align:center!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+ html body.mm-home .featured-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important;width:100%!important;max-width:340px!important;margin:14px auto 0!important}
+ html body.mm-home .featured-actions .button{width:100%!important;min-width:0!important;min-height:44px!important;padding:0 10px!important;font-size:13px!important;border-radius:14px!important;white-space:nowrap!important}
+
+ html body.mm-home .catalog-section,html body.mm-home .releases-section{padding-left:12px!important;padding-right:12px!important;overflow:hidden!important}
+ html body.mm-home .horizontal-rail{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;grid-auto-columns:minmax(148px,42vw)!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important}
+ html body.mm-home .premium-manga-card{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;border-radius:16px!important}
+ html body.mm-home .premium-manga-card .manga-cover{aspect-ratio:2/3!important;border-radius:16px 16px 0 0!important}
+}
