@@ -1,0 +1,60 @@
+/* MangaMorph — final dark-theme overrides. Loaded last on the home page. */
+body:not(.light){background:#202329!important;color:#f4f6f9!important}
+
+/* Manga rails: remove every remaining white footer/surface. */
+body:not(.light) .premium-manga-card,
+body:not(.light) .manga-card{background:#24282f!important;border-color:rgba(255,255,255,.10)!important;box-shadow:0 13px 30px rgba(0,0,0,.26)!important}
+body:not(.light) .premium-manga-card .manga-info,
+body:not(.light) .manga-card .manga-info{background:#292e35!important;border-top:1px solid rgba(255,255,255,.07)!important;color:#edf2f7!important}
+body:not(.light) .premium-card-footer,
+body:not(.light) .premium-card-chips,
+body:not(.light) .premium-manga-card .manga-stats,
+body:not(.light) .premium-manga-card .manga-meta{background:transparent!important;color:#c8d0db!important}
+body:not(.light) .premium-card-chip,
+body:not(.light) .premium-manga-card .manga-meta>span{background:#323841!important;border-color:rgba(255,255,255,.10)!important;color:#cbd4df!important}
+body:not(.light) .premium-card-chip.chapter,
+body:not(.light) .premium-manga-card .manga-meta>span:last-child{background:#303c4c!important;border-color:rgba(132,169,218,.18)!important;color:#bfd2eb!important}
+body:not(.light) .premium-manga-card .favorite-button{background:#30353d!important;border-color:rgba(255,255,255,.12)!important;color:#e8edf4!important;box-shadow:none!important}
+body:not(.light) .premium-manga-card .favorite-button.active{background:#3a3529!important;border-color:rgba(219,178,75,.22)!important;color:#f4cf6b!important}
+body:not(.light) .premium-card-stat,
+body:not(.light) .premium-card-stat strong{color:#c3ccd7!important}
+
+/* Ranking/catalog sections stay in the same gray palette. */
+body:not(.light) .catalog-section,
+body:not(.light) .ranking-catalog{background:#202329!important;color:#f4f6f9!important}
+body:not(.light) .catalog-section::before{background:linear-gradient(145deg,rgba(255,255,255,.018),rgba(255,255,255,.006))!important;border-color:rgba(255,255,255,.045)!important}
+body:not(.light) .section-heading h2{color:#f5f7fa!important}
+body:not(.light) .section-description{color:#aeb6c1!important}
+
+/* Account/profile drawer — all surfaces adapt to gray theme. */
+body.mm-home:not(.light) .account-hub{background:linear-gradient(180deg,#1d2025 0%,#171a1f 100%)!important;color:#f4f6f9!important;border-left:1px solid rgba(255,255,255,.08)!important;box-shadow:-20px 0 55px rgba(0,0,0,.42)!important}
+body.mm-home:not(.light) .account-hub-header{background:rgba(29,32,37,.96)!important;border-bottom-color:rgba(255,255,255,.07)!important}
+body.mm-home:not(.light) .account-hub-header h2{color:#f5f7fa!important}
+body.mm-home:not(.light) .account-hub-kicker{color:#a7b0bc!important}
+body.mm-home:not(.light) .account-hub-close{background:#2c3138!important;color:#f4f6f9!important;border-color:rgba(255,255,255,.11)!important;box-shadow:none!important}
+body.mm-home:not(.light) .account-identity-card{background:linear-gradient(145deg,#2b3037,#23272d)!important;border-color:rgba(255,255,255,.09)!important;box-shadow:0 12px 28px rgba(0,0,0,.22)!important}
+body.mm-home:not(.light) #accountProfileName{color:#f6f8fb!important}
+body.mm-home:not(.light) .account-profile-handle{color:#b0bac8!important}
+body.mm-home:not(.light) #accountProfileBio{color:#9ca6b3!important}
+body.mm-home:not(.light) .account-offline-badge{background:#283441!important;color:#bfd1e7!important;border-color:rgba(118,160,214,.14)!important}
+body.mm-home:not(.light) .account-profile-actions,
+body.mm-home:not(.light) .account-library-block{background:#24282f!important;border-color:rgba(255,255,255,.09)!important;box-shadow:0 10px 24px rgba(0,0,0,.18)!important}
+body.mm-home:not(.light) .account-library-title{background:#24282f!important;color:#aab3bf!important}
+body.mm-home:not(.light) .account-profile-action,
+body.mm-home:not(.light) .account-library-card>button{background:#292e35!important;color:#f4f6f9!important;border-bottom-color:rgba(255,255,255,.07)!important}
+body.mm-home:not(.light) .account-profile-action:hover,
+body.mm-home:not(.light) .account-library-card>button:hover{background:#30353d!important}
+body.mm-home:not(.light) .account-profile-action strong,
+body.mm-home:not(.light) .account-library-card strong{color:#f4f6f9!important}
+body.mm-home:not(.light) .account-profile-action small,
+body.mm-home:not(.light) .account-library-card small{color:#9fa9b6!important}
+body.mm-home:not(.light) .account-profile-action>span:first-child,
+body.mm-home:not(.light) .account-library-card>button>span:first-child{background:#343a43!important;color:#b8cbe3!important}
+body.mm-home:not(.light) .account-profile-action::after,
+body.mm-home:not(.light) .account-library-card i{color:#909ba8!important}
+body.mm-home:not(.light) .account-logout-button{background:#2b3037!important;color:#f0b5be!important;border-color:rgba(218,107,121,.20)!important}
+body.mm-home:not(.light) .account-hub-footer{border-top-color:rgba(255,255,255,.07)!important;color:#8f99a6!important}
+body.mm-home:not(.light) .account-hub-footer a{color:#b4c3d6!important}
+
+/* Keep the avatar and status polished rather than washed out. */
+body.mm-home:not(.light) .account-identity-avatar{border-color:#343941!important;background:#30353d!important;box-shadow:0 8px 18px rgba(0,0,0,.25)!important}
