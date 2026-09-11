@@ -75,3 +75,5 @@ readButton?.addEventListener("click",event=>{
   event.stopImmediatePropagation();
   location.href="reader.html?id="+mangaId+"&chapter="+encodeURIComponent(String(firstChapter));
 },true);
+
+import("./manga-chapter-source.js?v=001").catch(error=>console.error("MangaMorph chapter source:",error));
