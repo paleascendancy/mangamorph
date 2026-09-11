@@ -1,0 +1,198 @@
+/* MangaMorph global theme v2 — consistent gray / white system */
+:root{
+  --mm2-font:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mm2-display:'Manrope','Inter',system-ui,sans-serif;
+}
+
+body.mm-theme-gray{
+  --mm-bg:#1b1d21;
+  --mm-bg-2:#202329;
+  --mm-surface:#24272d;
+  --mm-surface-2:#2a2e35;
+  --mm-surface-3:#30353d;
+  --mm-text:#f2f4f6;
+  --mm-text-soft:#b2bac5;
+  --mm-text-faint:#8993a1;
+  --mm-border:rgba(255,255,255,.085);
+  --mm-border-strong:rgba(255,255,255,.14);
+  --mm-accent:#91a9cc;
+  --mm-accent-strong:#a7bddd;
+  --mm-accent-bg:#344156;
+  --mm-button:#2c3138;
+  --mm-button-hover:#353b44;
+  color-scheme:dark;
+  background:linear-gradient(180deg,#202329 0%,#1b1d21 48%,#191b1f 100%)!important;
+  color:var(--mm-text)!important;
+}
+
+body.mm-theme-light{
+  --mm-bg:#e4e7eb;
+  --mm-bg-2:#eceef1;
+  --mm-surface:#f7f8fa;
+  --mm-surface-2:#ffffff;
+  --mm-surface-3:#eef1f4;
+  --mm-text:#171a20;
+  --mm-text-soft:#626b78;
+  --mm-text-faint:#87909c;
+  --mm-border:rgba(20,24,31,.09);
+  --mm-border-strong:rgba(20,24,31,.15);
+  --mm-accent:#566f95;
+  --mm-accent-strong:#405d88;
+  --mm-accent-bg:#e1e7f0;
+  --mm-button:#ffffff;
+  --mm-button-hover:#f1f3f6;
+  color-scheme:light;
+  background:linear-gradient(180deg,#eef0f3 0%,#e4e7eb 56%,#dde1e5 100%)!important;
+  color:var(--mm-text)!important;
+}
+
+body.mm-theme-gray,body.mm-theme-light,
+body.mm-theme-gray button,body.mm-theme-light button,
+body.mm-theme-gray input,body.mm-theme-light input,
+body.mm-theme-gray textarea,body.mm-theme-light textarea,
+body.mm-theme-gray select,body.mm-theme-light select{font-family:var(--mm2-font)!important}
+body.mm-theme-gray h1,body.mm-theme-gray h2,body.mm-theme-gray h3,
+body.mm-theme-light h1,body.mm-theme-light h2,body.mm-theme-light h3,
+body.mm-theme-gray .brand-name,body.mm-theme-light .brand-name{font-family:var(--mm2-display)!important}
+
+/* text contrast */
+body.mm-theme-gray h1,body.mm-theme-gray h2,body.mm-theme-gray h3,body.mm-theme-gray h4,
+body.mm-theme-gray strong,body.mm-theme-gray .brand-name,body.mm-theme-gray .chapter-number strong,
+body.mm-theme-gray .rating-editor-card strong,body.mm-theme-gray .rating-score-card strong{color:var(--mm-text)!important}
+body.mm-theme-gray p,body.mm-theme-gray small,body.mm-theme-gray .section-description,
+body.mm-theme-gray .detail-description,body.mm-theme-gray .chapter-meta-line,
+body.mm-theme-gray .community-heading p,body.mm-theme-gray .chapters-heading p,
+body.mm-theme-gray .rating-score-label,body.mm-theme-gray .rating-editor-head span{color:var(--mm-text-soft)!important}
+
+/* global gray surfaces */
+body.mm-theme-gray .topbar,body.mm-theme-gray .manga-topbar,body.mm-theme-gray .reader-header,
+body.mm-theme-gray .public-topbar{background:rgba(35,38,44,.94)!important;border-color:var(--mm-border)!important}
+body.mm-theme-gray .manga-hero-premium,body.mm-theme-gray .mm-organized-hero,
+body.mm-theme-gray .mm-facts-card,body.mm-theme-gray .chapter-row,body.mm-theme-gray .related-card,
+body.mm-theme-gray .release-row,body.mm-theme-gray .release-item,body.mm-theme-gray .manga-card,
+body.mm-theme-gray .rank-card,body.mm-theme-gray .catalog-card,body.mm-theme-gray .community-section,
+body.mm-theme-gray .ratings-only-section,body.mm-theme-gray .rating-editor-card,
+body.mm-theme-gray .rating-score-card,body.mm-theme-gray .rating-metrics,
+body.mm-theme-gray .chapter-community,body.mm-theme-gray .chapter-comment-composer,
+body.mm-theme-gray .account-hub,body.mm-theme-gray .account-identity-card,
+body.mm-theme-gray .notifications-drawer,body.mm-theme-gray .side-menu,
+body.mm-theme-gray .search-dialog,body.mm-theme-gray .ranking-dialog,
+body.mm-theme-gray .profile-dialog,body.mm-theme-gray .settings-dialog,
+body.mm-theme-gray .public-profile-card,body.mm-theme-gray .public-stats article,
+body.mm-theme-gray .public-section,body.mm-theme-gray .public-activity-row{
+  background:var(--mm-surface)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+}
+body.mm-theme-gray .mm-stats-grid>span,body.mm-theme-gray .mm-synopsis-card,
+body.mm-theme-gray .mm-actions-bar,body.mm-theme-gray .mm-details-bottom,
+body.mm-theme-gray .detail-facts-grid>div,body.mm-theme-gray .status-inline-button,
+body.mm-theme-gray .chapter-toolbar,body.mm-theme-gray .manga-tabs,
+body.mm-theme-gray .rating-metrics>div,body.mm-theme-gray .rating-editor,
+body.mm-theme-gray .rating-editor-row,body.mm-theme-gray .rating-category,
+body.mm-theme-gray .chapter-reactions button,body.mm-theme-gray .reader-setting-row{
+  background:var(--mm-surface-2)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border)!important;
+}
+
+/* Fix the white-on-white buttons shown in mobile screenshots */
+body.mm-theme-gray button:not(.detail-main-action):not(.button-primary):not(.auth-primary):not(.profile-save):not(.chapter-comment-composer>button),
+body.mm-theme-gray .button-secondary,body.mm-theme-gray .chapter-read,
+body.mm-theme-gray .pagination button,body.mm-theme-gray .pagination-arrow,
+body.mm-theme-gray .rank-arrow-button,body.mm-theme-gray .detail-secondary-action,
+body.mm-theme-gray .detail-icon-action,body.mm-theme-gray .manga-header-back,
+body.mm-theme-gray .header-action-button,body.mm-theme-gray .icon-button{
+  background:var(--mm-button)!important;
+  color:var(--mm-text)!important;
+  border-color:var(--mm-border-strong)!important;
+  text-shadow:none!important;
+}
+body.mm-theme-gray button:not(.detail-main-action):hover{background:var(--mm-button-hover)!important}
+body.mm-theme-gray .detail-main-action,body.mm-theme-gray .button-primary,
+body.mm-theme-gray .auth-primary,body.mm-theme-gray .profile-save,
+body.mm-theme-gray .chapter-comment-composer>button{
+  background:linear-gradient(180deg,#6f87aa,#566f96)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+}
+body.mm-theme-gray .detail-main-action *,body.mm-theme-gray .button-primary *{color:#fff!important}
+body.mm-theme-gray .detail-main-action:disabled{background:#48515f!important;color:#cbd1d9!important;opacity:.72}
+
+/* Forms */
+body.mm-theme-gray input,body.mm-theme-gray textarea,body.mm-theme-gray select{
+  background:#202329!important;color:var(--mm-text)!important;border-color:var(--mm-border-strong)!important;
+}
+body.mm-theme-gray input::placeholder,body.mm-theme-gray textarea::placeholder{color:#7f8996!important;opacity:1}
+
+/* Tags, badges and source labels */
+body.mm-theme-gray .detail-tags span,body.mm-theme-gray .tag-pill,body.mm-theme-gray .pill,
+body.mm-theme-gray .origin-badge,body.mm-theme-gray .publication-badge,body.mm-theme-gray .year-badge,
+body.mm-theme-gray .chapter-source-badge,body.mm-theme-gray .page-indicator{
+  background:#2b3037!important;color:#d8dde4!important;border-color:var(--mm-border)!important;
+}
+body.mm-theme-gray .chapter-source-badge{color:#dfe5ec!important}
+
+/* Ratings: remove accidental white islands and guarantee readable labels */
+body.mm-theme-gray .ratings-only-section{background:transparent!important}
+body.mm-theme-gray .rating-score-card,body.mm-theme-gray .rating-editor-card{
+  background:#24272d!important;color:var(--mm-text)!important;
+}
+body.mm-theme-gray .rating-editor-card .rating-editor-row,
+body.mm-theme-gray .rating-editor-card [class*="rating-"]{color:var(--mm-text)!important}
+body.mm-theme-gray .rating-editor-card button{color:var(--mm-text)!important}
+body.mm-theme-gray .rating-summary-stars,body.mm-theme-gray .rating-star{color:#c8a95d!important}
+
+/* Comments */
+body.mm-theme-gray .manga-page-comments,body.mm-theme-gray .manga-comments-section,
+body.mm-theme-gray .work-comments-section,body.mm-theme-gray [class*="comments-card"]{
+  background:#202329!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important;
+}
+body.mm-theme-gray .manga-page-comments textarea,body.mm-theme-gray .chapter-comment-composer textarea{background:#1f2227!important;color:var(--mm-text)!important}
+
+/* Home */
+body.mm-theme-gray .catalog-section,body.mm-theme-gray .releases-section{background:#202329!important}
+body.mm-theme-gray .hero-feature{background:#15171b!important;color:var(--mm-text)!important}
+body.mm-theme-gray .hero-feature .featured-description{color:#b9c0ca!important}
+body.mm-theme-gray .hero-feature .button-secondary{background:#2b3037!important;color:#f2f4f6!important}
+
+/* Settings must follow selected theme */
+body.mm-theme-gray .settings-backdrop{background:rgba(10,11,13,.68)!important}
+body.mm-theme-gray .settings-dialog{background:#24272d!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important}
+body.mm-theme-gray .settings-row,body.mm-theme-gray .settings-submenu,body.mm-theme-gray #settingsClose,
+body.mm-theme-gray .settings-row-icon,body.mm-theme-gray .settings-option{
+  background:#2a2e35!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important;
+}
+body.mm-theme-gray .settings-row-copy span,body.mm-theme-gray .settings-title p,body.mm-theme-gray .settings-type-copy small{color:var(--mm-text-soft)!important}
+body.mm-theme-gray .settings-option.active{background:#354156!important;color:#fff!important;border-color:rgba(145,169,204,.38)!important}
+
+/* Light theme should stay intentionally white/gray when selected */
+body.mm-theme-light .topbar,body.mm-theme-light .manga-topbar,body.mm-theme-light .reader-header,
+body.mm-theme-light .manga-hero-premium,body.mm-theme-light .mm-facts-card,
+body.mm-theme-light .community-section,body.mm-theme-light .rating-editor-card,
+body.mm-theme-light .rating-score-card,body.mm-theme-light .chapter-row{
+  background:var(--mm-surface)!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important;
+}
+body.mm-theme-light .detail-main-action{background:linear-gradient(180deg,#627ca2,#4d678f)!important;color:#fff!important}
+body.mm-theme-light .detail-main-action *{color:#fff!important}
+
+/* Reader uses the selected global theme outside manga pages */
+body.mm-theme-gray.reader-body,body.mm-theme-gray.light-reader{background:#1b1d21!important;color:var(--mm-text)!important}
+body.mm-theme-gray .reader-progress-shell,body.mm-theme-gray .reader-bottom-bar{background:#25292f!important;border-color:var(--mm-border)!important}
+body.mm-theme-gray .reader-sheet-panel,body.mm-theme-gray .reader-finish{background:#24272d!important;color:var(--mm-text)!important}
+
+/* Admin follows global choice too */
+body.mm-theme-gray .admin-app,body.mm-theme-gray .admin-main,body.mm-theme-gray .admin-auth{background:#1b1d21!important;color:var(--mm-text)!important}
+body.mm-theme-gray .admin-sidebar,body.mm-theme-gray .admin-topbar{background:#23262c!important;border-color:var(--mm-border)!important}
+body.mm-theme-gray .admin-card,body.mm-theme-gray .admin-stats article{background:#262a30!important;color:var(--mm-text)!important;border-color:var(--mm-border)!important}
+body.mm-theme-light .admin-app,body.mm-theme-light .admin-main,body.mm-theme-light .admin-auth{background:#e4e7eb!important;color:#171a20!important}
+body.mm-theme-light .admin-sidebar,body.mm-theme-light .admin-topbar{background:#f4f6f8!important;color:#171a20!important;border-color:var(--mm-border)!important}
+body.mm-theme-light .admin-card,body.mm-theme-light .admin-stats article{background:#fff!important;color:#171a20!important;border-color:var(--mm-border)!important}
+body.mm-theme-light .admin-card h1,body.mm-theme-light .admin-card h2,body.mm-theme-light .admin-card h3{color:#171a20!important}
+body.mm-theme-light .admin-card p,body.mm-theme-light .admin-helper{color:#68717d!important}
+
+@media(max-width:760px){
+  body.mm-theme-gray{background:#1b1d21!important}
+  body.mm-theme-light{background:#e4e7eb!important}
+  body.mm-theme-gray .manga-page,body.mm-theme-light .manga-page{background:transparent!important}
+}
