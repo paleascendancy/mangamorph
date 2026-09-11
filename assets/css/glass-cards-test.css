@@ -1,115 +1,15 @@
-/* Experimental MangaMorph glass-card layer */
-:root{
-  --mm-glass-bg:linear-gradient(145deg,rgba(255,255,255,.70),rgba(245,247,250,.46));
-  --mm-glass-bg-strong:linear-gradient(145deg,rgba(255,255,255,.84),rgba(242,245,249,.62));
-  --mm-glass-border:rgba(255,255,255,.72);
-  --mm-glass-line:rgba(72,84,102,.12);
-  --mm-glass-shadow:0 18px 42px rgba(32,39,50,.10),inset 0 1px 0 rgba(255,255,255,.88),inset 0 -1px 0 rgba(107,119,136,.07);
-  --mm-glass-shadow-soft:0 10px 26px rgba(32,39,50,.075),inset 0 1px 0 rgba(255,255,255,.76);
-}
-
-/* Primary surfaces */
-.manga-card,.catalog-card,.rank-card,.public-profile-card,.account-hub,.account-identity-card,
-.notifications-drawer,.side-menu,.search-dialog,.ranking-dialog,.manga-hero-premium,.mm-facts-card,
-.mm-synopsis-card,.mm-details-bottom,.rating-score-card,.rating-editor-card,.chapter-community,
-.chapter-comment-composer,.reader-sheet-panel,.reader-finish,.admin-card,.partner-site-card,.partner-work-card{
-  position:relative;
-  background:var(--mm-glass-bg)!important;
-  border:1px solid var(--mm-glass-border)!important;
-  box-shadow:var(--mm-glass-shadow)!important;
-  -webkit-backdrop-filter:blur(16px) saturate(118%);
-  backdrop-filter:blur(16px) saturate(118%);
-}
-
-/* High-frequency/repeated cards: same language, lighter GPU cost */
-.release-item,.chapter-row,.related-card,.public-activity-row,.public-stats article,.admin-stats article,
-.mm-stats-grid>span,.mm-facts-card .detail-facts-grid div,.rating-metrics>div{
-  background:linear-gradient(145deg,rgba(255,255,255,.67),rgba(244,246,249,.50))!important;
-  border:1px solid rgba(255,255,255,.62)!important;
-  box-shadow:var(--mm-glass-shadow-soft)!important;
-}
-
-/* Reflective edge without turning every card into neon */
-.manga-card,.catalog-card,.rank-card,.manga-hero-premium,.mm-facts-card,.public-profile-card,.account-hub,
-.rating-score-card,.rating-editor-card,.chapter-community,.admin-card{
-  overflow:hidden;
-}
-.manga-card::after,.catalog-card::after,.rank-card::after,.manga-hero-premium::after,.mm-facts-card::after,
-.public-profile-card::after,.account-hub::after,.rating-score-card::after,.rating-editor-card::after,
-.chapter-community::after,.admin-card::after{
-  content:"";
-  position:absolute;
-  z-index:3;
-  pointer-events:none;
-  left:8%;right:8%;top:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);
-  opacity:.72;
-}
-
-/* Controls inside the glass system */
-.status-inline-button,.chapter-toolbar,.manga-tabs,.settings-row,.account-profile-action,.reader-setting-row,
-.chapter-reactions button,.reader-bottom-bar button,.pagination button,.pagination-arrow,.rank-arrow-button,
-.icon-button,.header-action-button,.menu-tab,.manga-header-back,.manga-theme-toggle{
-  background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(241,244,248,.52))!important;
-  border-color:rgba(255,255,255,.68)!important;
-  box-shadow:0 8px 20px rgba(35,43,54,.07),inset 0 1px 0 rgba(255,255,255,.9)!important;
-}
-
-/* Slightly sharper hierarchy */
+/* MangaMorph glass-card layer */
+:root{--mm-glass-bg:linear-gradient(145deg,rgba(255,255,255,.70),rgba(245,247,250,.46));--mm-glass-border:rgba(255,255,255,.72);--mm-glass-shadow:0 18px 42px rgba(32,39,50,.10),inset 0 1px 0 rgba(255,255,255,.88)}
+.manga-card,.catalog-card,.rank-card,.public-profile-card,.notifications-drawer,.side-menu,.search-dialog,.ranking-dialog,.manga-hero-premium,.mm-facts-card,.mm-synopsis-card,.mm-details-bottom,.rating-score-card,.rating-editor-card,.chapter-community,.reader-sheet-panel,.reader-finish,.admin-card,.partner-site-card,.partner-work-card{position:relative;background:var(--mm-glass-bg)!important;border:1px solid var(--mm-glass-border)!important;box-shadow:var(--mm-glass-shadow)!important;backdrop-filter:blur(16px) saturate(118%)}
+.release-item,.chapter-row,.related-card,.public-activity-row,.public-stats article,.admin-stats article,.mm-stats-grid>span,.mm-facts-card .detail-facts-grid div,.rating-metrics>div{background:linear-gradient(145deg,rgba(255,255,255,.67),rgba(244,246,249,.50))!important;border:1px solid rgba(255,255,255,.62)!important}
+.status-inline-button,.chapter-toolbar,.manga-tabs,.settings-row,.reader-setting-row,.chapter-reactions button,.reader-bottom-bar button,.pagination button,.pagination-arrow,.rank-arrow-button,.icon-button,.header-action-button,.menu-tab,.manga-header-back,.manga-theme-toggle{background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(241,244,248,.52))!important;border-color:rgba(255,255,255,.68)!important}
 .manga-card,.catalog-card,.rank-card,.release-item,.chapter-row,.related-card{border-radius:22px!important}
-.mm-synopsis-card,.mm-details-bottom,.rating-score-card,.rating-editor-card,.chapter-community{border-radius:24px!important}
-.pill,.tag-pill,.detail-tags span,.meta-pill,.chapter-source-badge,.page-indicator{
-  background:rgba(245,247,250,.62)!important;
-  border-color:rgba(255,255,255,.74)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.72)!important;
-}
-
-/* Dark/gray theme: reference-inspired smoked glass */
-body.mm-theme-gray,
-body:not(.light),body.dark{
-  --mm-glass-bg:linear-gradient(145deg,rgba(52,56,63,.76),rgba(28,31,36,.72));
-  --mm-glass-bg-strong:linear-gradient(145deg,rgba(61,66,73,.82),rgba(31,35,41,.78));
-  --mm-glass-border:rgba(255,255,255,.15);
-  --mm-glass-line:rgba(255,255,255,.07);
-  --mm-glass-shadow:0 20px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.18);
-  --mm-glass-shadow-soft:0 11px 27px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.09);
-}
-body.mm-theme-gray .release-item,body.mm-theme-gray .chapter-row,body.mm-theme-gray .related-card,
-body.mm-theme-gray .public-activity-row,body.mm-theme-gray .public-stats article,body.mm-theme-gray .admin-stats article,
-body.mm-theme-gray .mm-stats-grid>span,body.mm-theme-gray .mm-facts-card .detail-facts-grid div,
-body.mm-theme-gray .rating-metrics>div,
-body:not(.light) .release-item,body:not(.light) .chapter-row,body:not(.light) .related-card{
-  background:linear-gradient(145deg,rgba(48,53,61,.75),rgba(29,33,39,.72))!important;
-  border-color:rgba(255,255,255,.10)!important;
-}
-body.mm-theme-gray .status-inline-button,body.mm-theme-gray .chapter-toolbar,body.mm-theme-gray .manga-tabs,
-body.mm-theme-gray .settings-row,body.mm-theme-gray .account-profile-action,body.mm-theme-gray .reader-setting-row,
-body.mm-theme-gray .chapter-reactions button,body.mm-theme-gray .reader-bottom-bar button,
-body.mm-theme-gray .pagination button,body.mm-theme-gray .pagination-arrow,body.mm-theme-gray .rank-arrow-button,
-body.mm-theme-gray .icon-button,body.mm-theme-gray .header-action-button,body.mm-theme-gray .menu-tab,
-body.mm-theme-gray .manga-header-back,body.mm-theme-gray .manga-theme-toggle{
-  background:linear-gradient(145deg,rgba(58,63,71,.78),rgba(34,38,44,.74))!important;
-  border-color:rgba(255,255,255,.11)!important;
-  box-shadow:0 9px 22px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.09)!important;
-}
-body.mm-theme-gray .pill,body.mm-theme-gray .tag-pill,body.mm-theme-gray .detail-tags span,
-body.mm-theme-gray .meta-pill,body.mm-theme-gray .chapter-source-badge,body.mm-theme-gray .page-indicator{
-  background:rgba(47,52,60,.72)!important;
-  color:#dce2e9!important;
-  border-color:rgba(255,255,255,.10)!important;
-}
-
-/* Keep inputs readable rather than fully transparent */
-body.mm-theme-gray input,body.mm-theme-gray textarea,body.mm-theme-gray select,
-body:not(.light) input,body:not(.light) textarea,body:not(.light) select{
-  background:rgba(24,28,33,.80)!important;
-  border-color:rgba(255,255,255,.12)!important;
-}
-
-@media(max-width:760px){
-  .manga-card,.catalog-card,.rank-card,.release-item,.chapter-row,.related-card{border-radius:19px!important}
-  .manga-card,.catalog-card,.rank-card,.release-item,.chapter-row,.related-card{
-    -webkit-backdrop-filter:none;
-    backdrop-filter:none;
-  }
-}
+body.mm-theme-gray,body:not(.light),body.dark{--mm-glass-bg:linear-gradient(145deg,rgba(48,52,59,.82),rgba(27,30,35,.80));--mm-glass-border:rgba(255,255,255,.12);--mm-glass-shadow:0 20px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10)}
+body.mm-theme-gray .release-item,body.mm-theme-gray .chapter-row,body.mm-theme-gray .related-card,body.mm-theme-gray .public-activity-row,body.mm-theme-gray .public-stats article,body.mm-theme-gray .admin-stats article,body:not(.light) .release-item,body:not(.light) .chapter-row,body:not(.light) .related-card{background:linear-gradient(145deg,rgba(48,53,61,.78),rgba(29,33,39,.76))!important;border-color:rgba(255,255,255,.10)!important}
+body.mm-theme-gray .status-inline-button,body.mm-theme-gray .chapter-toolbar,body.mm-theme-gray .manga-tabs,body.mm-theme-gray .settings-row,body.mm-theme-gray .reader-setting-row,body.mm-theme-gray .chapter-reactions button,body.mm-theme-gray .reader-bottom-bar button,body.mm-theme-gray .pagination button,body.mm-theme-gray .pagination-arrow,body.mm-theme-gray .rank-arrow-button,body.mm-theme-gray .icon-button,body.mm-theme-gray .header-action-button,body.mm-theme-gray .menu-tab,body.mm-theme-gray .manga-header-back,body.mm-theme-gray .manga-theme-toggle{background:linear-gradient(145deg,rgba(58,63,71,.78),rgba(34,38,44,.74))!important;border-color:rgba(255,255,255,.11)!important}
+/* Home ranking sections: remove the remaining light strip/card chrome in dark mode */
+body.mm-home.mm-theme-gray .ranking-section,body.mm-home:not(.light) .ranking-section,body.mm-home.dark .ranking-section,body.mm-home.mm-theme-gray .ranking-block,body.mm-home:not(.light) .ranking-block{background:#202329!important;color:#f5f7fa!important;border-color:rgba(255,255,255,.06)!important}body.mm-home.mm-theme-gray .ranking-section h2,body.mm-home:not(.light) .ranking-section h2,body.mm-home.mm-theme-gray .ranking-section h3,body.mm-home:not(.light) .ranking-section h3{color:#f5f7fa!important}body.mm-home.mm-theme-gray .ranking-section p,body.mm-home:not(.light) .ranking-section p{color:#a7afb9!important}
+/* Cards must not keep a white footer in dark mode */
+body.mm-theme-gray .manga-card,body:not(.light) .manga-card,body.dark .manga-card,body.mm-theme-gray .rank-card,body:not(.light) .rank-card{background:linear-gradient(145deg,#30343b,#20242a)!important;color:#f5f7fa!important;border-color:rgba(255,255,255,.11)!important}body.mm-theme-gray .manga-card-footer,body:not(.light) .manga-card-footer,body.mm-theme-gray .rank-card-footer,body:not(.light) .rank-card-footer,body.mm-theme-gray .card-footer,body:not(.light) .card-footer{background:#292e35!important;color:#f4f6f9!important;border-top-color:rgba(255,255,255,.08)!important}body.mm-theme-gray .manga-card button,body:not(.light) .manga-card button,body.mm-theme-gray .rank-card button,body:not(.light) .rank-card button{color:#e8edf4!important;border-color:rgba(255,255,255,.12)!important}
+body.mm-theme-gray input,body.mm-theme-gray textarea,body.mm-theme-gray select,body:not(.light) input,body:not(.light) textarea,body:not(.light) select{background:rgba(24,28,33,.80)!important;color:#eef2f6!important;border-color:rgba(255,255,255,.12)!important}
+@media(max-width:760px){.manga-card,.catalog-card,.rank-card,.release-item,.chapter-row,.related-card{border-radius:19px!important;backdrop-filter:none}}
