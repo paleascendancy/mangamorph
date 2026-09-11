@@ -10,9 +10,30 @@ if(!window.__mangamorphPageCommentsLoaded){
   );
 
   const mangaId=Math.max(1,Number(new URLSearchParams(location.search).get("id"))||1);
-  const ratings=document.querySelector("#ratings");
-  const existing=document.querySelector("#comments");
+  const $=selector=>document.querySelector(selector);
+  const esc=value=>String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  const safeUrl=value=>{try{const url=new URL(String(value||""));return url.protocol==="https:"?url.href:""}catch{return""}};
+  const initials=name=>(String(name||"Leitor").trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("")||"L").toUpperCase();
+  const fmtDate=value=>{try{return new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(value)).replace(".","")}catch{return""}};
 
+  let session=null;
+  let profile=null;
+  let comments=[];
+  let likes=[];
+  let sending=false;
+
+  function removeLegacyComments(){
+    $("#tabComments")?.remove();
+    $("#panelComments")?.remove();
+    document.querySelectorAll(".work-comments-section,.work-comments-note").forEach(node=>node.closest("#panelComments")?.remove());
+  }
+
+  removeLegacyComments();
+  const cleanupObserver=new MutationObserver(removeLegacyComments);
+  cleanupObserver.observe(document.body,{childList:true,subtree:true});
+
+  const ratings=$("#ratings");
+  const oldDirect=$("#comments");
   const section=document.createElement("section");
   section.className="manga-comments-direct";
   section.id="comments";
@@ -27,7 +48,10 @@ if(!window.__mangamorphPageCommentsLoaded){
     </div>
 
     <form class="mm-comment-composer" id="mmCommentForm">
-      <div class="mm-comment-avatar" id="mmCommentAvatar"><span id="mmCommentInitials">?</span><img id="mmCommentAvatarImage" alt="" hidden></div>
+      <div class="mm-comment-avatar" id="mmCommentAvatar">
+        <span id="mmCommentInitials">?</span>
+        <img id="mmCommentAvatarImage" alt="" hidden>
+      </div>
       <div class="mm-comment-compose-main">
         <div class="mm-comment-compose-meta">
           <strong id="mmCommentComposerName">Entre para comentar</strong>
@@ -45,131 +69,104 @@ if(!window.__mangamorphPageCommentsLoaded){
     <div class="mm-comments-list" id="mmCommentsList"></div>
   `;
 
-  if(existing)existing.replaceWith(section);
+  if(oldDirect)oldDirect.replaceWith(section);
   else if(ratings)ratings.insertAdjacentElement("beforebegin",section);
-  else document.querySelector("#mangaPage")?.append(section);
+  else $("#mangaPage")?.append(section);
 
   const style=document.createElement("style");
   style.id="mangamorphDirectCommentsStyles";
   style.textContent=`
+    .manga-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}
     .manga-comments-direct{margin-top:1.2rem;padding:1rem;border:1px solid rgba(255,255,255,.06);border-radius:1rem;background:#0d1219}
     .mm-comments-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:.8rem}
     .mm-comments-head h2{margin:0;font-size:clamp(1.55rem,3vw,2.2rem);letter-spacing:-.04em}
     .mm-comments-head p:not(.eyebrow){margin:.22rem 0 0;color:#748195;font-size:.72rem}
     .mm-comments-head>span{color:#788496;font-size:.66rem;white-space:nowrap}
-    .mm-comment-composer{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.72rem;padding:.78rem;border:1px solid rgba(92,145,229,.13);border-radius:.88rem;background:#101720}
-    .mm-comment-avatar{width:2.65rem;height:2.65rem;display:grid;place-items:center;overflow:hidden;border-radius:.78rem;background:linear-gradient(145deg,#244b7b,#17263a);color:#eaf3ff;font-size:.78rem;font-weight:900;flex:none}
+    .mm-comment-composer{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.72rem;padding:.8rem;border:1px solid rgba(92,145,229,.14);border-radius:.9rem;background:#101720}
+    .mm-comment-avatar{width:2.8rem;height:2.8rem;display:grid;place-items:center;overflow:hidden;border-radius:.85rem;background:linear-gradient(145deg,var(--avatar-accent,#526782),#202a38);color:#fff;font-size:.72rem;font-weight:900;flex:none}
     .mm-comment-avatar img{width:100%;height:100%;object-fit:cover}
-    .mm-comment-compose-main{min-width:0}
-    .mm-comment-compose-meta{display:flex;align-items:baseline;gap:.45rem;flex-wrap:wrap;margin-bottom:.48rem}
-    .mm-comment-compose-meta strong{font-size:.72rem}.mm-comment-compose-meta span{color:#748195;font-size:.6rem}
-    #mmCommentInput{display:block;width:100%;min-height:5.1rem;resize:vertical;padding:.72rem .78rem;border:1px solid rgba(255,255,255,.065);border-radius:.72rem;outline:0;background:#0b1118;color:#eef4fb;font:inherit;font-size:.75rem;line-height:1.5;transition:.16s}
-    #mmCommentInput:focus{border-color:rgba(78,142,239,.52);box-shadow:0 0 0 3px rgba(78,142,239,.08)}
-    #mmCommentInput::placeholder{color:#5f6e82}
-    #mmCommentInput:disabled{opacity:.72;cursor:pointer}
-    .mm-comment-compose-footer{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin-top:.5rem}
-    .mm-comment-compose-footer>span{color:#6e7c90;font-size:.58rem}
-    #mmCommentSubmit{min-height:2.35rem;padding:0 .8rem;border:1px solid rgba(98,153,240,.22);border-radius:.66rem;background:#2d6ac6;color:white;font-size:.64rem;font-weight:850;cursor:pointer}
-    #mmCommentSubmit:disabled{opacity:.55;cursor:wait}
-    .mm-comments-state{padding:1.1rem .6rem;color:#718096;text-align:center;font-size:.68rem}
-    .mm-comments-list{display:grid;gap:.48rem;margin-top:.75rem}
-    .mm-comment-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.65rem;padding:.72rem;border:1px solid rgba(255,255,255,.05);border-radius:.78rem;background:#0f151d}
-    .mm-comment-item-avatar{width:2.2rem;height:2.2rem;display:grid;place-items:center;overflow:hidden;border-radius:.65rem;background:#192536;color:#d8e8ff;font-size:.68rem;font-weight:850}
-    .mm-comment-item-avatar img{width:100%;height:100%;object-fit:cover}
-    .mm-comment-item-body{min-width:0}.mm-comment-item-top{display:flex;align-items:center;gap:.38rem;flex-wrap:wrap}
-    .mm-comment-item-top strong{font-size:.7rem}.mm-comment-handle{color:#738197;font-size:.57rem}.mm-comment-date{margin-left:auto;color:#667488;font-size:.55rem}
-    .mm-comment-item-body p{margin:.34rem 0 0;color:#c4ceda;font-size:.72rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
-    .mm-comment-actions{display:flex;align-items:center;gap:.35rem;margin-top:.48rem}
-    .mm-comment-actions button{min-height:1.8rem;padding:0 .5rem;border:1px solid rgba(255,255,255,.055);border-radius:.52rem;background:#141c26;color:#8c9bb0;font-size:.57rem;cursor:pointer}
-    .mm-comment-actions button.active{color:#8eb9ff;border-color:rgba(85,147,239,.2);background:rgba(70,126,210,.08)}
-    .mm-comment-you{padding:.12rem .3rem;border-radius:999px;background:rgba(72,137,232,.1);color:#80aff7;font-size:.48rem;font-weight:850;text-transform:uppercase}
-    body.light .manga-comments-direct,body.light .mm-comment-composer,body.light .mm-comment-item{background:#fff;border-color:rgba(0,0,0,.07)}
-    body.light #mmCommentInput{background:#f6f8fb;color:#171b22;border-color:rgba(0,0,0,.08)}
-    body.light .mm-comment-item-body p{color:#343b47}
-    body.light .mm-comment-actions button{background:#f3f5f8;color:#657184;border-color:rgba(0,0,0,.06)}
-    body.light .mm-comments-head p:not(.eyebrow),body.light .mm-comment-compose-meta span{color:#697486}
-    @media(max-width:560px){
-      .manga-comments-direct{padding:.78rem;border-radius:.88rem}.mm-comments-head{align-items:flex-start;flex-direction:column;gap:.32rem}
-      .mm-comment-composer{grid-template-columns:1fr}.mm-comment-avatar{width:2.35rem;height:2.35rem}.mm-comment-compose-footer{align-items:flex-end}
-      #mmCommentSubmit{max-width:70%;padding:0 .65rem}.mm-comment-date{width:100%;margin-left:0}.mm-comment-item{padding:.65rem}
-    }
+    .mm-comment-compose-main{min-width:0}.mm-comment-compose-meta{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem}.mm-comment-compose-meta strong{font-size:.72rem}.mm-comment-compose-meta span{color:#748195;font-size:.6rem}
+    #mmCommentInput{width:100%;min-height:6.4rem;resize:vertical;padding:.7rem .75rem;border:1px solid rgba(255,255,255,.065);border-radius:.72rem;outline:0;background:#0c121a;color:#edf3fb;font:inherit;font-size:.75rem;line-height:1.5;box-sizing:border-box}
+    #mmCommentInput:focus{border-color:rgba(74,132,224,.5);box-shadow:0 0 0 3px rgba(74,132,224,.08)}#mmCommentInput:disabled{opacity:.62;cursor:not-allowed}
+    .mm-comment-compose-footer{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin-top:.5rem}.mm-comment-compose-footer>span{color:#718096;font-size:.62rem}.mm-comment-compose-footer button{min-height:2.35rem;padding:0 .85rem;border:0;border-radius:.68rem;background:#2f70d3;color:#fff;font-size:.66rem;font-weight:850;cursor:pointer}.mm-comment-compose-footer button:disabled{opacity:.58;cursor:wait}
+    .mm-comments-state{padding:1rem 0;color:#7b8799;text-align:center;font-size:.68rem}.mm-comments-state[hidden]{display:none}
+    .mm-comments-list{display:grid;gap:.5rem;margin-top:.78rem}.mm-comment-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.65rem;padding:.72rem;border:1px solid rgba(255,255,255,.055);border-radius:.8rem;background:#0f151d}.mm-comment-card-avatar{width:2.35rem;height:2.35rem;display:grid;place-items:center;overflow:hidden;border-radius:.72rem;background:linear-gradient(145deg,var(--comment-accent,#526782),#202a38);color:#fff;font-size:.65rem;font-weight:900}.mm-comment-card-avatar img{width:100%;height:100%;object-fit:cover}.mm-comment-card-main{min-width:0}.mm-comment-card-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem}.mm-comment-card-author{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}.mm-comment-card-author strong{font-size:.7rem}.mm-comment-card-author span,.mm-comment-card-head>span{color:#748195;font-size:.56rem}.mm-comment-scope{padding:.13rem .32rem;border-radius:999px;background:rgba(75,132,224,.1);color:#78a7ef!important;font-size:.5rem!important;font-weight:800}.mm-comment-card p{margin:.3rem 0 0;color:#b9c3d1;font-size:.68rem;line-height:1.52;white-space:pre-wrap;overflow-wrap:anywhere}.mm-comment-card-actions{display:flex;gap:.4rem;margin-top:.45rem}.mm-comment-card-actions button{min-height:1.85rem;padding:0 .48rem;border:1px solid rgba(255,255,255,.055);border-radius:.52rem;background:#151d27;color:#9aa8ba;font-size:.55rem;font-weight:750;cursor:pointer}.mm-comment-card-actions button.active{color:#7eaeff;border-color:rgba(76,139,255,.18);background:rgba(76,139,255,.08)}
+    body.light .manga-comments-direct,body.light .mm-comment-composer,body.light .mm-comment-card{background:#fff;border-color:rgba(0,0,0,.07);color:#11151d}body.light #mmCommentInput{background:#f7f9fc;color:#11151d;border-color:rgba(0,0,0,.08)}body.light .mm-comment-card p{color:#5f6877}body.light .mm-comment-card-actions button{background:#f3f6fa;border-color:rgba(0,0,0,.06);color:#657286}
+    @media(max-width:560px){.manga-comments-direct{padding:.8rem}.mm-comments-head{align-items:flex-start;flex-direction:column;gap:.35rem}.mm-comment-composer{grid-template-columns:1fr}.mm-comment-avatar{width:2.55rem;height:2.55rem}.mm-comment-compose-footer button{min-height:2.6rem}.manga-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
   `;
   document.head.append(style);
 
-  const form=document.querySelector("#mmCommentForm");
-  const input=document.querySelector("#mmCommentInput");
-  const submit=document.querySelector("#mmCommentSubmit");
-  const list=document.querySelector("#mmCommentsList");
-  const state=document.querySelector("#mmCommentState");
-  const count=document.querySelector("#mmCommentCount");
-  const chars=document.querySelector("#mmCommentChars");
-  const composerName=document.querySelector("#mmCommentComposerName");
-  const composerHandle=document.querySelector("#mmCommentComposerHandle");
-  const avatar=document.querySelector("#mmCommentAvatar");
-  const avatarImage=document.querySelector("#mmCommentAvatarImage");
-  const initialsNode=document.querySelector("#mmCommentInitials");
+  const form=$("#mmCommentForm");
+  const input=$("#mmCommentInput");
+  const submit=$("#mmCommentSubmit");
+  const chars=$("#mmCommentChars");
+  const count=$("#mmCommentCount");
+  const state=$("#mmCommentState");
+  const list=$("#mmCommentsList");
+  const avatar=$("#mmCommentAvatar");
+  const avatarImage=$("#mmCommentAvatarImage");
+  const avatarInitials=$("#mmCommentInitials");
+  const composerName=$("#mmCommentComposerName");
+  const composerHandle=$("#mmCommentComposerHandle");
 
-  let session=null;
-  let profile=null;
-  let comments=[];
-  let likes=[];
-
-  function esc(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-  function initials(value){const parts=String(value||"Leitor").trim().split(/\s+/).filter(Boolean);return(parts.slice(0,2).map(x=>x[0]).join("")||"L").toUpperCase()}
-  function safeImage(value){try{const u=new URL(String(value||""));return u.protocol==="https:"?u.toString():""}catch{return""}}
-  function dateLabel(value){try{return new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(value)).replace(".","")}catch{return""}}
-  function login(){const returnTo="manga.html?id="+mangaId+"#comments";location.href="index.html?auth=login&return="+encodeURIComponent(returnTo)}
-
-  function updateComposer(){
-    const logged=Boolean(session?.user&&profile);
-    if(logged){
-      const name=profile.display_name||profile.username||"Leitor";
-      const image=safeImage(profile.avatar_url);
-      composerName.textContent="Comentar como "+name;
-      composerHandle.textContent=profile.username?"@"+profile.username+" · MangaMorph":"Conta MangaMorph";
-      submit.textContent="Publicar";
-      input.disabled=false;
-      initialsNode.textContent=initials(name);
-      if(image){avatarImage.src=image;avatarImage.hidden=false;initialsNode.hidden=true}else{avatarImage.hidden=true;initialsNode.hidden=false}
-      avatar.style.background=profile.accent||"linear-gradient(145deg,#244b7b,#17263a)";
-    }else{
-      composerName.textContent="Entre para comentar";
-      composerHandle.textContent="Faça login para participar da conversa.";
-      submit.textContent="Entrar para comentar";
-      input.disabled=true;
-      input.placeholder="Entre na sua conta para escrever um comentário…";
-      avatarImage.hidden=true;initialsNode.hidden=false;initialsNode.textContent="?";
-    }
+  function loginUrl(){
+    return "index.html?auth=login&return="+encodeURIComponent("manga.html?id="+mangaId+"#comments");
   }
 
-  function likeCount(id){return likes.filter(x=>Number(x.comment_id)===Number(id)).length}
-  function likedByMe(id){return Boolean(session?.user&&likes.some(x=>Number(x.comment_id)===Number(id)&&x.user_id===session.user.id))}
+  function renderComposer(){
+    const logged=Boolean(session?.user&&profile);
+    input.disabled=!logged;
+    submit.disabled=false;
+    submit.textContent=logged?"Publicar":"Entrar para comentar";
+    if(!logged){
+      composerName.textContent="Entre para comentar";
+      composerHandle.textContent="Sua conta MangaMorph será exibida.";
+      avatarImage.hidden=true;
+      avatarInitials.hidden=false;
+      avatarInitials.textContent="?";
+      return;
+    }
+    const name=profile.display_name||profile.username||"Leitor";
+    const image=safeUrl(profile.avatar_url);
+    composerName.textContent="Comentar como "+name;
+    composerHandle.textContent="@"+(profile.username||"leitor")+" · MangaMorph";
+    avatar.style.setProperty("--avatar-accent",profile.accent||"#5b8def");
+    avatarInitials.textContent=initials(name);
+    avatarInitials.hidden=Boolean(image);
+    avatarImage.hidden=!image;
+    if(image)avatarImage.src=image;
+  }
 
-  function render(){
-    const total=comments.length;
-    count.textContent=total+(total===1?" comentário":" comentários");
-    state.hidden=total>0;
-    if(!total){state.textContent="Ainda não há comentários. Seja o primeiro a comentar.";list.innerHTML="";return}
+  function likeCount(commentId){return likes.filter(row=>Number(row.comment_id)===Number(commentId)).length}
+  function likedByMe(commentId){return Boolean(session?.user&&likes.some(row=>Number(row.comment_id)===Number(commentId)&&row.user_id===session.user.id))}
+
+  function renderComments(){
+    count.textContent=comments.length+(comments.length===1?" comentário":" comentários");
+    if(!comments.length){
+      state.hidden=false;
+      state.textContent="Ainda não há comentários nesta obra.";
+      list.innerHTML="";
+      return;
+    }
+    state.hidden=true;
     list.innerHTML=comments.map(comment=>{
       const author=comment.author||{};
       const name=author.display_name||author.username||"Leitor";
-      const image=safeImage(author.avatar_url);
+      const image=safeUrl(author.avatar_url);
       const mine=session?.user?.id===comment.user_id;
       const liked=likedByMe(comment.id);
-      const avatarHtml=image?`<img src="${esc(image)}" alt="" loading="lazy">`:`<span>${esc(initials(name))}</span>`;
-      return `<article class="mm-comment-item" data-comment-id="${Number(comment.id)}">
-        <div class="mm-comment-item-avatar">${avatarHtml}</div>
-        <div class="mm-comment-item-body">
-          <div class="mm-comment-item-top">
-            <strong>${esc(name)}</strong>
-            ${mine?'<span class="mm-comment-you">você</span>':''}
-            ${author.username?`<span class="mm-comment-handle">@${esc(author.username)}</span>`:""}
-            <span class="mm-comment-date">${esc(dateLabel(comment.created_at))}</span>
+      const scope=comment.chapter_number==null?"Obra":"Cap. "+comment.chapter_number;
+      return `<article class="mm-comment-card" data-comment-id="${comment.id}">
+        <div class="mm-comment-card-avatar" style="--comment-accent:${esc(author.accent||"#526782")}">${image?`<img src="${esc(image)}" alt="" loading="lazy">`:`<span>${esc(initials(name))}</span>`}</div>
+        <div class="mm-comment-card-main">
+          <div class="mm-comment-card-head">
+            <div class="mm-comment-card-author"><strong>${esc(name)}</strong><span>@${esc(author.username||"leitor")}</span><span class="mm-comment-scope">${esc(scope)}</span></div>
+            <span>${esc(fmtDate(comment.created_at))}</span>
           </div>
           <p>${esc(comment.content)}</p>
-          <div class="mm-comment-actions">
-            <button type="button" data-mm-like="${Number(comment.id)}" class="${liked?"active":""}">♡ ${likeCount(comment.id)}</button>
-            ${mine?`<button type="button" data-mm-delete="${Number(comment.id)}">Excluir</button>`:""}
+          <div class="mm-comment-card-actions">
+            <button type="button" data-mm-like="${comment.id}" class="${liked?"active":""}">♡ ${likeCount(comment.id)}</button>
+            ${mine?`<button type="button" data-mm-delete="${comment.id}">Excluir</button>`:""}
           </div>
         </div>
       </article>`;
@@ -177,80 +174,112 @@ if(!window.__mangamorphPageCommentsLoaded){
   }
 
   async function loadLikes(){
-    const ids=comments.map(x=>x.id);
+    const ids=comments.map(row=>row.id);
     if(!ids.length){likes=[];return}
     const {data,error}=await supabase.from("mangamorph_comment_likes").select("comment_id,user_id").in("comment_id",ids);
     likes=error?[]:(data||[]);
   }
 
   async function loadComments(){
-    state.hidden=false;state.textContent="Carregando comentários…";list.innerHTML="";
-    const {data,error}=await supabase
-      .from("mangamorph_comments")
-      .select('id,manga_id,user_id,content,created_at,updated_at,author:mangamorph_profiles!mangamorph_comments_user_id_fkey(display_name,username,avatar_url,accent)')
+    state.hidden=false;
+    state.textContent="Carregando comentários…";
+    const {data,error}=await supabase.from("mangamorph_comments")
+      .select('id,manga_id,chapter_number,user_id,content,created_at,author:mangamorph_profiles!mangamorph_comments_user_id_fkey(display_name,username,avatar_url,accent)')
       .eq("manga_id",mangaId)
       .order("created_at",{ascending:false})
       .limit(100);
-    if(error){state.hidden=false;state.textContent="Não foi possível carregar os comentários agora.";return}
+    if(error){
+      state.hidden=false;
+      state.textContent="Não foi possível carregar os comentários agora.";
+      console.error("MangaMorph comments load:",error);
+      return;
+    }
     comments=data||[];
     await loadLikes();
-    render();
-  }
-
-  async function loadAccount(){
-    const {data:{session:current}}=await supabase.auth.getSession();
-    session=current;
-    profile=null;
-    if(session?.user){
-      const {data}=await supabase.from("mangamorph_profiles").select("id,display_name,username,avatar_url,accent").eq("id",session.user.id).maybeSingle();
-      profile=data||null;
-    }
-    updateComposer();
+    renderComments();
   }
 
   input.addEventListener("input",()=>{chars.textContent=input.value.length+"/280"});
-  input.addEventListener("click",()=>{if(!session?.user)login()});
 
   form.addEventListener("submit",async event=>{
     event.preventDefault();
-    if(!session?.user||!profile){login();return}
-    const text=String(input.value||"").trim();
-    if(!text)return;
-    submit.disabled=true;submit.textContent="Publicando…";
-    const {error}=await supabase.from("mangamorph_comments").insert({manga_id:mangaId,user_id:session.user.id,content:text.slice(0,280)});
-    submit.disabled=false;submit.textContent="Publicar";
-    if(error){state.hidden=false;state.textContent="Não foi possível publicar o comentário.";return}
-    input.value="";chars.textContent="0/280";
+    if(!session?.user||!profile){location.href=loginUrl();return}
+    const text=input.value.trim();
+    if(!text||sending)return;
+    sending=true;
+    submit.disabled=true;
+    submit.textContent="Publicando…";
+    state.hidden=true;
+
+    const {error}=await supabase.from("mangamorph_comments").insert({
+      manga_id:mangaId,
+      user_id:session.user.id,
+      content:text.slice(0,280),
+      chapter_number:null
+    });
+
+    sending=false;
+    submit.disabled=false;
+    submit.textContent="Publicar";
+
+    if(error){
+      console.error("MangaMorph comment publish:",error);
+      state.hidden=false;
+      state.textContent="Não foi possível publicar o comentário. Tente novamente.";
+      return;
+    }
+
+    input.value="";
+    chars.textContent="0/280";
+    state.hidden=false;
+    state.textContent="Comentário publicado.";
     await loadComments();
   });
 
   list.addEventListener("click",async event=>{
     const like=event.target.closest("[data-mm-like]");
-    const remove=event.target.closest("[data-mm-delete]");
+    const del=event.target.closest("[data-mm-delete]");
     if(like){
-      if(!session?.user){login();return}
-      const id=Number(like.dataset.mmLike);like.disabled=true;
-      if(likedByMe(id))await supabase.from("mangamorph_comment_likes").delete().eq("comment_id",id).eq("user_id",session.user.id);
-      else await supabase.from("mangamorph_comment_likes").insert({comment_id:id,user_id:session.user.id});
-      await loadLikes();render();return;
+      if(!session?.user){location.href=loginUrl();return}
+      const id=Number(like.dataset.mmLike);
+      like.disabled=true;
+      if(likedByMe(id)){
+        await supabase.from("mangamorph_comment_likes").delete().eq("comment_id",id).eq("user_id",session.user.id);
+      }else{
+        await supabase.from("mangamorph_comment_likes").insert({comment_id:id,user_id:session.user.id});
+      }
+      await loadComments();
+      return;
     }
-    if(remove){
+    if(del){
       if(!session?.user)return;
-      const id=Number(remove.dataset.mmDelete);
-      const target=comments.find(x=>Number(x.id)===id);
-      if(!target||target.user_id!==session.user.id)return;
-      remove.disabled=true;
-      await supabase.from("mangamorph_comments").delete().eq("id",id).eq("user_id",session.user.id);
+      const id=Number(del.dataset.mmDelete);
+      const row=comments.find(item=>Number(item.id)===id);
+      if(!row||row.user_id!==session.user.id)return;
+      del.disabled=true;
+      const {error}=await supabase.from("mangamorph_comments").delete().eq("id",id).eq("user_id",session.user.id);
+      if(error){state.hidden=false;state.textContent="Não foi possível excluir o comentário.";return}
       await loadComments();
     }
   });
 
-  await loadAccount();
+  const {data:{session:currentSession}}=await supabase.auth.getSession();
+  session=currentSession;
+  if(session?.user){
+    const {data}=await supabase.from("mangamorph_profiles").select("id,display_name,username,avatar_url,accent").eq("id",session.user.id).maybeSingle();
+    profile=data||null;
+  }
+  renderComposer();
   await loadComments();
 
-  supabase.auth.onAuthStateChange(async(_event,newSession)=>{
-    session=newSession;
-    await loadAccount();
+  supabase.auth.onAuthStateChange(async(_event,nextSession)=>{
+    session=nextSession;
+    profile=null;
+    if(session?.user){
+      const {data}=await supabase.from("mangamorph_profiles").select("id,display_name,username,avatar_url,accent").eq("id",session.user.id).maybeSingle();
+      profile=data||null;
+    }
+    renderComposer();
     await loadComments();
   });
 }
