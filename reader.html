@@ -7,6 +7,9 @@
   <meta name="description" content="Leitor de capítulos do MangaMorph.">
   <title>MangaMorph — Leitor</title>
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="modulepreload" href="assets/js/reader-runtime.js?v=007">
   <link rel="stylesheet" href="assets/css/style.css?v=041">
   <link rel="stylesheet" href="assets/css/reader.css?v=008">
   <script>
@@ -18,21 +21,19 @@
 <body class="reader-body light-reader">
   <header class="reader-header" id="readerHeader">
     <a class="reader-back reader-home-mark" id="readerBack" href="./" aria-label="MangaMorph — voltar à página inicial" title="Início">M</a>
-
     <div class="reader-heading">
       <span class="reader-brand">MangaMorph</span>
-      <a class="reader-title-link" id="readerTitleLink" href="manga.html" aria-label="Abrir página da obra"><strong id="readerTitle">Neon Ronin</strong></a>
-      <small id="readerChapterLabel">Capítulo 127</small>
+      <a class="reader-title-link" id="readerTitleLink" href="manga.html" aria-label="Abrir página da obra"><strong id="readerTitle">Carregando...</strong></a>
+      <small id="readerChapterLabel">Preparando capítulo</small>
     </div>
-
     <button class="reader-icon-button" id="readerSettingsButton" type="button" aria-label="Configurações de leitura">⚙</button>
   </header>
 
   <main class="reader-main">
     <div class="reader-progress-shell">
       <div class="reader-progress-meta">
-        <span id="readerProgressText">Página 1 de 6</span>
-        <span id="readerProgressPercent">0%</span>
+        <span id="readerProgressText">Preparando capítulo</span>
+        <span id="readerProgressPercent">…</span>
       </div>
       <div class="reader-progress-track"><span id="readerProgressBar"></span></div>
     </div>
@@ -41,7 +42,7 @@
 
     <div class="reader-finish" id="readerFinish">
       <span>Fim do capítulo</span>
-      <strong id="finishChapterLabel">Capítulo 127 concluído</strong>
+      <strong id="finishChapterLabel">Capítulo concluído</strong>
       <div class="reader-finish-actions">
         <button type="button" id="finishPrevious">← Anterior</button>
         <button type="button" id="finishNext">Próximo →</button>
@@ -52,7 +53,7 @@
       <div class="chapter-community-head">
         <div>
           <span>COMUNIDADE DO CAPÍTULO</span>
-          <h2 id="chapterCommunityTitle">Capítulo 127</h2>
+          <h2 id="chapterCommunityTitle">Capítulo</h2>
           <p>Escolha quantas reações quiser e converse com outros leitores.</p>
         </div>
         <small id="chapterReactionTotal">0 reações</small>
@@ -108,7 +109,7 @@
     <button type="button" id="previousChapter" aria-label="Capítulo anterior">←</button>
     <button class="reader-chapter-pill" type="button" id="chapterPickerButton">
       <span>Capítulo</span>
-      <strong id="bottomChapterLabel">127</strong>
+      <strong id="bottomChapterLabel">…</strong>
       <small>⌄</small>
     </button>
     <button type="button" id="nextChapter" aria-label="Próximo capítulo">→</button>
@@ -119,10 +120,7 @@
     <div class="reader-sheet-backdrop" data-close-reader-sheet></div>
     <section class="reader-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="chapterPickerTitle">
       <div class="reader-sheet-head">
-        <div>
-          <span>CAPÍTULOS</span>
-          <h2 id="chapterPickerTitle">Escolher capítulo</h2>
-        </div>
+        <div><span>CAPÍTULOS</span><h2 id="chapterPickerTitle">Escolher capítulo</h2></div>
         <button type="button" data-close-reader-sheet aria-label="Fechar">×</button>
       </div>
       <div class="reader-chapter-grid" id="readerChapterGrid"></div>
@@ -133,23 +131,17 @@
     <div class="reader-sheet-backdrop" data-close-reader-settings></div>
     <section class="reader-sheet-panel reader-settings-panel" role="dialog" aria-modal="true" aria-labelledby="readerSettingsTitle">
       <div class="reader-sheet-head">
-        <div>
-          <span>LEITURA</span>
-          <h2 id="readerSettingsTitle">Configurações</h2>
-        </div>
+        <div><span>LEITURA</span><h2 id="readerSettingsTitle">Configurações</h2></div>
         <button type="button" data-close-reader-settings aria-label="Fechar">×</button>
       </div>
-
       <div class="reader-setting-row">
         <div><strong>Modo de leitura</strong><span>Rolagem vertical</span></div>
         <span class="reader-setting-value">Vertical</span>
       </div>
-
       <button class="reader-setting-row reader-setting-button" id="readerThemeToggle" type="button">
         <div><strong>Tema</strong><span>Fundo do leitor</span></div>
         <span class="reader-setting-value" id="readerThemeLabel">Escuro</span>
       </button>
-
       <button class="reader-setting-row reader-setting-button" id="readerControlsToggle" type="button">
         <div><strong>Controles</strong><span>Mostrar cabeçalho e barra inferior</span></div>
         <span class="reader-toggle active" id="readerControlsSwitch"></span>
@@ -159,9 +151,9 @@
 
   <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/js/reader.js?v=009" defer></script>
-  <script type="module" src="assets/js/reader-runtime.js?v=006"></script>
-  <script src="assets/js/reader-ui-fixes.js?v=002" defer></script>
+  <script src="assets/js/reader.js?v=010" defer></script>
+  <script type="module" src="assets/js/reader-runtime.js?v=007"></script>
+  <script src="assets/js/reader-ui-fixes.js?v=003" defer></script>
   <script type="module" src="assets/js/account-sync.js?v=002"></script>
   <script type="module" src="assets/js/reader-community.js?v=003"></script>
 </body>
