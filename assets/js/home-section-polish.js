@@ -13,13 +13,16 @@
     setTimeout(()=>document.head.appendChild(link),900);
   };
 
-  // Current MangaMorph-native profile drawer + final home guardrails.
+  // Base/current MangaMorph UI layers.
   ensureStyle('assets/css/account-menu.css?v=003','accountMenuStyle');
   ensureStyle('assets/css/home-final-fixes.css?v=001','homeFinalFixes');
   ensureStyle('assets/css/card-compact-fix.css?v=001','cardCompactFix');
   ensureStyle('assets/css/hero-actions-reference.css?v=001','heroActionsReference');
-  // Must be last: adapts every remaining white account/card surface to dark mode.
-  ensureStyle('assets/css/dark-theme-final.css?v=001','darkThemeFinal');
+
+  // Theme layers are fully isolated by body.light vs body:not(.light).
+  // Keep both loaded so switching themes never flashes the opposite palette.
+  ensureStyle('assets/css/dark-theme-final.css?v=002','darkThemeFinal');
+  ensureStyle('assets/css/light-theme-final.css?v=001','lightThemeFinal');
 
   const settingsList=document.querySelector('#settingsPanel .settings-list');
   if(settingsList){
@@ -86,6 +89,13 @@
 
   clearLegacyCatalog();
 
+  const keepThemeStylesLast=()=>{
+    ['homeFinalFixes','cardCompactFix','heroActionsReference','darkThemeFinal','lightThemeFinal'].forEach(key=>{
+      const link=document.querySelector('link[data-'+key+']');
+      if(link)document.head.appendChild(link);
+    });
+  };
+
   const revealLive=()=>{
     document.documentElement.classList.add('mm-live-ready');
     document.documentElement.classList.remove('mm-prelive');
@@ -93,16 +103,20 @@
     const actions=document.querySelector('.featured-actions');
     if(actions)actions.style.visibility='';
     document.querySelector('#mmNoLegacyFlash')?.remove();
-    ['home-final-fixes','card-compact-fix','hero-actions-reference','darkThemeFinal'].forEach(key=>{
-      const link=document.querySelector('link[data-'+key+']');
-      if(link)document.head.appendChild(link);
-    });
+    keepThemeStylesLast();
   };
 
   window.addEventListener('mangamorph:catalog-loaded',()=>requestAnimationFrame(revealLive),{once:true});
   window.addEventListener('mangamorph:catalog-error',()=>requestAnimationFrame(revealLive),{once:true});
 
+  // Reassert final theme layers after a theme switch, without mixing palettes.
   document.addEventListener('click',event=>{
+    const themeChoice=event.target.closest('[data-theme]');
+    if(themeChoice){
+      requestAnimationFrame(keepThemeStylesLast);
+      setTimeout(keepThemeStylesLast,40);
+    }
+
     const choice=event.target.closest('[data-filter]');
     if(!choice)return;
     const labels={Padrão:'Todos',Mangá:'Mangá · Japão',Manhwa:'Manhwa · Coreia',Manhua:'Manhua · China'};
