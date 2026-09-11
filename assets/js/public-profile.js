@@ -1,4 +1,5 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+if(!document.querySelector('link[data-mm-gray-theme]')){const theme=document.createElement('link');theme.rel='stylesheet';theme.href='assets/css/system-gray.css?v=001';theme.dataset.mmGrayTheme='1';document.head.append(theme)}
 const supabase=createClient("https://fnyellunugdfesprmvzm.supabase.co","sb_publishable_clf6HlhhxdftO1_XZU7YsA_pRmkCEJK");
 const username=new URLSearchParams(location.search).get("user")||"";
 const $=id=>document.querySelector("#"+id);
@@ -11,7 +12,7 @@ async function load(){
   if(error||!profile||!profile.is_public)return fail();
   document.title="MangaMorph — "+profile.display_name;
   $("publicDisplayName").textContent=profile.display_name;$("publicUsername").textContent="@"+profile.username;$("publicBio").textContent=profile.bio||"Leitor do MangaMorph.";
-  $("publicAvatar").style.setProperty("--accent",profile.accent||"#5b8def");
+  $("publicAvatar").style.setProperty("--accent",profile.accent||"#5d769c");
   const image=safeUrl(profile.avatar_url);$("publicAvatarInitials").textContent=initials(profile.display_name);$("publicAvatarImage").hidden=!image;$("publicAvatarInitials").hidden=!!image;if(image)$("publicAvatarImage").src=image;
   const {data:stats}=await supabase.rpc("get_mangamorph_public_profile_stats",{profile_username:profile.username});
   const s=stats?.[0]||{};$("publicRatingCount").textContent=s.ratings_count||0;$("publicCommentCount").textContent=s.comments_count||0;$("publicReactionCount").textContent=s.reactions_count||0;
