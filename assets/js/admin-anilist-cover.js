@@ -120,6 +120,31 @@ if(!window.__mangamorphAniListProfileLoaded){
     showLinkState();
   }
 
+  async function readInvokePayload(error){
+    try{
+      if(error?.context&&typeof error.context.clone==="function")return await error.context.clone().json();
+    }catch{}
+    return null;
+  }
+
+  async function invokeAniListProfile(session,mangaId,onFallback){
+    supabase.functions.setAuth(session.access_token);
+    const primary=await supabase.functions.invoke("mangamorph-import-anilist-cover",{body:{manga_id:mangaId}});
+    if(!primary.error&&primary.data?.ok)return primary.data;
+
+    const primaryPayload=await readInvokePayload(primary.error);
+    const unavailable=primaryPayload?.code==="ANILIST_UNAVAILABLE"||/temporariamente indisponível|temporarily disabled|stability|unavailable/i.test(String(primaryPayload?.error||primary.error?.message||""));
+    if(!unavailable){
+      throw new Error(primaryPayload?.error||primary.data?.error||primary.error?.message||"Não foi possível atualizar o perfil pelo AniList.");
+    }
+
+    onFallback?.();
+    const fallback=await supabase.functions.invoke("mangamorph-anilist-page-fallback",{body:{manga_id:mangaId}});
+    if(!fallback.error&&fallback.data?.ok)return fallback.data;
+    const fallbackPayload=await readInvokePayload(fallback.error);
+    throw new Error(fallbackPayload?.error||fallback.data?.error||primaryPayload?.error||"O AniList está temporariamente indisponível.");
+  }
+
   aniInput?.addEventListener("input",showLinkState);
   aniInput?.addEventListener("change",()=>{showLinkState();syncHiddenFromVisible()});
 
@@ -187,10 +212,9 @@ if(!window.__mangamorphAniListProfileLoaded){
           if(saveLinkError)throw saveLinkError;
         }
 
-        supabase.functions.setAuth(session.access_token);
-        const {data,error}=await supabase.functions.invoke("mangamorph-import-anilist-cover",{body:{manga_id:mangaId}});
-        if(error)throw error;
-        if(!data?.ok)throw new Error(data?.error||"Não foi possível atualizar o perfil pelo AniList.");
+        const data=await invokeAniListProfile(session,mangaId,()=>{
+          message.textContent="A API do AniList está instável. Tentando obter capa e dados pela página pública da obra…";
+        });
 
         const url=String(data.cover_url||"");
         const imported=$("mangaImportedCoverUrl");
@@ -199,24 +223,23 @@ if(!window.__mangamorphAniListProfileLoaded){
           metadataSource.value="AniList API";
           metadataSourceId.value=String(data.anilist_id);
           metadataSourceUrl.value=data.anilist_url||`https://anilist.co/manga/${data.anilist_id}`;
-          aniInput.value=metadataSourceUrl.value;
+          aniInput.value=`https://anilist.co/manga/${data.anilist_id}`;
           showLinkState();
         }
-        status.textContent="Perfil atualizado pelo AniList e capa salva no MangaMorph.";
-        const score=Number(data.match_score);
-        message.textContent=`Pronto: ${data.anilist_title||"perfil encontrado"}${Number.isFinite(score)?` · ${Math.round(score*100)}%`:""}.`;
+
+        if(data.partial_profile){
+          status.textContent=url?"Capa salva pelo AniList (fallback público).":"Perfil parcial obtido pelo AniList.";
+          message.textContent=data.message||"Perfil parcial atualizado pela página pública do AniList. Quando a API normalizar, o MangaMorph completa automaticamente os demais dados.";
+        }else{
+          status.textContent="Perfil atualizado pelo AniList e capa salva no MangaMorph.";
+          const score=Number(data.match_score);
+          message.textContent=`Pronto: ${data.anilist_title||"perfil encontrado"}${Number.isFinite(score)?` · ${Math.round(score*100)}%`:""}.`;
+        }
         if(url){preview.src=url;preview.hidden=false}
         window.dispatchEvent(new CustomEvent("mangamorph:admin-cover-imported",{detail:data}));
         return data;
       }catch(error){
-        let text=error?.message||"Falha ao consultar o AniList.";
-        try{
-          if(error?.context&&typeof error.context.clone==="function"){
-            const payload=await error.context.clone().json();
-            if(payload?.error)text=payload.error;
-          }
-        }catch{}
-        message.textContent=automatic?"Atualização automática: "+String(text):String(text);
+        message.textContent=automatic?"Atualização automática: "+String(error?.message||error):String(error?.message||error||"Falha ao consultar o AniList.");
         return null;
       }finally{
         busy=false;
