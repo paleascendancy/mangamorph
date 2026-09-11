@@ -14,14 +14,13 @@
   };
 
   // Current MangaMorph-native profile drawer + final home guardrails.
-  ensureStyle('assets/css/account-menu.css?v=002','accountMenuStyle');
+  ensureStyle('assets/css/account-menu.css?v=003','accountMenuStyle');
   ensureStyle('assets/css/home-final-fixes.css?v=001','homeFinalFixes');
   ensureStyle('assets/css/card-compact-fix.css?v=001','cardCompactFix');
   ensureStyle('assets/css/hero-actions-reference.css?v=001','heroActionsReference');
+  // Must be last: adapts every remaining white account/card surface to dark mode.
+  ensureStyle('assets/css/dark-theme-final.css?v=001','darkThemeFinal');
 
-  // Remove settings that no longer belong to the current product before the
-  // settings sheet can ever be opened. This replaces the old "render then hide"
-  // behavior that caused legacy rows to flash on slower phones.
   const settingsList=document.querySelector('#settingsPanel .settings-list');
   if(settingsList){
     ['language','notifications','reading'].forEach(name=>{
@@ -29,7 +28,6 @@
       document.querySelector('#'+name+'Menu')?.remove();
     });
 
-    // Keep one canonical catalog-origin filter. Delete any older copy first.
     settingsList.querySelector('[data-settings-section="filter"]')?.remove();
     document.querySelector('#filterMenu')?.remove();
 
@@ -62,8 +60,6 @@
     }
   }
 
-  // app.js still contains an old offline/demo catalog for fallback logic. Never
-  // allow that data to be visible while the real Supabase catalog is loading.
   const clearLegacyCatalog=()=>{
     ['#favoriteRail','#popularRail','#newRail','#releaseList','#rankingList','#searchResults'].forEach(selector=>{
       const node=document.querySelector(selector);
@@ -97,7 +93,7 @@
     const actions=document.querySelector('.featured-actions');
     if(actions)actions.style.visibility='';
     document.querySelector('#mmNoLegacyFlash')?.remove();
-    ['home-final-fixes','card-compact-fix','hero-actions-reference'].forEach(key=>{
+    ['home-final-fixes','card-compact-fix','hero-actions-reference','darkThemeFinal'].forEach(key=>{
       const link=document.querySelector('link[data-'+key+']');
       if(link)document.head.appendChild(link);
     });
@@ -106,7 +102,6 @@
   window.addEventListener('mangamorph:catalog-loaded',()=>requestAnimationFrame(revealLive),{once:true});
   window.addEventListener('mangamorph:catalog-error',()=>requestAnimationFrame(revealLive),{once:true});
 
-  // Keep filter labels synchronized with app.js without recreating old menus.
   document.addEventListener('click',event=>{
     const choice=event.target.closest('[data-filter]');
     if(!choice)return;
