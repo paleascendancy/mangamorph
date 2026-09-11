@@ -1,5 +1,6 @@
-const CACHE = "mangamorph-v0.17.27";
+const CACHE = "mangamorph-v0.17.28";
 const ASSETS = [
+  "./assets/css/ui-repair.css?v=001",
   "./",
   "./index.html",
   "./manga.html",
