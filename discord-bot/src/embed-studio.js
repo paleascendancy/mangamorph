@@ -17,7 +17,7 @@ const keyFor = (interaction) => `${interaction.guildId}:${interaction.user.id}`;
 
 const blankEmbed = (index = 1) => ({
   title: `Embed ${index}`,
-  description: 'Use os controles abaixo para personalizar este embed.',
+  description: 'Use os controles para personalizar este embed.',
   color: '#5865F2',
   url: '',
   image: '',
@@ -55,9 +55,9 @@ function clean(value = '') {
 }
 
 function parseColor(value) {
-  const cleanValue = String(value || '#5865F2').replace('#', '').trim();
-  if (!/^[0-9a-fA-F]{6}$/.test(cleanValue)) return null;
-  return Number.parseInt(cleanValue, 16);
+  const raw = String(value || '#5865F2').replace('#', '').trim();
+  if (!/^[0-9a-fA-F]{6}$/.test(raw)) return null;
+  return Number.parseInt(raw, 16);
 }
 
 function parseBoolean(value, fallback = false) {
@@ -161,33 +161,34 @@ function input(id, label, style, value, maxLength, placeholder = null) {
   return field;
 }
 
-function basicModal(session) {
+function titleModal(session) {
   const item = activeEmbed(session);
-  return new ModalBuilder().setCustomId('es_modal_edit').setTitle(`Editar Embed ${session.active + 1}`).addComponents(
+  return new ModalBuilder().setCustomId('es_modal_title').setTitle('Título do Embed').addComponents(
     new ActionRowBuilder().addComponents(input('title', 'Título', TextInputStyle.Short, item.title, 256, 'Título do embed')),
-    new ActionRowBuilder().addComponents(input('description', 'Descrição', TextInputStyle.Paragraph, item.description, 4000, 'Conteúdo principal')),
-    new ActionRowBuilder().addComponents(input('color', 'Cor hexadecimal', TextInputStyle.Short, item.color, 7, '#5865F2')),
-    new ActionRowBuilder().addComponents(input('url', 'URL clicável do título', TextInputStyle.Short, item.url, 1000, 'https://...')),
-    new ActionRowBuilder().addComponents(input('image', 'Imagem grande', TextInputStyle.Short, item.image, 1000, 'https://...'))
+    new ActionRowBuilder().addComponents(input('url', 'URL clicável do título', TextInputStyle.Short, item.url, 1000, 'https://...'))
   );
 }
 
-function visualModal(session) {
+function descriptionModal(session) {
   const item = activeEmbed(session);
-  return new ModalBuilder().setCustomId('es_modal_visual').setTitle('Visual do Embed').addComponents(
-    new ActionRowBuilder().addComponents(input('thumbnail', 'Thumbnail', TextInputStyle.Short, item.thumbnail, 1000, 'https://...')),
-    new ActionRowBuilder().addComponents(input('timestamp', 'Timestamp: sim ou não', TextInputStyle.Short, item.timestamp ? 'sim' : 'não', 5, 'sim'))
+  return new ModalBuilder().setCustomId('es_modal_description').setTitle('Descrição do Embed').addComponents(
+    new ActionRowBuilder().addComponents(input('description', 'Descrição', TextInputStyle.Paragraph, item.description, 4000, 'Conteúdo principal do embed'))
+  );
+}
+
+function colorModal(session) {
+  const item = activeEmbed(session);
+  return new ModalBuilder().setCustomId('es_modal_color').setTitle('Cor do Embed').addComponents(
+    new ActionRowBuilder().addComponents(input('color', 'Cor hexadecimal', TextInputStyle.Short, item.color, 7, '#5865F2'))
   );
 }
 
 function authorModal(session) {
   const item = activeEmbed(session);
-  return new ModalBuilder().setCustomId('es_modal_author').setTitle('Autor e Rodapé').addComponents(
-    new ActionRowBuilder().addComponents(input('author', 'Autor', TextInputStyle.Short, item.author, 256)),
+  return new ModalBuilder().setCustomId('es_modal_author').setTitle('Autor do Embed').addComponents(
+    new ActionRowBuilder().addComponents(input('author', 'Nome do autor', TextInputStyle.Short, item.author, 256, 'MangaMorph')),
     new ActionRowBuilder().addComponents(input('author_url', 'URL do autor', TextInputStyle.Short, item.authorUrl, 1000, 'https://...')),
-    new ActionRowBuilder().addComponents(input('author_icon', 'Ícone do autor', TextInputStyle.Short, item.authorIcon, 1000, 'https://...')),
-    new ActionRowBuilder().addComponents(input('footer', 'Rodapé', TextInputStyle.Short, item.footer, 2048)),
-    new ActionRowBuilder().addComponents(input('footer_icon', 'Ícone do rodapé', TextInputStyle.Short, item.footerIcon, 1000, 'https://...'))
+    new ActionRowBuilder().addComponents(input('author_icon', 'Ícone do autor', TextInputStyle.Short, item.authorIcon, 1000, 'https://...'))
   );
 }
 
@@ -196,12 +197,29 @@ function fieldsModal(session) {
   return new ModalBuilder().setCustomId('es_modal_fields').setTitle('Campos do Embed').addComponents(
     new ActionRowBuilder().addComponents(input(
       'fields',
-      'Campos: Nome|Valor|inline;;...',
+      'Nome|Valor|inline ;; próximo...',
       TextInputStyle.Paragraph,
       stringifyFields(item.fields),
       4000,
       'Plano|R$ 20|true;;Prazo|2 dias|true'
     ))
+  );
+}
+
+function mediaModal(session) {
+  const item = activeEmbed(session);
+  return new ModalBuilder().setCustomId('es_modal_media').setTitle('Imagem e Thumbnail').addComponents(
+    new ActionRowBuilder().addComponents(input('image', 'Imagem grande', TextInputStyle.Short, item.image, 1000, 'https://...')),
+    new ActionRowBuilder().addComponents(input('thumbnail', 'Thumbnail', TextInputStyle.Short, item.thumbnail, 1000, 'https://...'))
+  );
+}
+
+function footerModal(session) {
+  const item = activeEmbed(session);
+  return new ModalBuilder().setCustomId('es_modal_footer').setTitle('Rodapé do Embed').addComponents(
+    new ActionRowBuilder().addComponents(input('footer', 'Texto do rodapé', TextInputStyle.Short, item.footer, 2048, 'MangaMorph')),
+    new ActionRowBuilder().addComponents(input('footer_icon', 'Ícone do rodapé', TextInputStyle.Short, item.footerIcon, 1000, 'https://...')),
+    new ActionRowBuilder().addComponents(input('timestamp', 'Timestamp: sim ou não', TextInputStyle.Short, item.timestamp ? 'sim' : 'não', 5, 'sim'))
   );
 }
 
@@ -228,6 +246,13 @@ function personalizedModal(session) {
   );
 }
 
+function importJsonModal(session) {
+  const item = activeEmbed(session);
+  return new ModalBuilder().setCustomId('es_modal_import_json').setTitle(`Importar JSON • Embed ${session.active + 1}`).addComponents(
+    new ActionRowBuilder().addComponents(input('json', 'Cole o JSON do embed', TextInputStyle.Paragraph, JSON.stringify(exportableEmbed(item), null, 2), 4000, '{"title":"Meu título","color":"#5865F2"}'))
+  );
+}
+
 function generateModel(purpose, style, guildName) {
   const prompt = clean(purpose) || 'Informação importante para a comunidade';
   const tone = clean(style).toLowerCase();
@@ -249,59 +274,139 @@ function generateModel(purpose, style, guildName) {
   };
 }
 
+function exportableEmbed(item) {
+  return {
+    title: item.title || '',
+    description: item.description || '',
+    color: item.color || '#5865F2',
+    url: item.url || '',
+    image: item.image || '',
+    thumbnail: item.thumbnail || '',
+    author: item.author || '',
+    authorUrl: item.authorUrl || '',
+    authorIcon: item.authorIcon || '',
+    footer: item.footer || '',
+    footerIcon: item.footerIcon || '',
+    fields: (item.fields || []).map((field) => ({ name: field.name, value: field.value, inline: Boolean(field.inline) })),
+    timestamp: Boolean(item.timestamp)
+  };
+}
+
+function normalizeImportedEmbed(raw, fallbackIndex) {
+  const author = typeof raw?.author === 'object' && raw.author !== null ? raw.author : null;
+  const footer = typeof raw?.footer === 'object' && raw.footer !== null ? raw.footer : null;
+  const image = typeof raw?.image === 'object' && raw.image !== null ? raw.image.url : raw?.image;
+  const thumbnail = typeof raw?.thumbnail === 'object' && raw.thumbnail !== null ? raw.thumbnail.url : raw?.thumbnail;
+  let color = raw?.color ?? '#5865F2';
+  if (typeof color === 'number' && Number.isFinite(color)) color = `#${color.toString(16).padStart(6, '0').slice(-6)}`;
+  if (typeof color === 'string' && !color.startsWith('#') && /^[0-9a-fA-F]{6}$/.test(color)) color = `#${color}`;
+
+  const normalized = {
+    ...blankEmbed(fallbackIndex),
+    title: clean(raw?.title ?? ''),
+    description: clean(raw?.description ?? ''),
+    color: clean(color) || '#5865F2',
+    url: clean(raw?.url ?? ''),
+    image: clean(image ?? ''),
+    thumbnail: clean(thumbnail ?? ''),
+    author: clean(author?.name ?? raw?.author ?? ''),
+    authorUrl: clean(author?.url ?? raw?.authorUrl ?? ''),
+    authorIcon: clean(author?.icon_url ?? author?.iconURL ?? raw?.authorIcon ?? ''),
+    footer: clean(footer?.text ?? raw?.footer ?? ''),
+    footerIcon: clean(footer?.icon_url ?? footer?.iconURL ?? raw?.footerIcon ?? ''),
+    fields: Array.isArray(raw?.fields) ? raw.fields.slice(0, 25).map((field) => ({
+      name: String(field?.name || 'Campo').slice(0, 256),
+      value: String(field?.value || '—').slice(0, 1024),
+      inline: Boolean(field?.inline)
+    })) : [],
+    timestamp: Boolean(raw?.timestamp)
+  };
+  buildOneEmbed(normalized);
+  return normalized;
+}
+
 async function resolveChannel(interaction, session) {
   if (!session.channelId) return interaction.channel;
   return interaction.guild.channels.fetch(session.channelId).catch(() => null);
 }
 
-async function panelPayload(interaction, session) {
-  const channel = await resolveChannel(interaction, session);
-  const previewEmbeds = session.embeds.map(buildOneEmbed);
-  const select = new StringSelectMenuBuilder()
+function embedSelect(session) {
+  return new StringSelectMenuBuilder()
     .setCustomId('es_select_embed')
-    .setPlaceholder(`Selecione um Embed para editar • atual: ${session.active + 1}`)
+    .setPlaceholder('Selecione um Embed para editar')
     .addOptions(session.embeds.map((item, index) => ({
       label: `Embed ${index + 1}`,
       description: (item.title || 'Sem título').slice(0, 90),
-      value: String(index),
-      default: index === session.active
+      value: String(index)
     })));
+}
 
-  const rowSelect = new ActionRowBuilder().addComponents(select);
-  const rowEdit = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('es_add_embed').setLabel('Adicionar Embed').setEmoji('➕').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_edit').setLabel('Editar').setEmoji('✏️').setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('es_visual').setLabel('Visual').setEmoji('🎨').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_fields').setLabel('Campos').setEmoji('🧩').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_remove_embed').setLabel('Remover').setEmoji('🗑️').setStyle(ButtonStyle.Danger)
-  );
-  const rowActions = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('es_author').setLabel('Autor/Rodapé').setEmoji('👤').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_add_button').setLabel('Adicionar Botão').setEmoji('🔗').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_generate').setLabel('Gerar Modelo').setEmoji('✨').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('es_personalized').setLabel('Enviar Personalizado').setEmoji('🪝').setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId('es_quick_send').setLabel('Enviar Rápido').setEmoji('➤').setStyle(ButtonStyle.Success)
-  );
-  const channelRow = new ActionRowBuilder().addComponents(
-    new ChannelSelectMenuBuilder()
-      .setCustomId('es_channel')
-      .setPlaceholder(`Canal de destino: ${channel?.name || 'selecione'}`.slice(0, 150))
-      .setChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
-      .setMinValues(1)
-      .setMaxValues(1)
-  );
+async function selectionPayload(interaction, session) {
+  const channel = await resolveChannel(interaction, session);
+  const preview = buildOneEmbed(activeEmbed(session));
+  const components = [
+    new ActionRowBuilder().addComponents(embedSelect(session)),
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId('es_add_embed').setLabel('Adicionar Embed').setEmoji('➕').setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId('es_generate').setLabel('Gerar Modelo').setEmoji('✨').setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId('es_add_button').setLabel('Adicionar Botão').setEmoji('🔗').setStyle(ButtonStyle.Secondary)
+    ),
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId('es_personalized').setLabel('Enviar Personalizado').setEmoji('🪝').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId('es_quick_send').setLabel('Enviar Rápido').setEmoji('📤').setStyle(ButtonStyle.Success)
+    ),
+    new ActionRowBuilder().addComponents(
+      new ChannelSelectMenuBuilder()
+        .setCustomId('es_channel')
+        .setPlaceholder(`Canal de destino: ${channel?.name || 'selecione'}`.slice(0, 150))
+        .setChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
+        .setMinValues(1)
+        .setMaxValues(1)
+    )
+  ];
 
-  const components = [rowSelect, rowEdit, rowActions, channelRow];
   const linkRow = buildLinkRow(session);
   if (linkRow) components.unshift(linkRow);
 
   return {
     content:
       `## 🧩 Painel de Criação de Embed\n` +
-      `**Prévia em tempo real** • ${session.embeds.length}/10 embeds • ${session.buttons.length}/5 botões\n` +
-      `Edite os elementos abaixo e veja o resultado antes de enviar.`,
-    embeds: previewEmbeds,
+      `**Passo 2 de 3** • selecione qual embed deseja editar ou adicione outro.\n` +
+      `${session.embeds.length}/10 embeds • ${session.buttons.length}/5 botões`,
+    embeds: [preview],
     components: components.slice(0, 5),
+    allowedMentions: { parse: [] }
+  };
+}
+
+async function editorPayload(interaction, session) {
+  const item = activeEmbed(session);
+  return {
+    content:
+      `## ✏️ Editando Embed ${session.active + 1}\n` +
+      `**Passo 3 de 3** • personalize cada parte abaixo. A prévia é atualizada quando você salva uma alteração.`,
+    embeds: [buildOneEmbed(item)],
+    components: [
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('es_title').setLabel('Título').setEmoji('📄').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('es_description').setLabel('Descrição').setEmoji('📝').setStyle(ButtonStyle.Secondary)
+      ),
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('es_color').setLabel('Cor').setEmoji('🎨').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('es_author').setLabel('Autor').setEmoji('👤').setStyle(ButtonStyle.Secondary)
+      ),
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('es_fields').setLabel('Editar Campos').setEmoji('🧩').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('es_media').setLabel('Imagem e Thumbnail').setEmoji('🖼️').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('es_footer').setLabel('Rodapé').setEmoji('🚩').setStyle(ButtonStyle.Secondary)
+      ),
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('es_back').setLabel('Voltar').setEmoji('↩️').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('es_import_json').setLabel('Importar JSON').setEmoji('📤').setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId('es_export_json').setLabel('Exportar JSON').setEmoji('📥').setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId('es_remove_embed').setLabel('Excluir').setEmoji('🗑️').setStyle(ButtonStyle.Danger)
+      )
+    ],
     allowedMentions: { parse: [] }
   };
 }
@@ -368,7 +473,7 @@ export async function setupEmbedStudio(guild) {
   const payload = { name: command.name, description: command.description, options };
   if (command.defaultMemberPermissions) payload.defaultMemberPermissions = command.defaultMemberPermissions;
   await command.edit(payload);
-  console.log(`[EMBED-STUDIO] ${guild.name}: /embed criar convertido para painel interativo.`);
+  console.log(`[EMBED-STUDIO] ${guild.name}: /embed criar em fluxo de 3 passos.`);
 }
 
 export async function handleEmbedStudioInteraction(interaction) {
@@ -391,7 +496,7 @@ export async function handleEmbedStudioInteraction(interaction) {
       webhookAvatar: interaction.guild.iconURL({ size: 256 }) || ''
     };
     sessions.set(keyFor(interaction), session);
-    await interaction.reply({ ...(await panelPayload(interaction, session)), ephemeral: true });
+    await interaction.reply({ ...(await selectionPayload(interaction, session)), ephemeral: true });
     return true;
   }
 
@@ -407,13 +512,13 @@ export async function handleEmbedStudioInteraction(interaction) {
   try {
     if (isSelect) {
       session.active = Math.max(0, Math.min(Number(interaction.values[0]) || 0, session.embeds.length - 1));
-      await interaction.update(await panelPayload(interaction, session));
+      await interaction.update(await editorPayload(interaction, session));
       return true;
     }
 
     if (isChannel) {
       session.channelId = interaction.values[0];
-      await interaction.update(await panelPayload(interaction, session));
+      await interaction.update(await selectionPayload(interaction, session));
       return true;
     }
 
@@ -422,20 +527,34 @@ export async function handleEmbedStudioInteraction(interaction) {
         if (session.embeds.length >= 10) throw new Error('Você já atingiu o limite de 10 embeds por mensagem.');
         session.embeds.push(blankEmbed(session.embeds.length + 1));
         session.active = session.embeds.length - 1;
-        await interaction.update(await panelPayload(interaction, session));
+        await interaction.update(await selectionPayload(interaction, session));
         return true;
       }
       if (interaction.customId === 'es_remove_embed') {
         if (session.embeds.length === 1) throw new Error('A mensagem precisa manter pelo menos um embed.');
         session.embeds.splice(session.active, 1);
-        session.active = Math.max(0, session.active - 1);
-        await interaction.update(await panelPayload(interaction, session));
+        session.active = Math.max(0, Math.min(session.active, session.embeds.length - 1));
+        await interaction.update(await selectionPayload(interaction, session));
         return true;
       }
-      if (interaction.customId === 'es_edit') { await interaction.showModal(basicModal(session)); return true; }
-      if (interaction.customId === 'es_visual') { await interaction.showModal(visualModal(session)); return true; }
+      if (interaction.customId === 'es_back') { await interaction.update(await selectionPayload(interaction, session)); return true; }
+      if (interaction.customId === 'es_title') { await interaction.showModal(titleModal(session)); return true; }
+      if (interaction.customId === 'es_description') { await interaction.showModal(descriptionModal(session)); return true; }
+      if (interaction.customId === 'es_color') { await interaction.showModal(colorModal(session)); return true; }
       if (interaction.customId === 'es_author') { await interaction.showModal(authorModal(session)); return true; }
       if (interaction.customId === 'es_fields') { await interaction.showModal(fieldsModal(session)); return true; }
+      if (interaction.customId === 'es_media') { await interaction.showModal(mediaModal(session)); return true; }
+      if (interaction.customId === 'es_footer') { await interaction.showModal(footerModal(session)); return true; }
+      if (interaction.customId === 'es_import_json') { await interaction.showModal(importJsonModal(session)); return true; }
+      if (interaction.customId === 'es_export_json') {
+        const json = JSON.stringify(exportableEmbed(activeEmbed(session)), null, 2);
+        await interaction.reply({
+          content: `📥 JSON do **Embed ${session.active + 1}**.`,
+          files: [{ attachment: Buffer.from(json, 'utf8'), name: `embed-${session.active + 1}.json` }],
+          ephemeral: true
+        });
+        return true;
+      }
       if (interaction.customId === 'es_add_button') {
         if (session.buttons.length >= 5) throw new Error('Você já atingiu o limite de 5 botões por mensagem.');
         await interaction.showModal(buttonModal());
@@ -446,42 +565,55 @@ export async function handleEmbedStudioInteraction(interaction) {
       if (interaction.customId === 'es_quick_send') {
         await interaction.deferUpdate();
         const channel = await sendQuick(interaction, session);
-        await interaction.followUp({ content: `✅ Embed enviado em ${channel}. O painel continua aberto para novas alterações.`, ephemeral: true });
+        await interaction.followUp({ content: `✅ Embed enviado em ${channel}. O painel continua aberto.`, ephemeral: true });
         return true;
       }
     }
 
     if (isModal) {
       const item = activeEmbed(session);
-      if (interaction.customId === 'es_modal_edit') {
+      if (interaction.customId === 'es_modal_title') {
         item.title = clean(interaction.fields.getTextInputValue('title'));
-        item.description = clean(interaction.fields.getTextInputValue('description'));
-        item.color = clean(interaction.fields.getTextInputValue('color')) || '#5865F2';
         item.url = clean(interaction.fields.getTextInputValue('url'));
-        item.image = clean(interaction.fields.getTextInputValue('image'));
-      } else if (interaction.customId === 'es_modal_visual') {
-        item.thumbnail = clean(interaction.fields.getTextInputValue('thumbnail'));
-        item.timestamp = parseBoolean(interaction.fields.getTextInputValue('timestamp'), item.timestamp);
+      } else if (interaction.customId === 'es_modal_description') {
+        item.description = clean(interaction.fields.getTextInputValue('description'));
+      } else if (interaction.customId === 'es_modal_color') {
+        item.color = clean(interaction.fields.getTextInputValue('color')) || '#5865F2';
       } else if (interaction.customId === 'es_modal_author') {
         item.author = clean(interaction.fields.getTextInputValue('author'));
         item.authorUrl = clean(interaction.fields.getTextInputValue('author_url'));
         item.authorIcon = clean(interaction.fields.getTextInputValue('author_icon'));
-        item.footer = clean(interaction.fields.getTextInputValue('footer'));
-        item.footerIcon = clean(interaction.fields.getTextInputValue('footer_icon'));
       } else if (interaction.customId === 'es_modal_fields') {
         item.fields = parseFields(interaction.fields.getTextInputValue('fields'));
+      } else if (interaction.customId === 'es_modal_media') {
+        item.image = clean(interaction.fields.getTextInputValue('image'));
+        item.thumbnail = clean(interaction.fields.getTextInputValue('thumbnail'));
+      } else if (interaction.customId === 'es_modal_footer') {
+        item.footer = clean(interaction.fields.getTextInputValue('footer'));
+        item.footerIcon = clean(interaction.fields.getTextInputValue('footer_icon'));
+        item.timestamp = parseBoolean(interaction.fields.getTextInputValue('timestamp'), item.timestamp);
+      } else if (interaction.customId === 'es_modal_import_json') {
+        const raw = interaction.fields.getTextInputValue('json');
+        let parsed;
+        try { parsed = JSON.parse(raw); }
+        catch { throw new Error('JSON inválido. Corrija o conteúdo e tente novamente.'); }
+        session.embeds[session.active] = normalizeImportedEmbed(parsed, session.active + 1);
       } else if (interaction.customId === 'es_modal_button') {
         const label = clean(interaction.fields.getTextInputValue('label')) || 'Abrir';
         const url = clean(interaction.fields.getTextInputValue('url'));
         const emoji = clean(interaction.fields.getTextInputValue('emoji'));
         if (!validUrl(url)) throw new Error('Informe uma URL válida para o botão.');
         session.buttons.push({ label, url, emoji });
+        await interaction.update(await selectionPayload(interaction, session));
+        return true;
       } else if (interaction.customId === 'es_modal_generate') {
         session.embeds[session.active] = generateModel(
           interaction.fields.getTextInputValue('purpose'),
           interaction.fields.getTextInputValue('style'),
           interaction.guild.name
         );
+        await interaction.update(await selectionPayload(interaction, session));
+        return true;
       } else if (interaction.customId === 'es_modal_personalized') {
         const username = clean(interaction.fields.getTextInputValue('username')) || interaction.guild.name;
         const avatar = clean(interaction.fields.getTextInputValue('avatar'));
@@ -503,13 +635,13 @@ export async function handleEmbedStudioInteraction(interaction) {
           avatarURL: avatar || undefined,
           allowedMentions: { parse: [] }
         });
-        await interaction.update(await panelPayload(interaction, session));
+        await interaction.update(await selectionPayload(interaction, session));
         await interaction.followUp({ content: `✅ Enviado por webhook personalizado em ${channel}.`, ephemeral: true });
         return true;
       }
 
       validateSession(session);
-      await interaction.update(await panelPayload(interaction, session));
+      await interaction.update(await editorPayload(interaction, session));
       return true;
     }
   } catch (error) {
