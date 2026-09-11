@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.37";
+const CACHE = "mangamorph-v0.17.38";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const OFFLINE_ASSETS = [
   "./assets/css/navigation-speed.css",
   "./assets/js/navigation-speed.js",
   "./assets/css/home-canonical.css",
+  "./assets/css/desktop-home.css",
   "./assets/css/manga-ratings-panel.css",
   "./assets/css/reader-community-panel.css"
 ];
@@ -52,7 +53,7 @@ async function cleanDocument(request,response){
 
   if(home){
     html=html.replace(/<script[^>]+home-premium-cards-v2\.js[^>]*><\/script>/gi,"");
-    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=003">`;
+    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=004"><link rel="stylesheet" href="assets/css/desktop-home.css?v=001">`;
     const guard=`${themeBoot}<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .horizontal-rail>*{display:none!important}html.mm-prelive body.mm-home #releaseList>*{display:none!important}html.mm-prelive body.mm-home .featured-content>*{visibility:hidden!important}html.mm-prelive body.mm-home{min-height:100vh}</style>`;
     html=html.replace(/<head>/i,"<head>"+guard);
   }
@@ -63,7 +64,7 @@ async function cleanDocument(request,response){
   }
 
   if(reader){
-    html=html.replace(/<head>/i,'<head><link rel="stylesheet" href="assets/css/reader-community-panel.css?v=001">');
+    html=html.replace(/<head>/i,'<head><link rel="stylesheet" href="assets/css/reader-community-panel.css?v=002">');
   }
 
   return textResponse(html,response,"text/html; charset=utf-8");
@@ -124,7 +125,7 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     fetchFresh(event.request).then(response=>{
       const pathname=new URL(event.request.url).pathname;
-      if(response.ok && (destination==="image" || pathname.endsWith('/assets/js/navigation-speed.js') || pathname.endsWith('/assets/css/navigation-speed.css') || pathname.endsWith('/assets/css/home-canonical.css') || pathname.endsWith('/assets/css/manga-ratings-panel.css') || pathname.endsWith('/assets/css/reader-community-panel.css'))){
+      if(response.ok && (destination==="image" || pathname.endsWith('/assets/js/navigation-speed.js') || pathname.endsWith('/assets/css/navigation-speed.css') || pathname.endsWith('/assets/css/home-canonical.css') || pathname.endsWith('/assets/css/desktop-home.css') || pathname.endsWith('/assets/css/manga-ratings-panel.css') || pathname.endsWith('/assets/css/reader-community-panel.css'))){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
