@@ -77,3 +77,4 @@ readButton?.addEventListener("click",event=>{
 },true);
 
 import("./manga-chapter-source.js?v=002").catch(error=>console.error("MangaMorph chapter source:",error));
+import("./manga-page-comments.js?v=002").catch(error=>console.error("MangaMorph page comments:",error));
