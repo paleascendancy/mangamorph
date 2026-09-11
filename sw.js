@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.38";
+const CACHE = "mangamorph-v0.17.39";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -53,9 +53,8 @@ async function cleanDocument(request,response){
 
   if(home){
     html=html.replace(/<script[^>]+home-premium-cards-v2\.js[^>]*><\/script>/gi,"");
-    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=004"><link rel="stylesheet" href="assets/css/desktop-home.css?v=001">`;
-    const guard=`${themeBoot}<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .horizontal-rail>*{display:none!important}html.mm-prelive body.mm-home #releaseList>*{display:none!important}html.mm-prelive body.mm-home .featured-content>*{visibility:hidden!important}html.mm-prelive body.mm-home{min-height:100vh}</style>`;
-    html=html.replace(/<head>/i,"<head>"+guard);
+    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=004"><link rel="stylesheet" href="assets/css/desktop-home.css?v=002">`;
+    html=html.replace(/<head>/i,"<head>"+themeBoot);
   }
 
   if(manga){
