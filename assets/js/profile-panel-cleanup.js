@@ -32,9 +32,6 @@
       if(oldAvatarAction.getAttribute('aria-hidden')!=='true')oldAvatarAction.setAttribute('aria-hidden','true');
     }
 
-    const adminLink=document.querySelector('#accountAdminLink');
-    if(adminLink)adminLink.remove();
-
     let section=document.querySelector('#profilePhotoSection');
     if(!section){
       section=document.createElement('div');
