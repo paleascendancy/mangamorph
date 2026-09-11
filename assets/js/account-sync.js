@@ -7,6 +7,13 @@ if(!document.querySelector('link[data-mm-gray-theme]')){
   theme.dataset.mmGrayTheme='1';
   document.head.append(theme);
 }
+if(!document.querySelector('link[data-mm-home-cta]')){
+  const cta=document.createElement('link');
+  cta.rel='stylesheet';
+  cta.href='assets/css/home-cta-premium.css?v=001';
+  cta.dataset.mmHomeCta='1';
+  document.head.append(cta);
+}
 import("./theme-system.js?v=002").catch(()=>{});
 import("./profile-panel-cleanup.js?v=001").catch(()=>{});
 
