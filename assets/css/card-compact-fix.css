@@ -9,12 +9,12 @@ html body.mm-home .horizontal-rail{
   max-width:100%!important;
   min-width:0!important;
   margin:0!important;
-  padding:.18rem 6px .55rem 2px!important;
+  padding:.14rem 10px .45rem 4px!important;
   gap:10px!important;
   overflow-x:auto!important;
   overflow-y:hidden!important;
   overscroll-behavior-inline:contain!important;
-  scroll-padding-inline:2px 10px!important;
+  scroll-padding-inline:4px 12px!important;
   scrollbar-width:none!important;
 }
 html body.mm-home .horizontal-rail::-webkit-scrollbar{display:none!important}
@@ -26,111 +26,116 @@ html body.mm-home .premium-manga-card{
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
-  border-radius:16px!important;
-  clip-path:inset(0 round 16px)!important;
+  border:0!important;
+  border-radius:15px!important;
+  clip-path:inset(0 round 15px)!important;
+  background:#fff!important;
   background-clip:padding-box!important;
+  box-shadow:0 8px 22px rgba(46,62,82,.09)!important;
   scroll-snap-align:start!important;
 }
 html body.mm-home .premium-manga-card::before,
 html body.mm-home .premium-manga-card::after{display:none!important;content:none!important}
 
 html body.mm-home .premium-manga-card .manga-cover{
+  position:relative!important;
   width:100%!important;
   max-width:100%!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
   border:0!important;
-  border-radius:16px 16px 0 0!important;
-  clip-path:inset(0 round 16px 16px 0 0)!important;
+  border-radius:15px 15px 0 0!important;
+  clip-path:inset(0 round 15px 15px 0 0)!important;
+  box-shadow:none!important;
+  background-clip:border-box!important;
+}
+html body.mm-home .premium-manga-card .manga-cover::after{
+  display:none!important;
+  content:none!important;
 }
 html body.mm-home .premium-manga-card .manga-cover-image{
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
+  position:absolute!important;
+  inset:-1px!important;
+  width:calc(100% + 2px)!important;
+  height:calc(100% + 2px)!important;
   max-width:none!important;
+  max-height:none!important;
   margin:0!important;
   padding:0!important;
+  border:0!important;
   object-fit:cover!important;
-  object-position:center!important;
+  object-position:center center!important;
   transform:none!important;
+  border-radius:0!important;
 }
 
-/* Only chapter + views below the cover. */
+/* Ultra-compact footer: favorite at left, chapter at right. */
 html body.mm-home .premium-manga-card .manga-info{
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
-  gap:7px!important;
+  gap:6px!important;
   width:100%!important;
-  min-height:38px!important;
+  min-height:30px!important;
+  height:30px!important;
   margin:0!important;
-  padding:6px 8px!important;
+  padding:3px 6px!important;
   border:0!important;
-  border-radius:0 0 16px 16px!important;
+  border-radius:0 0 15px 15px!important;
   box-shadow:none!important;
+  background:#fff!important;
 }
-html body.mm-home .premium-card-chips{
+html body.mm-home .premium-card-footer{
+  order:1!important;
   display:flex!important;
   align-items:center!important;
   justify-content:flex-start!important;
+  flex:0 0 auto!important;
+  gap:0!important;
+  margin:0!important;
+}
+html body.mm-home .premium-card-chips{
+  order:2!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
   flex:0 1 auto!important;
   min-width:0!important;
   gap:0!important;
+  margin:0!important;
 }
 html body.mm-home .premium-card-chip:not(.chapter){display:none!important}
 html body.mm-home .premium-card-chip.chapter{
   display:inline-flex!important;
   align-items:center!important;
   justify-content:center!important;
-  height:24px!important;
+  height:22px!important;
   min-width:0!important;
   max-width:100%!important;
-  padding:0 8px!important;
+  margin:0!important;
+  padding:0 7px!important;
   border-radius:999px!important;
-  font-size:10px!important;
+  font-size:9px!important;
   font-weight:800!important;
   line-height:1!important;
   white-space:nowrap!important;
 }
-html body.mm-home .premium-card-footer{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:flex-end!important;
-  flex:0 0 auto!important;
-  gap:0!important;
-}
-html body.mm-home .premium-card-stat{
-  display:none!important;
-}
-html body.mm-home .premium-card-stat:first-child{
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:4px!important;
-  min-width:0!important;
-  color:#728095!important;
-  font-size:10px!important;
-  font-weight:800!important;
-  white-space:nowrap!important;
-}
-html body.mm-home .premium-card-stat:first-child .premium-card-icon{
-  display:inline-grid!important;
+html body.mm-home .premium-card-stat{display:none!important}
+html body.mm-home .premium-manga-card .favorite-button{
+  display:grid!important;
   place-items:center!important;
-  width:14px!important;
-  height:14px!important;
-  font-size:0!important;
+  width:22px!important;
+  height:22px!important;
+  min-width:22px!important;
+  min-height:22px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:7px!important;
+  font-size:12px!important;
   line-height:1!important;
-  opacity:1!important;
+  box-shadow:none!important;
 }
-html body.mm-home .premium-card-stat:first-child .premium-card-icon::before{
-  content:'◉'!important;
-  font-size:11px!important;
-  line-height:1!important;
-  color:#7890aa!important;
-}
-html body.mm-home .premium-card-stat.rating,
-html body.mm-home .premium-manga-card .favorite-button{display:none!important}
 
 @media(max-width:620px){
   html body.mm-home .catalog-section,
@@ -140,21 +145,34 @@ html body.mm-home .premium-manga-card .favorite-button{display:none!important}
   }
   html body.mm-home .horizontal-rail{
     grid-auto-columns:minmax(148px,42vw)!important;
-    padding-left:2px!important;
-    padding-right:8px!important;
-    padding-bottom:.45rem!important;
+    padding-left:4px!important;
+    padding-right:12px!important;
+    padding-bottom:.38rem!important;
   }
   html body.mm-home .premium-manga-card{
-    border-radius:15px!important;
-    clip-path:inset(0 round 15px)!important;
+    border-radius:14px!important;
+    clip-path:inset(0 round 14px)!important;
   }
   html body.mm-home .premium-manga-card .manga-cover{
-    border-radius:15px 15px 0 0!important;
-    clip-path:inset(0 round 15px 15px 0 0)!important;
+    border-radius:14px 14px 0 0!important;
+    clip-path:inset(0 round 14px 14px 0 0)!important;
   }
   html body.mm-home .premium-manga-card .manga-info{
-    min-height:36px!important;
-    padding:5px 7px!important;
-    border-radius:0 0 15px 15px!important;
+    min-height:28px!important;
+    height:28px!important;
+    padding:3px 5px!important;
+    border-radius:0 0 14px 14px!important;
+  }
+  html body.mm-home .premium-card-chip.chapter{
+    height:20px!important;
+    padding:0 6px!important;
+    font-size:8px!important;
+  }
+  html body.mm-home .premium-manga-card .favorite-button{
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+    min-height:20px!important;
+    font-size:11px!important;
   }
 }
