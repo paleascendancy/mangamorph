@@ -3,208 +3,98 @@ if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 function forceReaderTop(){
   window.scrollTo({top:0,left:0,behavior:"auto"});
 }
-
 forceReaderTop();
 window.addEventListener("pageshow",forceReaderTop);
-window.addEventListener("load",function(){ requestAnimationFrame(forceReaderTop); },{once:true});
 
-const catalog = [
-  {id:1,title:"Neon Ronin",chapter:127,accent:"#3a4162"},
-  {id:2,title:"Astral Bloom",chapter:91,accent:"#523b64"},
-  {id:3,title:"Zero District",chapter:68,accent:"#294b52"},
-  {id:4,title:"Crimson Archive",chapter:143,accent:"#64363c"},
-  {id:5,title:"Moon Relay",chapter:82,accent:"#354561"},
-  {id:6,title:"Silent Frame",chapter:74,accent:"#494b55"},
-  {id:7,title:"Vector Hearts",chapter:112,accent:"#593c4f"},
-  {id:8,title:"Glass Kingdom",chapter:105,accent:"#36545e"},
-  {id:9,title:"Night Protocol",chapter:57,accent:"#31384a"},
-  {id:10,title:"Afterlight",chapter:49,accent:"#5a4650"},
-  {id:11,title:"Morrow Gate",chapter:36,accent:"#3e4e66"},
-  {id:12,title:"Black Signal",chapter:28,accent:"#52383d"},
-  {id:13,title:"Lucid Crown",chapter:19,accent:"#3a5661"},
-  {id:14,title:"Echo Garden",chapter:16,accent:"#50455f"},
-  {id:15,title:"Iron Chapel",chapter:11,accent:"#4c4b50"}
-];
+const params=new URLSearchParams(location.search);
+const requestedChapter=Number(params.get("chapter"));
+const chapter=Number.isFinite(requestedChapter)&&requestedChapter>=0?requestedChapter:1;
+const mangaId=Number(params.get("id"))||1;
 
-const params = new URLSearchParams(location.search);
-const mangaId = Number(params.get("id")) || 1;
-const rawRequestedChapter = params.get("chapter");
-const parsedRequestedChapter = Number(rawRequestedChapter);
-const requestedChapter = Number.isFinite(parsedRequestedChapter) && parsedRequestedChapter >= 0 ? parsedRequestedChapter : 1;
-const manga = catalog.find(function(item){ return item.id === mangaId; }) || {
-  id:mangaId,title:"Carregando...",chapter:requestedChapter,accent:"#3a4162"
-};
-let chapter = Math.max(0, Math.min(requestedChapter, manga.chapter));
+const readerStage=document.querySelector("#readerStage");
+const chapterPicker=document.querySelector("#chapterPicker");
+const readerSettings=document.querySelector("#readerSettings");
+const readerThemeLabel=document.querySelector("#readerThemeLabel");
+const controlsSwitch=document.querySelector("#readerControlsSwitch");
+const progressText=document.querySelector("#readerProgressText");
+const progressPercent=document.querySelector("#readerProgressPercent");
+const progressBar=document.querySelector("#readerProgressBar");
+const toast=document.querySelector("#readerToast");
 
-const readerTitle = document.querySelector("#readerTitle");
-const readerChapterLabel = document.querySelector("#readerChapterLabel");
-const bottomChapterLabel = document.querySelector("#bottomChapterLabel");
-const finishChapterLabel = document.querySelector("#finishChapterLabel");
-const readerStage = document.querySelector("#readerStage");
-const progressText = document.querySelector("#readerProgressText");
-const progressPercent = document.querySelector("#readerProgressPercent");
-const progressBar = document.querySelector("#readerProgressBar");
-const chapterPicker = document.querySelector("#chapterPicker");
-const readerSettings = document.querySelector("#readerSettings");
-const chapterGrid = document.querySelector("#readerChapterGrid");
-const readerThemeLabel = document.querySelector("#readerThemeLabel");
-const controlsSwitch = document.querySelector("#readerControlsSwitch");
-const toast = document.querySelector("#readerToast");
-
-document.querySelector("#readerBack").href = "manga.html?id=" + manga.id;
+// Never render the old demo reader. Show a tiny loading state until live data arrives.
+if(readerStage && !readerStage.children.length){
+  readerStage.innerHTML='<div class="reader-live-loading" role="status" aria-live="polite"><span></span><strong>Carregando capítulo '+chapter+'</strong></div>';
+}
+const loadingStyle=document.createElement("style");
+loadingStyle.id="readerLiveLoadingStyle";
+loadingStyle.textContent=`
+.reader-live-loading{min-height:42vh;display:grid;place-items:center;align-content:center;gap:.7rem;color:#66758a;font-size:.72rem;font-weight:750}
+.reader-live-loading span{width:1.8rem;height:1.8rem;border:3px solid rgba(83,111,148,.16);border-top-color:#5b7ea9;border-radius:50%;animation:mmReaderSpin .7s linear infinite}
+@keyframes mmReaderSpin{to{transform:rotate(360deg)}}
+`;
+document.head.append(loadingStyle);
 
 function showToast(message){
-  toast.textContent = message;
-  toast.hidden = false;
+  if(!toast)return;
+  toast.textContent=message;
+  toast.hidden=false;
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(function(){ toast.hidden = true; },2200);
+  showToast.timer=setTimeout(()=>{toast.hidden=true},1800);
 }
+function openSheet(sheet){if(!sheet)return;sheet.hidden=false;document.body.style.overflow="hidden"}
+function closeSheet(sheet){if(!sheet)return;sheet.hidden=true;document.body.style.overflow=""}
 
-function pageCopy(page){
-  const lines = [
-    "A leitura real será exibida aqui quando os arquivos das páginas forem conectados.",
-    "Este espaço já está preparado para imagens verticais em alta resolução.",
-    "O MangaMorph preservará a largura da página e o progresso do leitor.",
-    "Controles desaparecem durante a leitura para reduzir distrações.",
-    "O progresso é atualizado conforme você avança pelo capítulo.",
-    "Ao final, você pode seguir direto para o próximo capítulo."
-  ];
-  return lines[(page-1)%lines.length];
-}
+document.querySelector("#chapterPickerButton")?.addEventListener("click",()=>openSheet(chapterPicker));
+document.querySelector("#readerSettingsButton")?.addEventListener("click",()=>openSheet(readerSettings));
+document.querySelectorAll("[data-close-reader-sheet]").forEach(button=>button.addEventListener("click",()=>closeSheet(chapterPicker)));
+document.querySelectorAll("[data-close-reader-settings]").forEach(button=>button.addEventListener("click",()=>closeSheet(readerSettings)));
 
-function renderPages(){
-  const pageCount = 6;
-  readerStage.innerHTML = Array.from({length:pageCount},function(_,index){
-    const page = index + 1;
-    return '<article class="reader-page" data-reader-page="' + page + '" style="--page-accent:' + manga.accent + '">' +
-      '<div class="reader-page-copy"><span>PÁGINA ' + String(page).padStart(2,"0") + '</span><strong>' + manga.title + '</strong><small>' + pageCopy(page) + '</small></div>' +
-    '</article>';
-  }).join("");
-}
-
-function updateLabels(){
-  document.title = "MangaMorph — " + manga.title + " · Capítulo " + chapter;
-  readerTitle.textContent = manga.title;
-  readerChapterLabel.textContent = "Capítulo " + chapter;
-  bottomChapterLabel.textContent = chapter;
-  finishChapterLabel.textContent = "Capítulo " + chapter + " concluído";
-  params.set("id",manga.id);
-  params.set("chapter",chapter);
-  history.replaceState(null,"","reader.html?" + params.toString());
-}
-
-function renderChapterGrid(){
-  const start = Math.max(0,manga.chapter-29);
-  const values = [];
-  for(let value=manga.chapter;value>=start;value--) values.push(value);
-  chapterGrid.innerHTML = values.map(function(value){
-    return '<button type="button" data-reader-chapter="' + value + '" class="' + (value===chapter?'active':'') + '">Cap. ' + value + '</button>';
-  }).join("");
-}
-
-function changeChapter(nextChapter){
-  if(nextChapter < 0 || nextChapter > manga.chapter){
-    showToast(nextChapter > manga.chapter ? "Este é o capítulo mais recente." : "Não há capítulo anterior.");
-    return;
-  }
-  chapter = nextChapter;
-  updateLabels();
-  renderChapterGrid();
-  renderPages();
-  window.dispatchEvent(new CustomEvent("mangamorph:reader-chapter-change",{detail:{mangaId:manga.id,chapter:chapter}}));
-  forceReaderTop();
-}
-
-function openSheet(sheet){
-  sheet.hidden = false;
-  document.body.style.overflow = "hidden";
-}
-function closeSheet(sheet){
-  sheet.hidden = true;
-  document.body.style.overflow = "";
-}
-
-document.querySelector("#chapterPickerButton").addEventListener("click",function(){ openSheet(chapterPicker); });
-document.querySelector("#readerSettingsButton").addEventListener("click",function(){ openSheet(readerSettings); });
-document.querySelectorAll("[data-close-reader-sheet]").forEach(function(button){
-  button.addEventListener("click",function(){ closeSheet(chapterPicker); });
-});
-document.querySelectorAll("[data-close-reader-settings]").forEach(function(button){
-  button.addEventListener("click",function(){ closeSheet(readerSettings); });
-});
-
-chapterGrid.addEventListener("click",function(event){
-  const button = event.target.closest("[data-reader-chapter]");
-  if(!button) return;
-  closeSheet(chapterPicker);
-  changeChapter(Number(button.dataset.readerChapter));
-});
-
-document.querySelector("#previousChapter").addEventListener("click",function(){ changeChapter(chapter-1); });
-document.querySelector("#finishPrevious").addEventListener("click",function(){ changeChapter(chapter-1); });
-document.querySelector("#nextChapter").addEventListener("click",function(){ changeChapter(chapter+1); });
-document.querySelector("#finishNext").addEventListener("click",function(){ changeChapter(chapter+1); });
-
-function updateProgress(){
-  const pages = Array.from(document.querySelectorAll("[data-reader-page]"));
-  if(!pages.length) return;
-  const viewportMid = window.scrollY + window.innerHeight * .48;
-  let current = 1;
-  pages.forEach(function(page,index){
-    const top = page.offsetTop;
-    if(viewportMid >= top) current = index + 1;
-  });
-  const percent = pages.length > 1 ? Math.round(((current-1)/(pages.length-1))*100) : 100;
-  progressText.textContent = "Página " + current + " de " + pages.length;
-  progressPercent.textContent = percent + "%";
-  progressBar.style.width = percent + "%";
-  localStorage.setItem("mangamorph:reader:" + manga.id + ":" + chapter, String(current));
-  window.dispatchEvent(new CustomEvent("mangamorph:progress",{detail:{mangaId:manga.id,chapterNumber:chapter,pageNumber:current,percent:percent}}));
-}
-window.addEventListener("scroll",updateProgress,{passive:true});
-
-const savedReaderTheme = localStorage.getItem("mangamorph:theme") || localStorage.getItem("mangamorph:reader-theme") || "light";
-document.body.classList.toggle("light-reader",savedReaderTheme === "light");
-readerThemeLabel.textContent = savedReaderTheme === "light" ? "Claro" : "Escuro";
-
-document.querySelector("#readerThemeToggle").addEventListener("click",function(){
+const savedReaderTheme=localStorage.getItem("mangamorph:theme")||localStorage.getItem("mangamorph:reader-theme")||"light";
+document.body.classList.toggle("light-reader",savedReaderTheme==="light");
+if(readerThemeLabel)readerThemeLabel.textContent=savedReaderTheme==="light"?"Claro":"Escuro";
+document.querySelector("#readerThemeToggle")?.addEventListener("click",()=>{
   document.body.classList.toggle("light-reader");
-  const light = document.body.classList.contains("light-reader");
-  const value = light ? "light" : "dark";
+  const light=document.body.classList.contains("light-reader");
+  const value=light?"light":"dark";
   localStorage.setItem("mangamorph:theme",value);
   localStorage.setItem("mangamorph:reader-theme",value);
-  readerThemeLabel.textContent = light ? "Claro" : "Escuro";
+  if(readerThemeLabel)readerThemeLabel.textContent=light?"Claro":"Escuro";
 });
 
-let controlsVisible = localStorage.getItem("mangamorph:reader-controls") !== "hidden";
+let controlsVisible=localStorage.getItem("mangamorph:reader-controls")!=="hidden";
 function renderControls(){
   document.body.classList.toggle("controls-hidden",!controlsVisible);
-  controlsSwitch.classList.toggle("active",controlsVisible);
+  controlsSwitch?.classList.toggle("active",controlsVisible);
 }
-document.querySelector("#readerControlsToggle").addEventListener("click",function(){
-  controlsVisible = !controlsVisible;
+document.querySelector("#readerControlsToggle")?.addEventListener("click",()=>{
+  controlsVisible=!controlsVisible;
   localStorage.setItem("mangamorph:reader-controls",controlsVisible?"visible":"hidden");
   renderControls();
 });
-readerStage.addEventListener("click",function(){
-  controlsVisible = !controlsVisible;
-  renderControls();
-});
-
-updateLabels();
-renderPages();
-renderChapterGrid();
 renderControls();
-forceReaderTop();
-updateProgress();
 
-window.addEventListener("storage",function(event){
-  if(event.key !== "mangamorph:theme") return;
-  const light = event.newValue === "light";
+function updateProgress(){
+  const pages=[...document.querySelectorAll("[data-reader-page]")];
+  if(!pages.length)return;
+  const viewportMid=window.scrollY+window.innerHeight*.48;
+  let current=1;
+  pages.forEach((page,index)=>{if(viewportMid>=page.offsetTop)current=index+1});
+  const percent=pages.length>1?Math.round(((current-1)/(pages.length-1))*100):100;
+  if(progressText)progressText.textContent="Página "+current+" de "+pages.length;
+  if(progressPercent)progressPercent.textContent=percent+"%";
+  if(progressBar)progressBar.style.width=percent+"%";
+  localStorage.setItem("mangamorph:reader:"+mangaId+":"+chapter,String(current));
+  window.dispatchEvent(new CustomEvent("mangamorph:progress",{detail:{mangaId,chapterNumber:chapter,pageNumber:current,percent}}));
+}
+window.addEventListener("scroll",updateProgress,{passive:true});
+window.addEventListener("mangamorph:library-loaded",forceReaderTop);
+window.addEventListener("storage",event=>{
+  if(event.key!=="mangamorph:theme")return;
+  const light=event.newValue==="light";
   document.body.classList.toggle("light-reader",light);
-  readerThemeLabel.textContent = light ? "Claro" : "Escuro";
+  if(readerThemeLabel)readerThemeLabel.textContent=light?"Claro":"Escuro";
 });
 
-window.addEventListener("mangamorph:library-loaded",function(){
-  forceReaderTop();
-});
+if(progressText)progressText.textContent="Preparando capítulo "+chapter;
+if(progressPercent)progressPercent.textContent="…";
+if(progressBar)progressBar.style.width="0%";
