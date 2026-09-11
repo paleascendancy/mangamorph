@@ -7,6 +7,7 @@ if(!document.querySelector('link[data-mm-gray-theme]')){
   theme.dataset.mmGrayTheme='1';
   document.head.append(theme);
 }
+import("./theme-system.js?v=002").catch(()=>{});
 
 const supabase=createClient(
   "https://fnyellunugdfesprmvzm.supabase.co",
