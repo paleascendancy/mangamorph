@@ -48,9 +48,7 @@ try{
       const label='<span class="chapter-source-badge">'+esc(source.source_name)+'</span>';
       const credit=source.source_credit?'<span class="chapter-source-credit">'+esc(source.source_credit)+'</span>':'';
       line.innerHTML=label+credit;
-      if(/^https:\/\//i.test(url)){
-        line.title="Capítulo fornecido por "+source.source_name;
-      }
+      if(/^https:\/\//i.test(url))line.title="Capítulo fornecido por "+source.source_name;
       numberBox.append(line);
     });
   };
@@ -61,3 +59,5 @@ try{
 }catch(error){
   console.error("MangaMorph chapter source:",error);
 }
+
+import("./manga-page-comments.js?v=001").catch(error=>console.error("MangaMorph comments:",error));
