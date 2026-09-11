@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.32";
+const CACHE = "mangamorph-v0.17.33";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -40,7 +40,7 @@ async function cleanDocument(request,response){
   const path=url.pathname;
   let html=await response.text();
 
-  const perf='<link rel="stylesheet" href="assets/css/navigation-speed.css?v=001"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
+  const perf='<link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="assets/css/navigation-speed.css?v=001"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
   html=html.replace(/<\/head>/i,perf+'</head>');
 
   const home=path.endsWith("/")||path.endsWith("/index.html")||path.endsWith("/mangamorph/");
@@ -82,6 +82,12 @@ async function fetchFresh(request) {
       return textResponse(source,response,"text/javascript; charset=utf-8");
     }
 
+    if(pathname.endsWith("/assets/js/catalog-runtime.js")){
+      let source=await response.text();
+      source=source.replace('await warmCovers(catalog);','warmCovers(catalog).catch(()=>{});');
+      return textResponse(source,response,"text/javascript; charset=utf-8");
+    }
+
     if(pathname.endsWith("/assets/js/manga.js")){
       let source=await response.text();
       source=source.replace(/const catalog\s*=\s*\[[\s\S]*?\n\];\n\nconst params/,"const catalog = [];\n\nconst params");
@@ -104,7 +110,8 @@ self.addEventListener("fetch", event => {
   const destination=event.request.destination;
   event.respondWith(
     fetchFresh(event.request).then(response=>{
-      if(response.ok && (destination==="image" || new URL(event.request.url).pathname.includes('/assets/js/navigation-speed.js') || new URL(event.request.url).pathname.includes('/assets/css/navigation-speed.css'))){
+      const pathname=new URL(event.request.url).pathname;
+      if(response.ok && (destination==="image" || pathname.endsWith('/assets/js/navigation-speed.js') || pathname.endsWith('/assets/css/navigation-speed.css'))){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
