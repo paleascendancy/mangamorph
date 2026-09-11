@@ -1,10 +1,12 @@
-const CACHE = "mangamorph-v0.17.34";
+const CACHE = "mangamorph-v0.17.35";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./assets/css/navigation-speed.css",
-  "./assets/js/navigation-speed.js"
+  "./assets/js/navigation-speed.js",
+  "./assets/css/light-theme-final.css",
+  "./assets/css/dark-theme-final.css"
 ];
 
 self.addEventListener("install", event => {
@@ -47,8 +49,8 @@ async function cleanDocument(request,response){
   const manga=path.endsWith("/manga.html");
 
   if(home){
-    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/card-compact-fix.css?v=002"><link rel="stylesheet" href="assets/css/dark-theme-final.css?v=002">`;
-    const guard=`${themeBoot}<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:38%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);box-shadow:0 0 14px rgba(95,131,179,.28);animation:mmPreliveBar .85s ease-in-out infinite alternate}@keyframes mmPreliveBar{to{width:78%}}html.mm-theme-dark body.mm-home{background:#202329!important;color:#f4f6f9!important}html.mm-theme-dark body.mm-home .topbar{background:rgba(31,34,39,.94)!important;border-color:rgba(255,255,255,.07)!important}html.mm-theme-dark body.mm-home .menu-tab,html.mm-theme-dark body.mm-home .icon-button{background:#2b3037!important;color:#f4f6f9!important;border-color:rgba(255,255,255,.10)!important}</style>`;
+    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/card-compact-fix.css?v=002"><link rel="stylesheet" href="assets/css/dark-theme-final.css?v=003"><link rel="stylesheet" href="assets/css/light-theme-final.css?v=002">`;
+    const guard=`${themeBoot}<script>document.documentElement.classList.add('mm-prelive')</script><style id="mmNoLegacyFlash">html.mm-prelive body.mm-home .hero-feature,html.mm-prelive body.mm-home .catalog-section,html.mm-prelive body.mm-home .releases-section{visibility:hidden!important}html.mm-prelive body.mm-home:after{content:'';position:fixed;left:0;top:0;z-index:2147483646;width:38%;height:3px;background:linear-gradient(90deg,#5f83b3,#8db7ee);box-shadow:0 0 14px rgba(95,131,179,.28);animation:mmPreliveBar .85s ease-in-out infinite alternate}@keyframes mmPreliveBar{to{width:78%}}html.mm-theme-dark body.mm-home{background:#202329!important;color:#f4f6f9!important}html.mm-theme-dark body.mm-home .topbar{background:rgba(31,34,39,.94)!important;border-color:rgba(255,255,255,.07)!important}html.mm-theme-dark body.mm-home .menu-tab,html.mm-theme-dark body.mm-home .icon-button{background:#2b3037!important;color:#f4f6f9!important;border-color:rgba(255,255,255,.10)!important}html.mm-theme-light body.mm-home{background:#f3f5f8!important;color:#141b25!important}html.mm-theme-light body.mm-home .topbar{background:rgba(248,250,252,.96)!important;border-color:rgba(24,35,50,.08)!important}html.mm-theme-light body.mm-home .menu-tab,html.mm-theme-light body.mm-home .icon-button{background:#fff!important;color:#18212d!important;border-color:rgba(34,49,70,.09)!important}</style>`;
     html=html.replace(/<head>/i,"<head>"+guard);
   }
 
@@ -121,7 +123,7 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     fetchFresh(event.request).then(response=>{
       const pathname=new URL(event.request.url).pathname;
-      if(response.ok && (destination==="image" || pathname.endsWith('/assets/js/navigation-speed.js') || pathname.endsWith('/assets/css/navigation-speed.css'))){
+      if(response.ok && (destination==="image" || pathname.endsWith('/assets/js/navigation-speed.js') || pathname.endsWith('/assets/css/navigation-speed.css') || pathname.endsWith('/assets/css/light-theme-final.css') || pathname.endsWith('/assets/css/dark-theme-final.css'))){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       }
