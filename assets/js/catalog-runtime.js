@@ -15,7 +15,7 @@ premiumCardStyle.textContent=`
   .featured-cover{background-color:#151b25!important}
   .featured-cover>*{display:none!important}
   .featured-cover::before,.featured-cover::after{content:none!important;display:none!important}
-  .featured-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
+  .featured-cover[style*="background-image"]{background-size:contain!important;background-position:center top!important;background-repeat:no-repeat!important}
 
   .horizontal-rail{grid-auto-columns:minmax(174px,16.7vw)!important;gap:1rem!important;padding:.45rem .15rem 1.35rem!important}
   .premium-manga-card{position:relative!important;isolation:isolate!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:1.28rem!important;background:linear-gradient(180deg,#121822,#0d1219)!important;box-shadow:0 15px 38px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.045)!important;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease!important}
@@ -190,7 +190,8 @@ function enhanceCard(card){
 
   let copy=cover.querySelector(".manga-cover-copy");
   if(!copy){copy=document.createElement("div");copy.className="manga-cover-copy";cover.append(copy)}
-  copy.innerHTML='<span class="manga-cover-title">'+esc(item.title)+'</span>';
+  const titleHTML='<span class="manga-cover-title">'+esc(item.title)+'</span>';
+  if(copy.innerHTML!==titleHTML)copy.innerHTML=titleHTML;
 
   if(card.dataset.premiumInfoVersion!=="4"){
     const oldFavorite=info.querySelector("[data-favorite]");

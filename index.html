@@ -253,7 +253,7 @@
         </button>
         <label class="account-profile-action" id="accountAvatarButton" for="accountAvatarInput">
           <span>＋</span>
-          <span><strong>Trocar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
+          <span><strong id="accountAvatarButtonLabel">Trocar foto</strong><small>JPG, PNG ou WebP · até 3 MB</small></span>
           <input id="accountAvatarInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
         </label>
         <a class="account-profile-action" id="accountPublicProfile" href="profile.html">
@@ -265,14 +265,14 @@
       <section class="account-library-block" id="accountLibraryBlock" hidden>
         <div class="account-library-title">BIBLIOTECA</div>
         <div class="account-library-card">
-          <button type="button" data-account-scroll="#favoritadas">
-            <span>☆</span><span><strong>Favoritos</strong><small>Obras que você marcou</small></span><b id="accountFavoriteCount">0</b><i>›</i>
+          <button type="button" id="accountFavorites">
+            <span>☆</span><span><strong>Favoritos</strong><small>Obras que você marcou</small></span><b id="accountFavoritesCount">0</b><i>›</i>
           </button>
-          <button type="button" data-account-scroll="#recentes">
+          <button type="button" id="accountHistory">
             <span>◷</span><span><strong>Histórico</strong><small>Últimas obras abertas</small></span><b id="accountHistoryCount">0</b><i>›</i>
           </button>
-          <button type="button" data-account-scroll="#novas">
-            <span>＋</span><span><strong>Minha lista</strong><small>Obras salvas para acompanhar</small></span><b id="accountListCount">0</b><i>›</i>
+          <button type="button" id="accountReadingList">
+            <span>＋</span><span><strong>Minha lista</strong><small>Obras salvas para acompanhar</small></span><b id="accountReadingListCount">0</b><i>›</i>
           </button>
         </div>
       </section>
@@ -614,9 +614,10 @@
   </footer>
 
   <noscript><div class="noscript">Ative o JavaScript para usar busca, rankings, paginação e favoritos.</div></noscript>
-  <script src="assets/js/app.js?v=044" defer></script>
-  <script type="module" src="assets/js/catalog-runtime.js?v=003"></script>
+  <script src="assets/js/app.js?v=045" defer></script>
+  <script type="module" src="assets/js/catalog-runtime.js?v=004"></script>
   <script type="module" src="assets/js/home-premium-cards-v2.js?v=001"></script>
+  <script src="assets/js/home-section-polish.js?v=002" defer></script>
   <script type="module" src="assets/js/account-sync.js?v=004"></script>
   <script type="module" src="assets/js/notifications.js?v=001"></script>
   <script type="module" src="assets/js/auth.js?v=004"></script>

@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.26";
+const CACHE = "mangamorph-v0.17.27";
 const ASSETS = [
   "./",
   "./index.html",
@@ -17,10 +17,11 @@ const ASSETS = [
   "./assets/css/admin.css?v=004",
   "./assets/css/admin-blue.css?v=001",
   "./assets/css/public-profile.css?v=001",
-  "./assets/js/app.js?v=044",
-  "./assets/js/catalog-runtime.js?v=003",
-  "./assets/js/catalog-cover-fix.js?v=003",
-  "./assets/js/account-sync.js?v=002",
+  "./assets/js/app.js?v=045",
+  "./assets/js/catalog-runtime.js?v=004",
+  "./assets/js/home-premium-cards-v2.js?v=001",
+  "./assets/js/home-section-polish.js?v=002",
+  "./assets/js/account-sync.js?v=004",
   "./assets/js/notifications.js?v=001",
   "./assets/js/admin.js?v=004",
   "./assets/js/admin-import.js?v=003",
@@ -60,14 +61,6 @@ async function fetchFresh(request) {
 
   if(response.ok && destination === "script"){
     const pathname=new URL(request.url).pathname;
-
-    if(pathname.endsWith("/assets/js/catalog-runtime.js")){
-      const source=await response.text();
-      const injected=source+'\nimport("./catalog-cover-fix.js?v=003").catch(error=>console.error("MangaMorph cover fix:",error));\n';
-      const headers=new Headers(response.headers);
-      headers.set("Content-Type","text/javascript; charset=utf-8");
-      return new Response(injected,{status:response.status,statusText:response.statusText,headers});
-    }
 
     if(pathname.endsWith("/assets/js/manga.js")){
       const source=await response.text();

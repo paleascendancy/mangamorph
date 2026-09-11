@@ -402,6 +402,7 @@ function renderProfileUI() {
   accountLogout.hidden = !active;
   accountProfileStats.hidden = !active;
   accountProfileActions.hidden = !active;
+  document.querySelector("#accountLibraryBlock").hidden = !active;
   accountAuthMessage.hidden = true;
 
   accountTitle.textContent = active ? "Perfil" : "Conta";
@@ -541,7 +542,7 @@ function applyFilter(filter) {
   state.filter = filter;
   state.currentPage = 1;
   localStorage.setItem("mangamorph:filter", filter);
-  filterValue.textContent = filter;
+  if (filterValue) filterValue.textContent = filter;
   document.querySelectorAll("[data-filter]").forEach(function(button){
     button.classList.toggle("active", button.dataset.filter === filter);
   });
@@ -552,12 +553,22 @@ function applyFilter(filter) {
 function applyNotifications(enabled) {
   state.notifications = enabled;
   localStorage.setItem("mangamorph:notifications", enabled ? "on" : "off");
-  notificationToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
-  notificationSwitch.classList.toggle("active", enabled);
+  notificationToggle?.setAttribute("aria-pressed", enabled ? "true" : "false");
+  notificationSwitch?.classList.toggle("active", enabled);
+  const value = document.querySelector("#notificationsValue");
+  if (value) value.textContent = enabled ? "Ativadas" : "Desativadas";
+  document.querySelectorAll("[data-notifications]").forEach(function(button){
+    button.classList.toggle("active", (button.dataset.notifications === "on") === enabled);
+  });
   window.dispatchEvent(new CustomEvent("mangamorph:notifications-global",{detail:{enabled:enabled}}));
 }
 
 document.addEventListener("click", function(event) {
+  const notificationChoice = event.target.closest("[data-notifications]");
+  if (notificationChoice) {
+    applyNotifications(notificationChoice.dataset.notifications === "on");
+    return;
+  }
   const favorite = event.target.closest("[data-favorite]");
   if (favorite) {
     event.stopPropagation();
@@ -792,7 +803,7 @@ sideMenuSettings.addEventListener("click", function(){
   openSettings();
 });
 settingsClose.addEventListener("click", closeSettings);
-notificationToggle.addEventListener("click", function(){ applyNotifications(!state.notifications); });
+notificationToggle?.addEventListener("click", function(){ applyNotifications(!state.notifications); });
 
 const savedTheme = localStorage.getItem("mangamorph:theme") || "light";
 applyTheme(savedTheme);
