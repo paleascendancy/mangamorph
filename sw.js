@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.39";
+const CACHE = "mangamorph-v0.17.40";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -69,12 +69,6 @@ async function cleanDocument(request,response){
   return textResponse(html,response,"text/html; charset=utf-8");
 }
 
-function stripDemoCatalog(source){
-  source=source.replace(/let catalog\s*=\s*\[[\s\S]*?\n\];\n\nconst state/,"let catalog = [];\n\nconst state");
-  source=source.replace(/let releases\s*=\s*Array\.from\(\{length:150\}[\s\S]*?\n\}\);\n\nfunction releaseTemplate/,"let releases = [];\n\nfunction releaseTemplate");
-  return source;
-}
-
 function patchAppTheme(source){
   return source.replace(
     'function applyTheme(theme) {',
@@ -96,7 +90,7 @@ async function fetchFresh(request) {
     const pathname=new URL(request.url).pathname;
 
     if(pathname.endsWith("/assets/js/app.js")){
-      let source=stripDemoCatalog(await response.text());
+      let source=await response.text();
       source=patchAppTheme(source);
       return textResponse(source,response,"text/javascript; charset=utf-8");
     }
