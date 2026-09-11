@@ -1,0 +1,72 @@
+/* MangaMorph — final LIGHT theme. Scoped only to body.light so it never bleeds into gray/dark. */
+body.light{background:#f3f5f8!important;color:#141b25!important}
+
+/* Main page surfaces */
+body.light .topbar{background:rgba(248,250,252,.96)!important;color:#141b25!important;border-bottom-color:rgba(24,35,50,.08)!important;box-shadow:0 8px 24px rgba(37,52,72,.06)!important}
+body.light .brand-name{color:#111823!important}body.light .brand-name span{color:#8b96a7!important}
+body.light .menu-tab,body.light .icon-button,body.light .header-action-button,body.light .rank-arrow-button{background:linear-gradient(145deg,#fff,#f4f6f9)!important;color:#18212d!important;border-color:rgba(34,49,70,.09)!important;box-shadow:0 8px 22px rgba(48,63,84,.08),inset 0 1px 0 #fff!important}
+body.light .menu-tab span{background:#18212d!important}
+
+body.light .hero-feature{background:linear-gradient(180deg,#f8fafc 0%,#eef2f6 100%)!important;color:#111823!important;border-bottom-color:rgba(32,47,68,.08)!important}
+body.light .hero-feature::before{background:linear-gradient(145deg,rgba(255,255,255,.86),rgba(244,247,251,.66))!important;border-color:rgba(40,58,84,.08)!important;box-shadow:0 20px 50px rgba(50,67,91,.07),inset 0 1px 0 #fff!important}
+body.light .hero-feature::after{background:linear-gradient(180deg,transparent,#eef2f6)!important}
+body.light .featured-content h1{color:#111823!important}body.light .featured-description{color:#667386!important}body.light .featured-meta{color:#5f789a!important}
+body.light .featured-actions .button-primary{background:#111823!important;color:#fff!important;border-color:#111823!important}
+body.light .featured-actions .button-secondary{background:#fff!important;color:#161e29!important;border-color:rgba(35,49,69,.11)!important;box-shadow:0 8px 20px rgba(50,67,91,.07)!important}
+
+/* Every catalog/ranking section stays light. */
+body.light .catalog-section,body.light .ranking-catalog,body.light .releases-section{background:#f3f5f8!important;color:#151c26!important;border-color:rgba(35,49,69,.06)!important}
+body.light .catalog-section:nth-of-type(even){background:#eef2f6!important}
+body.light .catalog-section::before{background:linear-gradient(145deg,rgba(255,255,255,.76),rgba(245,247,250,.54))!important;border-color:rgba(44,62,88,.065)!important;box-shadow:0 18px 44px rgba(55,72,98,.045),inset 0 1px 0 #fff!important}
+body.light .section-heading h2{color:#161d27!important}body.light .section-heading .eyebrow{color:#8390a2!important}body.light .section-description{color:#667386!important}
+body.light .rank-arrow-button{background:#fff!important;color:#202a36!important;border-color:rgba(35,49,69,.10)!important;box-shadow:0 10px 24px rgba(52,68,92,.09)!important}
+
+/* Manga cards — white card on light page, no gray/dark remnants. */
+body.light .premium-manga-card,body.light .manga-card{background:#fff!important;color:#17202b!important;border-color:rgba(39,57,82,.09)!important;box-shadow:0 10px 26px rgba(54,70,95,.10)!important}
+body.light .premium-manga-card .manga-info,body.light .manga-card .manga-info{background:#fff!important;color:#17202b!important;border-top:1px solid rgba(40,57,81,.07)!important}
+body.light .premium-card-footer,body.light .premium-card-chips,body.light .manga-stats,body.light .manga-meta{background:transparent!important;color:#697689!important}
+body.light .premium-card-chip,body.light .manga-meta>span{background:#f4f7fa!important;color:#667487!important;border-color:rgba(42,59,83,.08)!important}
+body.light .premium-card-chip.chapter,body.light .manga-meta>span:last-child{background:#eef4fb!important;color:#4a6688!important;border-color:rgba(69,108,157,.12)!important}
+body.light .premium-manga-card .favorite-button{background:#f7f9fb!important;color:#7b8797!important;border-color:rgba(41,58,83,.09)!important;box-shadow:none!important}
+body.light .premium-manga-card .favorite-button.active{background:#fff5d9!important;color:#a87916!important;border-color:rgba(168,121,22,.18)!important}
+body.light .manga-rank{background:rgba(31,42,56,.80)!important;color:#fff!important;border-color:rgba(255,255,255,.22)!important}
+body.light .see-more-card{background:linear-gradient(145deg,#fff,#f6f8fb)!important;color:#18212d!important;border:1px dashed rgba(37,53,76,.16)!important;box-shadow:0 10px 24px rgba(52,68,92,.06)!important}
+body.light .see-more-card span{color:#748196!important}body.light .see-more-card .see-more-arrow{background:#18212d!important;color:#fff!important}
+
+/* Release/search/ranking dialogs */
+body.light .release-row,body.light .search-result-card,body.light .ranking-row{background:#fff!important;color:#17202b!important;border-color:rgba(36,53,77,.08)!important;box-shadow:0 7px 20px rgba(55,72,96,.06)!important}
+body.light .search-dialog,body.light .ranking-dialog{background:#f8fafc!important;color:#17202b!important;border-color:rgba(38,55,79,.10)!important;box-shadow:0 26px 70px rgba(44,58,80,.16)!important}
+body.light .search-input,body.light .premium-search-field{background:#fff!important;color:#17202b!important;border-color:rgba(38,55,79,.10)!important}
+
+/* Account/profile drawer */
+body.mm-home.light .account-hub{background:linear-gradient(180deg,#fafbfd,#f2f5f8)!important;color:#141b25!important;border-left-color:rgba(35,50,72,.08)!important;box-shadow:-18px 0 50px rgba(46,61,83,.14)!important}
+body.mm-home.light .account-hub-header{background:rgba(248,250,252,.96)!important;border-bottom-color:rgba(36,51,72,.07)!important}
+body.mm-home.light .account-hub-header h2,body.mm-home.light #accountProfileName{color:#151c26!important}
+body.mm-home.light .account-hub-kicker{color:#8692a2!important}
+body.mm-home.light .account-hub-close{background:#fff!important;color:#17202b!important;border-color:rgba(34,49,70,.09)!important;box-shadow:0 8px 20px rgba(48,63,84,.07)!important}
+body.mm-home.light .account-identity-card{background:#fff!important;border-color:rgba(35,50,72,.08)!important;box-shadow:0 10px 26px rgba(49,65,88,.07)!important}
+body.mm-home.light .account-profile-handle{color:#6480a4!important}body.mm-home.light #accountProfileBio{color:#758294!important}
+body.mm-home.light .account-profile-actions,body.mm-home.light .account-library-block{background:#fff!important;border-color:rgba(35,50,72,.08)!important;box-shadow:0 8px 22px rgba(49,65,88,.06)!important}
+body.mm-home.light .account-library-title{background:#fff!important;color:#8a96a6!important}
+body.mm-home.light .account-profile-action,body.mm-home.light .account-library-card>button{background:#fff!important;color:#17202b!important;border-bottom-color:rgba(35,50,72,.07)!important}
+body.mm-home.light .account-profile-action:hover,body.mm-home.light .account-library-card>button:hover{background:#f7f9fb!important}
+body.mm-home.light .account-profile-action strong,body.mm-home.light .account-library-card strong{color:#17202b!important}
+body.mm-home.light .account-profile-action small,body.mm-home.light .account-library-card small{color:#7b8796!important}
+body.mm-home.light .account-profile-action>span:first-child,body.mm-home.light .account-library-card>button>span:first-child{background:#eef3f9!important;color:#5f7da5!important}
+body.mm-home.light .account-logout-button{background:#fff7f8!important;color:#bd5663!important;border-color:rgba(189,86,99,.16)!important}
+
+/* Settings sheet */
+body.light .settings-dialog{background:linear-gradient(180deg,#f9fbfd,#eef2f6)!important;color:#141b25!important;border-color:rgba(44,67,103,.12)!important;box-shadow:0 26px 70px rgba(43,57,78,.17)!important}
+body.light .settings-row,body.light .settings-submenu,body.light #settingsClose{background:#fff!important;color:#17202b!important;border-color:rgba(35,51,74,.08)!important}
+body.light .settings-row-icon{background:#eef3f8!important;color:#33445b!important;border-color:rgba(35,51,74,.06)!important}
+body.light .settings-row-copy strong,body.light .settings-choice>span{color:#17202b!important}
+body.light .settings-row-copy span,body.light .settings-choice>small,body.light .settings-title p{color:#738094!important}
+body.light .settings-choice{background:transparent!important;color:#17202b!important;border-color:transparent!important}
+body.light .settings-choice.active{background:#edf4fc!important;border-color:rgba(75,114,166,.13)!important}
+body.light .settings-choice.active::after{border-color:#6382aa!important;background:#6382aa!important;box-shadow:inset 0 0 0 3px #edf4fc!important}
+
+/* Footer */
+body.light .footer{background:#eef2f6!important;color:#6d798a!important;border-top-color:rgba(36,52,75,.08)!important}body.light .footer strong{color:#19212d!important}
+
+/* Mobile: preserve same palette; no dark islands. */
+@media(max-width:620px){body.light .catalog-section,body.light .ranking-catalog,body.light .releases-section{background:#f3f5f8!important}body.light .catalog-section:nth-of-type(even){background:#eef2f6!important}}
