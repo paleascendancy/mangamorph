@@ -1,0 +1,72 @@
+/* MangaMorph featured actions — adapted from the user's preferred compact layout. */
+body.mm-home .featured-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  max-width:620px!important;
+  margin:16px auto 0!important;
+}
+body.mm-home .featured-actions .button{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:54px!important;
+  padding:0 18px!important;
+  border-radius:16px!important;
+  font-size:15px!important;
+  line-height:1!important;
+  font-weight:750!important;
+  letter-spacing:-.015em!important;
+  text-decoration:none!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+body.mm-home .featured-actions .button-primary,
+body.mm-home .featured-actions .read-now{
+  border:1px solid #111824!important;
+  background:#111824!important;
+  color:#fff!important;
+}
+body.mm-home .featured-actions .button-secondary{
+  border:1px solid #dce2ea!important;
+  background:#fff!important;
+  color:#202733!important;
+}
+body.mm-home .featured-actions .read-now>span:first-child{
+  display:inline-grid!important;
+  place-items:center!important;
+  width:auto!important;
+  height:auto!important;
+  min-width:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  font-size:13px!important;
+  box-shadow:none!important;
+}
+body.mm-home .featured-actions .button:hover,
+body.mm-home .featured-actions .button:active{
+  transform:none!important;
+}
+@media(max-width:620px){
+  body.mm-home .featured-actions{
+    gap:9px!important;
+    max-width:none!important;
+    margin-top:14px!important;
+  }
+  body.mm-home .featured-actions .button{
+    min-height:48px!important;
+    padding:0 12px!important;
+    border-radius:15px!important;
+    font-size:13px!important;
+  }
+  body.mm-home .featured-actions .read-now>span:first-child{font-size:12px!important}
+}
