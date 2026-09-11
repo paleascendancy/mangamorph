@@ -2,6 +2,14 @@
 @media (min-width:981px){
   html,body.mm-home{min-width:0!important;overflow-x:hidden!important}
   body.mm-home main{width:min(1440px,100%)!important;margin:0 auto!important}
+  body.mm-home .catalog-section,
+  body.mm-home .releases-section{
+    content-visibility:visible!important;
+    contain:none!important;
+    contain-intrinsic-size:auto!important;
+    min-height:0!important;
+    height:auto!important;
+  }
   body.mm-home .topbar{width:100%!important;min-height:76px!important;padding:12px clamp(24px,4vw,64px)!important;gap:20px!important}
   body.mm-home .header-brand{display:flex!important;align-items:center!important;gap:12px!important;min-width:230px!important}
   body.mm-home .menu-tab{width:46px!important;height:46px!important;min-width:46px!important;border-radius:15px!important}
@@ -21,7 +29,7 @@
   body.mm-home .featured-actions .button{min-height:54px!important;border-radius:16px!important;font-size:.92rem!important}
 
   body.mm-home .catalog-section,body.mm-home .releases-section{padding-left:clamp(34px,5vw,72px)!important;padding-right:clamp(34px,5vw,72px)!important}
-  body.mm-home .catalog-section{padding-top:52px!important;padding-bottom:52px!important}
+  body.mm-home .catalog-section{padding-top:42px!important;padding-bottom:42px!important}
   body.mm-home .section-heading{align-items:center!important;margin-bottom:22px!important}
   body.mm-home .section-heading h2{font-size:clamp(2rem,3vw,3rem)!important;line-height:1!important}
   body.mm-home .section-description{font-size:.92rem!important;max-width:620px!important}
