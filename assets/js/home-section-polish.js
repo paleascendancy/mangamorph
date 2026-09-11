@@ -17,6 +17,7 @@
   ensureStyle('assets/css/account-menu.css?v=002','accountMenuStyle');
   ensureStyle('assets/css/home-final-fixes.css?v=001','homeFinalFixes');
   ensureStyle('assets/css/card-compact-fix.css?v=001','cardCompactFix');
+  ensureStyle('assets/css/hero-actions-reference.css?v=001','heroActionsReference');
 
   // Remove settings that no longer belong to the current product before the
   // settings sheet can ever be opened. This replaces the old "render then hide"
@@ -96,7 +97,7 @@
     const actions=document.querySelector('.featured-actions');
     if(actions)actions.style.visibility='';
     document.querySelector('#mmNoLegacyFlash')?.remove();
-    ['home-final-fixes','card-compact-fix'].forEach(key=>{
+    ['home-final-fixes','card-compact-fix','hero-actions-reference'].forEach(key=>{
       const link=document.querySelector('link[data-'+key+']');
       if(link)document.head.appendChild(link);
     });
