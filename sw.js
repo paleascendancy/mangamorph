@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.30";
+const CACHE = "mangamorph-v0.17.31";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -38,8 +38,6 @@ async function cleanDocument(request,response){
   const path=url.pathname;
   let html=await response.text();
 
-  // Put the anti-flash guard in the document HEAD, before any legacy/static UI
-  // has a chance to paint. It is removed as soon as the real runtime is ready.
   const home=path.endsWith("/")||path.endsWith("/index.html")||path.endsWith("/mangamorph/");
   const manga=path.endsWith("/manga.html");
 
@@ -57,8 +55,6 @@ async function cleanDocument(request,response){
 }
 
 function stripDemoCatalog(source){
-  // app.js used to ship a complete fake catalog and synthetic releases. Keeping
-  // that code caused old manga/cards to render for a moment before Supabase won.
   source=source.replace(/let catalog\s*=\s*\[[\s\S]*?\n\];\n\nconst state/,"let catalog = [];\n\nconst state");
   source=source.replace(/let releases\s*=\s*Array\.from\(\{length:150\}[\s\S]*?\n\}\);\n\nfunction releaseTemplate/,"let releases = [];\n\nfunction releaseTemplate");
   return source;
@@ -103,9 +99,6 @@ self.addEventListener("fetch", event => {
   const destination=event.request.destination;
   event.respondWith(
     fetchFresh(event.request).then(response=>{
-      // Do not persist scripts/styles/documents as the normal path. Those are the
-      // files that were producing stale UI. Only images and the explicit offline
-      // shell are kept.
       if(response.ok && destination==="image"){
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put(event.request,copy));
