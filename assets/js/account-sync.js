@@ -7,6 +7,7 @@ if(!document.querySelector('link[data-mm-gray-theme]')){
   theme.dataset.mmGrayTheme='1';
   document.head.append(theme);
 }
+import("./theme-system.js?v=002").catch(()=>{});
 
 import("./home-premium-cards-v2.js?v=001").catch(()=>{});
 const db=createClient("https://fnyellunugdfesprmvzm.supabase.co","sb_publishable_clf6HlhhxdftO1_XZU7YsA_pRmkCEJK",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
