@@ -67,3 +67,61 @@ body.mm-home .premium-manga-card:hover .manga-cover-image{transform:none!importa
 }
 `;
 document.head.append(style);
+
+/* Restore the catalog-origin filter and remove settings the home no longer needs. */
+(function restoreCatalogOriginFilter(){
+  const list=document.querySelector('#settingsPanel .settings-list');
+  if(!list)return;
+
+  ['language','notifications','reading'].forEach(function(name){
+    const row=list.querySelector('[data-settings-section="'+name+'"]');
+    const menu=document.querySelector('#'+name+'Menu');
+    row?.remove();
+    menu?.remove();
+  });
+
+  document.querySelector('#filterMenu')?.remove();
+  list.querySelector('[data-settings-section="filter"]')?.remove();
+
+  const current=localStorage.getItem('mangamorph:filter')||'Padrão';
+  const labels={Padrão:'Todos',Mangá:'Mangá · Japão',Manhwa:'Manhwa · Coreia',Manhua:'Manhua · China'};
+  const aboutRow=list.querySelector('[data-settings-section="about"]');
+
+  const row=document.createElement('button');
+  row.className='settings-row';
+  row.type='button';
+  row.dataset.settingsSection='filter';
+  row.innerHTML='<span class="settings-row-icon" aria-hidden="true">⌘</span><span class="settings-row-copy"><strong>Tipo de obra</strong><span>Filtrar catálogo por origem</span></span><span class="settings-row-end"><span id="filterValue">'+(labels[current]||'Todos')+'</span><span class="settings-chevron">›</span></span>';
+
+  const menu=document.createElement('div');
+  menu.className='settings-submenu';
+  menu.id='filterMenu';
+  menu.hidden=true;
+  menu.innerHTML=[
+    ['Padrão','Todos','Mostrar todo o catálogo'],
+    ['Mangá','Mangá · Japão','Obras japonesas'],
+    ['Manhwa','Manhwa · Coreia','Obras coreanas'],
+    ['Manhua','Manhua · China','Obras chinesas']
+  ].map(function(item){
+    return '<button class="settings-choice '+(item[0]===current?'active':'')+'" type="button" data-filter="'+item[0]+'"><span>'+item[1]+'</span><small>'+item[2]+'</small></button>';
+  }).join('');
+
+  if(aboutRow){
+    list.insertBefore(row,aboutRow);
+    list.insertBefore(menu,aboutRow);
+  }else{
+    list.append(row,menu);
+  }
+
+  document.addEventListener('click',function(event){
+    const choice=event.target.closest('[data-filter]');
+    if(!choice)return;
+    requestAnimationFrame(function(){
+      const value=document.querySelector('#filterValue');
+      if(value)value.textContent=labels[choice.dataset.filter]||choice.dataset.filter;
+      document.querySelectorAll('#filterMenu [data-filter]').forEach(function(button){
+        button.classList.toggle('active',button.dataset.filter===choice.dataset.filter);
+      });
+    });
+  });
+})();
