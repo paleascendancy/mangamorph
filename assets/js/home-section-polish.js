@@ -43,6 +43,13 @@ body.mm-home .premium-manga-card .manga-cover{width:100%!important;margin:0!impo
 body.mm-home .premium-manga-card .manga-cover::after{inset:0!important;border:0!important;border-radius:inherit!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)!important}
 body.mm-home .premium-manga-card .manga-info{margin:0!important;border:0!important;border-radius:0 0 1rem 1rem!important;box-shadow:none!important}
 
+/* All manga artwork, including the featured hero, must fill its frame with no empty bands. */
+body.mm-home .featured-cover{padding:0!important;overflow:hidden!important;background-color:#151b25!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+body.mm-home .featured-cover[style*="background-image"]{background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+body.mm-home .premium-manga-card .manga-cover{background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+body.mm-home .premium-manga-card .manga-cover-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;object-fit:cover!important;object-position:center center!important;background:transparent!important;transform:none!important}
+body.mm-home .premium-manga-card:hover .manga-cover-image{transform:none!important}
+
 @media(max-width:620px){
  .catalog-section .section-heading>div:first-child{padding-left:2.7rem;min-height:2.35rem}
  .catalog-section .section-heading>div:first-child::before{width:2rem;height:2rem;border-radius:.7rem;font-size:.86rem}
