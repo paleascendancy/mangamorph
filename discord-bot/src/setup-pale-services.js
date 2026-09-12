@@ -1,11 +1,7 @@
 import 'dotenv/config';
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   ChannelType,
   Client,
-  EmbedBuilder,
   GatewayIntentBits
 } from 'discord.js';
 
@@ -76,50 +72,11 @@ client.once('ready', async () => {
       ManageMessages: true
     }).catch(() => {});
 
-    const embed = new EmbedBuilder()
-      .setColor(0x7b61ff)
-      .setAuthor({
-        name: 'Pale Ascendancy • Serviços',
-        iconURL: guild.iconURL({ size: 128 }) || client.user.displayAvatarURL()
-      })
-      .setTitle('🧾 Solicitar um serviço')
-      .setDescription(
-        'Precisa de **edição, design ou outro serviço criativo**? Abra um atendimento privado e conte o que você precisa.\n\n' +
-        '`01` Clique em **Solicitar serviço**.\n' +
-        '`02` Informe o serviço, referências, prazo e orçamento aproximado.\n' +
-        '`03` A equipe responde no seu ticket.'
-      )
-      .setFooter({ text: 'Pale Ascendancy • Atendimento profissional' });
-
-    const button = new ButtonBuilder()
-      .setCustomId('pa_service_open')
-      .setLabel('Solicitar serviço')
-      .setEmoji('💼')
-      .setStyle(ButtonStyle.Primary);
-
-    const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
-    const panels = recent?.filter((message) =>
-      message.author.id === client.user.id &&
-      message.embeds.some((item) => item.title === '🧾 Solicitar um serviço')
-    );
-
-    const primary = panels?.first() || null;
-    const payload = {
-      embeds: [embed],
-      components: [new ActionRowBuilder().addComponents(button)]
-    };
-
-    if (primary) {
-      await primary.edit(payload);
-      const duplicates = panels.filter((message) => message.id !== primary.id);
-      for (const message of duplicates.values()) {
-        await message.delete().catch(() => {});
-      }
-    } else {
-      await channel.send(payload);
-    }
-
-    console.log('[PA-SERVICES] 🧾・solicitar-serviço configurado.');
+    // Este script cuida apenas da existência/configuração do canal.
+    // O painel e o botão são responsabilidade exclusiva de
+    // setupPaleProfessionalServices(), evitando criar e apagar mensagens
+    // a cada reinício/deploy do bot.
+    console.log('[PA-SERVICES] 🧾・solicitar-serviço configurado sem republicar painel.');
   } catch (error) {
     console.error('[PA-SERVICES] Falha ao configurar solicitação de serviços:', error);
     process.exitCode = 1;
