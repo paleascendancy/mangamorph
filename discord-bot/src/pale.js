@@ -18,6 +18,11 @@ const normalize = (value = '') => value
 
 const STAFF_NAMES = new Set(['dono', 'desenvolvedor', 'administrador', 'moderador', 'suporte']);
 
+function findChannelInCollection(channels, names, type = ChannelType.GuildText) {
+  const wanted = names.map(normalize);
+  return channels.find((channel) => channel?.type === type && wanted.includes(normalize(channel.name))) || null;
+}
+
 async function findRole(guild, name) {
   const roles = await guild.roles.fetch();
   return roles.find((role) => normalize(role.name) === normalize(name)) || null;
@@ -25,12 +30,61 @@ async function findRole(guild, name) {
 
 async function findChannel(guild, names, type = ChannelType.GuildText) {
   const channels = await guild.channels.fetch();
-  const wanted = names.map(normalize);
-  return channels.find((channel) => channel?.type === type && wanted.includes(normalize(channel.name))) || null;
+  return findChannelInCollection(channels, names, type);
 }
 
 function isStaff(member) {
   return member?.roles?.cache?.some((role) => STAFF_NAMES.has(normalize(role.name))) || false;
+}
+
+export async function setupPaleWelcome(guild) {
+  if (guild.id !== PALE_GUILD_ID) return null;
+
+  const channels = await guild.channels.fetch();
+  let channel = findChannelInCollection(channels, ['👋・boas-vindas', 'boas-vindas', 'bem-vindos', 'welcome']);
+  const topic = 'Boas-vindas automáticas da Pale Ascendancy • leia as regras e conheça os serviços da comunidade.';
+
+  if (!channel) {
+    channel = await guild.channels.create({
+      name: '👋・boas-vindas',
+      type: ChannelType.GuildText,
+      parent: null,
+      topic,
+      reason: 'Criar canal de boas-vindas da Pale Ascendancy'
+    });
+  } else {
+    const changes = {};
+    if (channel.name !== '👋・boas-vindas') changes.name = '👋・boas-vindas';
+    if (channel.parentId !== null) changes.parent = null;
+    if (channel.topic !== topic) changes.topic = topic;
+    if (Object.keys(changes).length) {
+      await channel.edit(changes, 'Configurar canal de boas-vindas da Pale Ascendancy');
+    }
+  }
+
+  await channel.permissionOverwrites.edit(guild.roles.everyone.id, {
+    ViewChannel: true,
+    ReadMessageHistory: true,
+    SendMessages: false,
+    SendMessagesInThreads: false,
+    CreatePublicThreads: false,
+    CreatePrivateThreads: false,
+    AddReactions: false
+  });
+
+  const me = guild.members.me || await guild.members.fetchMe().catch(() => null);
+  if (me) {
+    await channel.permissionOverwrites.edit(me.id, {
+      ViewChannel: true,
+      ReadMessageHistory: true,
+      SendMessages: true,
+      EmbedLinks: true,
+      ManageMessages: true
+    });
+  }
+
+  console.log('[PA-WELCOME] 👋・boas-vindas configurado sem categoria.');
+  return channel;
 }
 
 async function createPaleTicket(interaction, reasonKey) {
@@ -187,21 +241,38 @@ export async function handlePaleMemberAdd(member) {
     await member.roles.add(memberRole, 'Entrada automática na Pale Ascendancy').catch(() => {});
   }
 
-  const welcome = await findChannel(member.guild, ['👋・boas-vindas', 'boas-vindas']);
+  const channels = await member.guild.channels.fetch();
+  let welcome = findChannelInCollection(channels, ['👋・boas-vindas', 'boas-vindas', 'bem-vindos', 'welcome']);
+  if (!welcome) welcome = await setupPaleWelcome(member.guild).catch(() => null);
+
   if (welcome) {
+    const rules = findChannelInCollection(channels, ['📜・regras', 'regras', 'rules']);
+    const service = findChannelInCollection(channels, ['🧾・solicitar-serviço', 'solicitar-serviço', 'pedir-serviço']);
+    const rulesMention = rules ? `${rules}` : '`#regras`';
+    const serviceMention = service ? `${service}` : '`#solicitar-serviço`';
+
     const embed = new EmbedBuilder()
       .setColor(0x7b61ff)
-      .setAuthor({ name: 'Pale Ascendancy • Comunidade Criativa' })
+      .setAuthor({
+        name: 'Pale Ascendancy • Bem-vindo',
+        iconURL: member.guild.iconURL({ size: 128 }) || undefined
+      })
       .setTitle('✨ Bem-vindo à Pale Ascendancy')
       .setDescription(
-        `Olá, ${member}. Bem-vindo à comunidade.\n\n` +
-        'Explore recursos, compartilhe seus trabalhos, converse com outros criadores e evolua junto com a comunidade.'
+        `Olá, ${member}! É muito bom ter você por aqui.\n\n` +
+        'Você agora faz parte de uma comunidade de editores, criadores e pessoas que curtem produção digital.\n\n' +
+        `📜 **Antes de começar:** leia ${rulesMention} para conhecer as regras da comunidade.\n` +
+        `💼 **Quer contratar um editor?** Se quiser, abra sua solicitação em ${serviceMention}.\n\n` +
+        'Explore os canais, converse com a comunidade e aproveite a Pale Ascendancy.'
       )
-      .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
+      .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
       .setFooter({ text: `Membro #${member.guild.memberCount} • Pale Ascendancy` })
       .setTimestamp();
 
-    await welcome.send({ embeds: [embed] }).catch(() => {});
+    await welcome.send({
+      embeds: [embed],
+      allowedMentions: { parse: [], users: [member.id] }
+    }).catch((error) => console.error('[PA-WELCOME] Falha ao enviar boas-vindas:', error));
   }
 
   return true;
