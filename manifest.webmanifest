@@ -1,6 +1,7 @@
 {
   "name": "MangaMorph",
   "short_name": "MangaMorph",
+  "version": "1.0.0",
   "description": "Descubra, acompanhe e organize mangás em uma experiência moderna.",
   "start_url": "./",
   "scope": "./",
