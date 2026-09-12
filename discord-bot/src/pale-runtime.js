@@ -1,4 +1,5 @@
 import { ChannelType } from 'discord.js';
+import { setupPaleWelcome } from './pale.js';
 import { setupPaleCommunity } from './pale-community.js';
 
 const normalize = (value = '') => value
@@ -12,6 +13,10 @@ export async function setupPaleRuntime(guild) {
   if (me?.manageable && me.nickname !== 'Pale Ascendancy') {
     await me.setNickname('Pale Ascendancy', 'Identidade visual do bot neste servidor').catch(() => {});
   }
+
+  await setupPaleWelcome(guild).catch((error) => {
+    console.error('[PA-WELCOME] Falha ao preparar boas-vindas:', error);
+  });
 
   const roles = await guild.roles.fetch().catch(() => null);
   const channels = await guild.channels.fetch().catch(() => null);
