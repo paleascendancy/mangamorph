@@ -1,4 +1,4 @@
-const CACHE = "mangamorph-v0.17.40";
+const CACHE = "mangamorph-v0.17.41";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -53,7 +53,7 @@ async function cleanDocument(request,response){
 
   if(home){
     html=html.replace(/<script[^>]+home-premium-cards-v2\.js[^>]*><\/script>/gi,"");
-    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme')||'light';document.documentElement.classList.remove('mm-theme-dark','mm-theme-light');document.documentElement.classList.add(t==='light'?'mm-theme-light':'mm-theme-dark')}catch(e){document.documentElement.classList.add('mm-theme-light')}})()</script><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=004"><link rel="stylesheet" href="assets/css/desktop-home.css?v=002">`;
+    const themeBoot=`<script>(function(){try{var t=localStorage.getItem('mangamorph:theme-v2')||localStorage.getItem('mangamorph:theme')||'gray';var light=t==='light';document.documentElement.classList.add(light?'mm-boot-light':'mm-boot-gray','mm-catalog-loading')}catch(e){document.documentElement.classList.add('mm-boot-gray','mm-catalog-loading')}})()</script><style id="mmCriticalBoot">#mangamorphCatalogBoot{display:none!important}html.mm-catalog-loading.mm-boot-gray,html.mm-catalog-loading.mm-boot-gray body{background:#1b1d21!important;color:#f2f4f6}html.mm-catalog-loading.mm-boot-light,html.mm-catalog-loading.mm-boot-light body{background:#eef1f5!important;color:#182435}html.mm-catalog-loading body.mm-home .hero-feature{min-height:220px!important}html.mm-catalog-loading body.mm-home .hero-feature>*{visibility:hidden!important}@media(max-width:620px){html.mm-catalog-loading body.mm-home .hero-feature{min-height:150px!important}}</style><link rel="stylesheet" href="assets/css/account-menu.css?v=004"><link rel="stylesheet" href="assets/css/home-canonical.css?v=004"><link rel="stylesheet" href="assets/css/desktop-home.css?v=002">`;
     html=html.replace(/<head>/i,"<head>"+themeBoot);
   }
 
@@ -78,7 +78,7 @@ function patchAppTheme(source){
 
 async function fetchFresh(request) {
   const destination=request.destination;
-  const mustRevalidate=destination==="document"||destination==="script"||destination==="style";
+  const mustRevalidate=destination==="document";
   const options=mustRevalidate?{cache:"no-cache"}:undefined;
   let response=await fetch(request,options);
 
