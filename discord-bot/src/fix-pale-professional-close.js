@@ -14,60 +14,36 @@ async function ensureProfessionalArchive(guild) {
   let category = await findCategory(guild, 'paarquivodeservicos');
   const { approvers } = await roleSets(guild);
 
-  const applyPermissions = async () => {
-    await category.permissionOverwrites.edit(guild.roles.everyone.id, {
-      ViewChannel: false
-    }).catch(() => {});
-
-    await category.permissionOverwrites.edit(guild.client.user.id, {
-      ViewChannel: true,
-      SendMessages: true,
-      ReadMessageHistory: true,
-      ManageChannels: true,
-      ManageMessages: true
-    }).catch(() => {});
-
-    for (const role of approvers.values()) {
-      await category.permissionOverwrites.edit(role.id, {
-        ViewChannel: true,
-        SendMessages: true,
-        ReadMessageHistory: true
-      }).catch(() => {});
-    }
-  };
-
   if (!category) {
     category = await guild.channels.create({
       name: '「 PA 」 ARQUIVO DE SERVIÇOS',
       type: ChannelType.GuildCategory,
-      permissionOverwrites: [
-        { id: guild.roles.everyone.id, deny: [PermissionFlagsBits.ViewChannel] },
-        {
-          id: guild.client.user.id,
-          allow: [
-            PermissionFlagsBits.ViewChannel,
-            PermissionFlagsBits.SendMessages,
-            PermissionFlagsBits.ReadMessageHistory,
-            PermissionFlagsBits.ManageChannels,
-            PermissionFlagsBits.ManageMessages
-          ]
-        },
-        ...Array.from(approvers.values()).map((role) => ({
-          id: role.id,
-          allow: [
-            PermissionFlagsBits.ViewChannel,
-            PermissionFlagsBits.SendMessages,
-            PermissionFlagsBits.ReadMessageHistory
-          ]
-        }))
-      ],
       reason: 'Arquivo privado de atendimentos profissionais da Pale Ascendancy'
     });
   } else {
     await category.edit({ name: '「 PA 」 ARQUIVO DE SERVIÇOS' }).catch(() => {});
   }
 
-  await applyPermissions();
+  await category.permissionOverwrites.edit(guild.roles.everyone.id, {
+    ViewChannel: false
+  }).catch(() => {});
+
+  await category.permissionOverwrites.edit(guild.client.user.id, {
+    ViewChannel: true,
+    SendMessages: true,
+    ReadMessageHistory: true,
+    ManageChannels: true,
+    ManageMessages: true
+  }).catch(() => {});
+
+  for (const role of approvers.values()) {
+    await category.permissionOverwrites.edit(role.id, {
+      ViewChannel: true,
+      SendMessages: true,
+      ReadMessageHistory: true
+    }).catch(() => {});
+  }
+
   return category;
 }
 `;
@@ -80,20 +56,6 @@ if (!source.includes('async function ensureProfessionalArchive(guild)')) {
   source = source.replace(marker, `${archiveHelper}\n${marker}`);
   changed = true;
 }
-
-const oldCloseBlock = String.raw`    if (interaction.customId === 'pa_pro_service_close') {
-      if (!isApprover(member, interaction.guild)) {
-        await interaction.reply({ content: 'Somente Administrador/Dono pode encerrar este atendimento.', ephemeral: true });
-        return true;
-      }
-      data.STATUS = 'closed';
-      await setServiceData(channel, data);
-      await channel.permissionOverwrites.edit(data.PA_PRO_SERVICE, { SendMessages: false }).catch(() => {});
-      for (const id of editors) await channel.permissionOverwrites.edit(id, { SendMessages: false }).catch(() => {});
-      await channel.setName(\`finalizado-\${safeName(channel.name.replace(/^cliente-/, ''))}\`).catch(() => {});
-      await interaction.reply({ content: '🔒 Atendimento finalizado e bloqueado para novas mensagens de cliente/editor.' });
-      return true;
-    }`;
 
 const newCloseBlock = String.raw`    if (interaction.customId === 'pa_pro_service_close') {
       if (!isTicketStaff(member, interaction.guild)) {
@@ -156,11 +118,13 @@ const newCloseBlock = String.raw`    if (interaction.customId === 'pa_pro_servic
       return true;
     }`;
 
-if (source.includes(oldCloseBlock)) {
-  source = source.replace(oldCloseBlock, newCloseBlock);
+if (!source.includes("content: '🔒 Atendimento encerrado. O canal será removido da área ativa e arquivado para a administração.'")) {
+  const closePattern = /    if \(interaction\.customId === 'pa_pro_service_close'\) \{[\s\S]*?await interaction\.reply\(\{ content: '🔒 Atendimento finalizado e bloqueado para novas mensagens de cliente\/editor\.' \}\);\s*return true;\s*    \}/;
+  if (!closePattern.test(source)) {
+    throw new Error('Bloco antigo de encerramento profissional não encontrado.');
+  }
+  source = source.replace(closePattern, newCloseBlock);
   changed = true;
-} else if (!source.includes("content: '🔒 Atendimento encerrado. O canal será removido da área ativa e arquivado para a administração.'")) {
-  throw new Error('Bloco antigo de encerramento profissional não encontrado.');
 }
 
 if (changed) {
