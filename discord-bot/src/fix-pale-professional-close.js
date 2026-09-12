@@ -102,7 +102,7 @@ const newCloseBlock = String.raw`    if (interaction.customId === 'pa_pro_servic
 
       await interaction.message.edit({ components: [] }).catch(() => {});
       await channel.setParent(archive.id, { lockPermissions: false }).catch(() => {});
-      await channel.setName(\`finalizado-\${cleanName}\`).catch(() => {});
+      await channel.setName('finalizado-' + cleanName).catch(() => {});
 
       await channel.send({
         embeds: [
@@ -110,7 +110,7 @@ const newCloseBlock = String.raw`    if (interaction.customId === 'pa_pro_servic
             .setColor(0x2f3545)
             .setTitle('🔒 Atendimento encerrado')
             .setDescription(
-              \`Encerrado por \${interaction.user}. O histórico da negociação foi preservado neste arquivo privado da administração.\`
+              'Encerrado por ' + interaction.user + '. O histórico da negociação foi preservado neste arquivo privado da administração.'
             )
             .setTimestamp()
         ]
