@@ -30,6 +30,62 @@ function stableCoverUrl(value){
 let catalogMap=new Map();
 let enhanceQueued=false;
 
+function setCatalogLoadingState(loading){
+  const hero=document.querySelector(".hero-feature");
+  const rails=[
+    document.querySelector("#favoriteRail"),
+    document.querySelector("#popularRail"),
+    document.querySelector("#newRail"),
+    document.querySelector("#releaseList")
+  ].filter(Boolean);
+
+  if(loading){
+    document.documentElement.classList.add("mm-catalog-loading");
+    hero?.setAttribute("aria-busy","true");
+    if(hero)hero.style.visibility="hidden";
+    rails.forEach(element=>{
+      element.setAttribute("aria-busy","true");
+      element.style.visibility="hidden";
+    });
+    return;
+  }
+
+  document.documentElement.classList.remove("mm-catalog-loading");
+  hero?.removeAttribute("aria-busy");
+  if(hero)hero.style.removeProperty("visibility");
+  rails.forEach(element=>{
+    element.removeAttribute("aria-busy");
+    element.style.removeProperty("visibility");
+  });
+}
+
+function showCatalogError(message){
+  const hero=document.querySelector(".hero-feature");
+  const cover=document.querySelector(".featured-cover");
+  const title=document.querySelector("#featuredTitle");
+  const meta=document.querySelector(".featured-meta");
+  const description=document.querySelector(".featured-description");
+  const actions=document.querySelector(".featured-actions");
+
+  ["#favoriteRail","#popularRail","#newRail","#releaseList"].forEach(selector=>{
+    const element=document.querySelector(selector);
+    if(element)element.replaceChildren();
+  });
+
+  if(cover){
+    cover.removeAttribute("style");
+    cover.replaceChildren();
+  }
+  if(title)title.textContent="Catálogo indisponível";
+  if(meta)meta.replaceChildren();
+  if(description)description.textContent=message||"Não foi possível carregar as obras agora. Atualize a página em alguns instantes.";
+  if(actions)actions.style.display="none";
+  setCatalogLoadingState(false);
+  hero?.setAttribute("data-catalog-error","true");
+}
+
+setCatalogLoadingState(true);
+
 function installCoverImage(cover,item){
   if(!cover||!item)return;
   const src=stableCoverUrl(item.coverUrl);
@@ -154,6 +210,7 @@ new MutationObserver(queueEnhance).observe(document.body,{childList:true,subtree
 
     if(!catalog.length){
       window.dispatchEvent(new CustomEvent("mangamorph:catalog-error",{detail:{message:"Catálogo vazio"}}));
+      showCatalogError("Nenhuma obra foi encontrada no catálogo.");
       return;
     }
 
@@ -161,7 +218,10 @@ new MutationObserver(queueEnhance).observe(document.body,{childList:true,subtree
     window.__MM_CATALOG__=catalog;
     window.dispatchEvent(new CustomEvent("mangamorph:catalog-loaded",{detail:catalog}));
 
-    requestAnimationFrame(enhanceAll);
+    requestAnimationFrame(()=>{
+      enhanceAll();
+      setCatalogLoadingState(false);
+    });
     setTimeout(enhanceAll,120);
 
     const map=new Map(catalog.map(item=>[item.id,item]));
@@ -176,5 +236,6 @@ new MutationObserver(queueEnhance).observe(document.body,{childList:true,subtree
   }catch(error){
     console.error("MangaMorph catalog runtime:",error);
     window.dispatchEvent(new CustomEvent("mangamorph:catalog-error",{detail:{message:error?.message||"Falha ao carregar catálogo"}}));
+    showCatalogError("Não foi possível carregar o catálogo agora. Atualize a página em alguns instantes.");
   }
 })();
