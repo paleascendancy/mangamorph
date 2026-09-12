@@ -1,5 +1,7 @@
 # MangaMorph
 
+**Versão atual: 1.0.0**
+
 MangaMorph é uma plataforma web responsiva para descoberta, organização e leitura de mangás/manhwas, com catálogo, perfis, favoritos, capítulos, administração e integração com Supabase.
 
 ## Estado atual
