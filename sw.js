@@ -1,4 +1,5 @@
-const CACHE = "mangamorph-v0.17.41";
+const VERSION = "1.0.0";
+const CACHE = "mangamorph-v" + VERSION;
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -36,6 +37,7 @@ function textResponse(source,response,contentType){
   const headers=new Headers(response.headers);
   headers.set("Content-Type",contentType);
   headers.set("Cache-Control","no-store, max-age=0");
+  headers.set("X-MangaMorph-Version",VERSION);
   return new Response(source,{status:response.status,statusText:response.statusText,headers});
 }
 
@@ -44,7 +46,9 @@ async function cleanDocument(request,response){
   const path=url.pathname;
   let html=await response.text();
 
-  const perf='<link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="assets/css/navigation-speed.css?v=003"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
+  html=html.replace(/MangaMorph v0\.1/g,"MangaMorph v1.0");
+
+  const perf='<meta name="application-version" content="1.0.0"><script>window.MANGAMORPH_VERSION="1.0.0"</script><link rel="preconnect" href="https://fnyellunugdfesprmvzm.supabase.co" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="assets/css/navigation-speed.css?v=003"><script src="assets/js/navigation-speed.js?v=001" defer></script>';
   html=html.replace(/<\/head>/i,perf+'</head>');
 
   const home=path.endsWith("/")||path.endsWith("/index.html")||path.endsWith("/mangamorph/");
