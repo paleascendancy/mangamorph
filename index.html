@@ -496,35 +496,16 @@
           <button class="settings-choice" type="button" data-theme="light"><span>Claro</span><small>Visual claro e editorial</small></button>
         </div>
 
-        <button class="settings-row" type="button" data-settings-section="language">
-          <span class="settings-row-icon" aria-hidden="true">文</span>
-          <span class="settings-row-copy"><strong>Idioma</strong><span>Idioma da interface</span></span>
-          <span class="settings-row-end"><span id="languageValue">Português</span><span class="settings-chevron">›</span></span>
+        <button class="settings-row" type="button" data-settings-section="filter">
+          <span class="settings-row-icon" aria-hidden="true">⌘</span>
+          <span class="settings-row-copy"><strong>Tipo de obra</strong><span>Filtrar catálogo por origem</span></span>
+          <span class="settings-row-end"><span id="filterValue">Padrão</span><span class="settings-chevron">›</span></span>
         </button>
-        <div class="settings-submenu" id="languageMenu" hidden>
-          <button class="settings-choice active" type="button" data-language="pt-BR"><span>Português (Brasil)</span><small>Idioma atual</small></button>
-          <button class="settings-choice" type="button" data-language="en"><span>English</span><small>Em breve</small></button>
-          <button class="settings-choice" type="button" data-language="es"><span>Español</span><small>Em breve</small></button>
-        </div>
-
-        <button class="settings-row" type="button" data-settings-section="notifications">
-          <span class="settings-row-icon" aria-hidden="true">♢</span>
-          <span class="settings-row-copy"><strong>Notificações</strong><span>Novos capítulos das favoritas</span></span>
-          <span class="settings-row-end"><span id="notificationsValue">Ativadas</span><span class="settings-chevron">›</span></span>
-        </button>
-        <div class="settings-submenu" id="notificationsMenu" hidden>
-          <button class="settings-choice active" type="button" data-notifications="on"><span>Ativadas</span><small>Receber alertas de novos capítulos</small></button>
-          <button class="settings-choice" type="button" data-notifications="off"><span>Desativadas</span><small>Não receber alertas</small></button>
-        </div>
-
-        <button class="settings-row" type="button" data-settings-section="reading">
-          <span class="settings-row-icon" aria-hidden="true">Aa</span>
-          <span class="settings-row-copy"><strong>Preferências de leitura</strong><span>Configure o leitor</span></span>
-          <span class="settings-row-end"><span class="settings-chevron">›</span></span>
-        </button>
-        <div class="settings-submenu" id="readingMenu" hidden>
-          <button class="settings-choice active" type="button" data-reading="vertical"><span>Rolagem vertical</span><small>Leitura contínua</small></button>
-          <button class="settings-choice" type="button" data-reading="paged"><span>Página por página</span><small>Em breve</small></button>
+        <div class="settings-submenu" id="filterMenu" hidden>
+          <button class="settings-choice active" type="button" data-filter="Padrão"><span>🌐 Todas</span><small>Mostrar todo o catálogo</small></button>
+          <button class="settings-choice" type="button" data-filter="Mangá"><span>🇯🇵 Mangá · Japão</span><small>Obras japonesas</small></button>
+          <button class="settings-choice" type="button" data-filter="Manhwa"><span>🇰🇷 Manhwa · Coreia</span><small>Obras coreanas</small></button>
+          <button class="settings-choice" type="button" data-filter="Manhua"><span>🇨🇳 Manhua · China</span><small>Obras chinesas</small></button>
         </div>
 
         <button class="settings-row" type="button" data-settings-section="about">
@@ -619,10 +600,10 @@
     document.documentElement.classList.remove("mm-prelive");
     document.getElementById("mmNoLegacyFlash")?.remove();
   </script>
-  <script src="assets/js/app.js?v=045" defer></script>
-  <script type="module" src="assets/js/catalog-runtime.js?v=004"></script>
-  <script type="module" src="assets/js/account-sync.js?v=004"></script>
-  <script type="module" src="assets/js/notifications.js?v=001"></script>
-  <script type="module" src="assets/js/auth.js?v=004"></script>
+  <script src="assets/js/app.js?v=019" defer></script>
+  <script type="module" src="assets/js/catalog-runtime.js?v=011"></script>
+  <script type="module" src="assets/js/auth.js?v=008"></script>
+  <script type="module" src="assets/js/notifications.js?v=004"></script>
+  <script type="module" src="assets/js/account-sync.js?v=002"></script>
 </body>
 </html>
