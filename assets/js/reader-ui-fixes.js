@@ -79,3 +79,40 @@ if(!document.querySelector('link[data-reader-hero-style]')){
 }
 
 window.addEventListener("resize",()=>requestAnimationFrame(installReaderControlFixes),{passive:true});
+
+// Prioritize the first pages as soon as the live reader mounts them.
+(function installReaderImagePriority(){
+  const stage=document.querySelector("#readerStage");
+  if(!stage)return;
+  let firstPreloaded="";
+  const prioritize=()=>{
+    const images=[...stage.querySelectorAll(".reader-real-page img")];
+    if(!images.length)return false;
+    images.forEach((img,index)=>{
+      if(index<3){
+        img.loading="eager";
+        img.setAttribute("fetchpriority",index===0?"high":"auto");
+      }else{
+        img.loading="lazy";
+        img.setAttribute("fetchpriority","low");
+      }
+      img.decoding="async";
+    });
+    const first=images[0];
+    if(first?.src&&first.src!==firstPreloaded){
+      firstPreloaded=first.src;
+      const preload=document.createElement("link");
+      preload.rel="preload";
+      preload.as="image";
+      preload.href=first.src;
+      preload.fetchPriority="high";
+      document.head.append(preload);
+    }
+    return true;
+  };
+  if(prioritize())return;
+  const observer=new MutationObserver(()=>{
+    if(prioritize())observer.disconnect();
+  });
+  observer.observe(stage,{childList:true,subtree:true});
+})();
