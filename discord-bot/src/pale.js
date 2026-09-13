@@ -17,6 +17,7 @@ const normalize = (value = '') => value
   .replace(/[^a-z0-9]/g, '');
 
 const STAFF_NAMES = new Set(['dono', 'desenvolvedor', 'administrador', 'moderador', 'suporte']);
+const PALE_WELCOME_INTRO_MARKER = 'PA_WELCOME_INTRO_V1';
 
 function findChannelInCollection(channels, names, type = ChannelType.GuildText) {
   const wanted = names.map(normalize);
@@ -37,12 +38,59 @@ function isStaff(member) {
   return member?.roles?.cache?.some((role) => STAFF_NAMES.has(normalize(role.name))) || false;
 }
 
+function paleWelcomeIntroEmbed(guild, channels) {
+  const rules = findChannelInCollection(channels, ['📜・diretrizes', 'diretrizes', '📜・regras', 'regras', 'rules']);
+  const service = findChannelInCollection(channels, ['🧾・solicitar-serviço', 'solicitar-serviço', 'pedir-serviço']);
+  const rulesMention = rules ? `${rules}` : '`#diretrizes`';
+  const serviceMention = service ? `${service}` : '`#solicitar-serviço`';
+
+  const embed = new EmbedBuilder()
+    .setColor(0x7b61ff)
+    .setAuthor({
+      name: 'Pale Ascendancy • Comunidade Criativa',
+      iconURL: guild.iconURL({ size: 128 }) || undefined
+    })
+    .setTitle('👋 Bem-vindo à Pale Ascendancy')
+    .setDescription(
+      'Seja bem-vindo à nossa comunidade de **editores, designers e criadores**.\n\n' +
+      `📜 **Comece por aqui:** confira ${rulesMention} para conhecer as diretrizes da comunidade.\n` +
+      `💼 **Precisa de um editor ou designer?** Abra uma solicitação em ${serviceMention}.\n\n` +
+      'Explore os canais, conheça a comunidade e fique à vontade para participar.'
+    )
+    .setFooter({ text: `${PALE_WELCOME_INTRO_MARKER} • Pale Ascendancy` });
+
+  const icon = guild.iconURL({ size: 256 });
+  if (icon) embed.setThumbnail(icon);
+  return embed;
+}
+
+async function ensurePaleWelcomeIntro(guild, channel) {
+  const channels = await guild.channels.fetch();
+  const payload = {
+    embeds: [paleWelcomeIntroEmbed(guild, channels)],
+    allowedMentions: { parse: [] }
+  };
+
+  const recent = await channel.messages.fetch({ limit: 100 }).catch(() => null);
+  const existing = recent?.find((message) =>
+    message.author.id === guild.client.user.id &&
+    message.embeds.some((embed) => embed.footer?.text?.startsWith(PALE_WELCOME_INTRO_MARKER))
+  ) || null;
+
+  if (existing) {
+    await existing.edit(payload);
+    return existing;
+  }
+
+  return channel.send(payload);
+}
+
 export async function setupPaleWelcome(guild) {
   if (guild.id !== PALE_GUILD_ID) return null;
 
   const channels = await guild.channels.fetch();
   let channel = findChannelInCollection(channels, ['👋・boas-vindas', 'boas-vindas', 'bem-vindos', 'welcome']);
-  const topic = 'Boas-vindas automáticas da Pale Ascendancy • leia as regras e conheça os serviços da comunidade.';
+  const topic = 'Boas-vindas automáticas da Pale Ascendancy • leia as diretrizes e conheça os serviços da comunidade.';
 
   if (!channel) {
     channel = await guild.channels.create({
@@ -82,6 +130,10 @@ export async function setupPaleWelcome(guild) {
       ManageMessages: true
     });
   }
+
+  await ensurePaleWelcomeIntro(guild, channel).catch((error) => {
+    console.error('[PA-WELCOME] Falha ao publicar mensagem inicial:', error);
+  });
 
   console.log('[PA-WELCOME] 👋・boas-vindas configurado sem categoria.');
   return channel;
@@ -246,9 +298,9 @@ export async function handlePaleMemberAdd(member) {
   if (!welcome) welcome = await setupPaleWelcome(member.guild).catch(() => null);
 
   if (welcome) {
-    const rules = findChannelInCollection(channels, ['📜・regras', 'regras', 'rules']);
+    const rules = findChannelInCollection(channels, ['📜・diretrizes', 'diretrizes', '📜・regras', 'regras', 'rules']);
     const service = findChannelInCollection(channels, ['🧾・solicitar-serviço', 'solicitar-serviço', 'pedir-serviço']);
-    const rulesMention = rules ? `${rules}` : '`#regras`';
+    const rulesMention = rules ? `${rules}` : '`#diretrizes`';
     const serviceMention = service ? `${service}` : '`#solicitar-serviço`';
 
     const embed = new EmbedBuilder()
@@ -261,7 +313,7 @@ export async function handlePaleMemberAdd(member) {
       .setDescription(
         `Olá, ${member}! É muito bom ter você por aqui.\n\n` +
         'Você agora faz parte de uma comunidade de editores, criadores e pessoas que curtem produção digital.\n\n' +
-        `📜 **Antes de começar:** leia ${rulesMention} para conhecer as regras da comunidade.\n` +
+        `📜 **Antes de começar:** leia ${rulesMention} para conhecer as diretrizes da comunidade.\n` +
         `💼 **Quer contratar um editor?** Se quiser, abra sua solicitação em ${serviceMention}.\n\n` +
         'Explore os canais, converse com a comunidade e aproveite a Pale Ascendancy.'
       )
