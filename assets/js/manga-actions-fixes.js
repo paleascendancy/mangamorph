@@ -59,7 +59,7 @@ try{
   if(error)throw error;
   if(data?.length&&Number.isFinite(Number(data[0].chapter_number))){
     firstChapter=Number(data[0].chapter_number);
-    if(readLabel)readLabel.textContent="Ler capítulo "+firstChapter;
+    if(readLabel)readLabel.textContent="Ler capítulo";
     const kicker=readButton?.querySelector("small");
     if(kicker)kicker.textContent="COMEÇAR";
   }else if(readLabel){
@@ -79,11 +79,19 @@ readButton?.addEventListener("click",event=>{
 if(!document.querySelector('link[data-mm-manga-layout-v2]')){
   const layoutCss=document.createElement("link");
   layoutCss.rel="stylesheet";
-  layoutCss.href="assets/css/manga-layout-premium-v2.css?v=001";
+  layoutCss.href="assets/css/manga-layout-premium-v2.css?v=002";
   layoutCss.dataset.mmMangaLayoutV2="true";
   document.head.append(layoutCss);
 }
 
-import("./manga-layout-premium-v2.js?v=001").catch(error=>console.error("MangaMorph organized layout:",error));
+if(!document.querySelector('link[data-mm-manga-mobile-fit]')){
+  const mobileFitCss=document.createElement("link");
+  mobileFitCss.rel="stylesheet";
+  mobileFitCss.href="assets/css/manga-profile-mobile-fix.css?v=001";
+  mobileFitCss.dataset.mmMangaMobileFit="true";
+  document.head.append(mobileFitCss);
+}
+
+import("./manga-layout-premium-v2.js?v=002").catch(error=>console.error("MangaMorph organized layout:",error));
 import("./manga-chapter-source.js?v=002").catch(error=>console.error("MangaMorph chapter source:",error));
 import("./manga-page-comments.js?v=002").catch(error=>console.error("MangaMorph page comments:",error));
