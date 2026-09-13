@@ -19,7 +19,6 @@
     return Number.isFinite(number)&&number>=0;
   }
 
-  /* Block malformed internal routes before any page runtime starts. */
   const params=new URLSearchParams(location.search);
   if(page==="manga.html"&&!validPositiveId(params.get("id"))){
     location.replace("index.html");
@@ -38,7 +37,6 @@
     }
   }
 
-  /* Remove obsolete guards left by older deployments. */
   root.classList.remove("mm-manga-prelive");
   d.querySelector("#mmMangaDocumentGuard")?.remove();
   d.querySelector("#mmMangaLiveGuard")?.remove();
@@ -150,10 +148,11 @@
   addEventListener("storage",event=>{
     if(event.key==="mangamorph:profile-session")normalizeAccountIndicator();
   });
+  addEventListener("mangamorph:auth-state",normalizeAccountIndicator);
   setTimeout(normalizeAccountIndicator,40);
 
   if("serviceWorker" in navigator){
-    const swVersion="2.1.0";
+    const swVersion="2.1.1";
     let changing=false;
     navigator.serviceWorker.addEventListener("controllerchange",()=>{
       if(changing)return;
