@@ -98,10 +98,12 @@
   function openAccountHub(event){
     event.preventDefault();
     event.stopImmediatePropagation();
+    const logged=localStorage.getItem("mangamorph:profile-session")==="on";
     const returnTo=currentReturnTarget();
-    if(returnTo){
-      try{localStorage.setItem("mangamorph:auth-return",returnTo)}catch{}
-    }
+    try{
+      if(!logged&&returnTo)localStorage.setItem("mangamorph:auth-return",returnTo);
+      else localStorage.removeItem("mangamorph:auth-return");
+    }catch{}
     location.assign("index.html?mmAccount=1");
   }
 
