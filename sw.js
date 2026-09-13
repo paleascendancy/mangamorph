@@ -1,5 +1,11 @@
-const VERSION="2.1.0";
+const VERSION="2.1.1";
 const CACHE_PREFIX="mangamorph-";
+const CRITICAL_ASSETS=new Set([
+  "/assets/js/navigation-speed.js",
+  "/assets/js/global-header.js",
+  "/assets/js/theme-system.js",
+  "/assets/css/navigation-speed.css"
+]);
 
 self.addEventListener("install",event=>{
   event.waitUntil(self.skipWaiting());
@@ -26,8 +32,16 @@ async function networkNavigation(request){
 }
 
 self.addEventListener("fetch",event=>{
-  if(event.request.method!=="GET"||event.request.mode!=="navigate")return;
+  if(event.request.method!=="GET")return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin)return;
-  event.respondWith(networkNavigation(event.request));
+
+  if(event.request.mode==="navigate"){
+    event.respondWith(networkNavigation(event.request));
+    return;
+  }
+
+  if(CRITICAL_ASSETS.has(url.pathname)){
+    event.respondWith(fetch(event.request,{cache:"no-store"}));
+  }
 });
