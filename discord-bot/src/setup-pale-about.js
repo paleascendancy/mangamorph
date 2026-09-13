@@ -31,7 +31,7 @@ const EDITORS = [
     label: 'Smookecut',
     emoji: '⭐',
     url: 'https://www.tiktok.com/@smookecut?_r=1&_t=ZS-99cfIpszrwT',
-    description: 'Editor principal • referência da equipe para serviços e produções.'
+    description: 'Editor de promoção • participa da produção de serviços solicitados.'
   },
   {
     label: 'Shyrez',
