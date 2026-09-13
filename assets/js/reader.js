@@ -1,10 +1,17 @@
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
+let readerTopLocked=true;
 function forceReaderTop(){
+  if(!readerTopLocked)return;
   window.scrollTo({top:0,left:0,behavior:"auto"});
 }
+function unlockReaderScroll(){
+  if(!readerTopLocked)return;
+  readerTopLocked=false;
+  document.documentElement.classList.add("reader-scroll-unlocked");
+}
 forceReaderTop();
-window.addEventListener("pageshow",forceReaderTop);
+window.addEventListener("pageshow",forceReaderTop,{once:true});
 
 const params=new URLSearchParams(location.search);
 const requestedChapter=Number(params.get("chapter"));
@@ -21,6 +28,38 @@ const progressPercent=document.querySelector("#readerProgressPercent");
 const progressBar=document.querySelector("#readerProgressBar");
 const toast=document.querySelector("#readerToast");
 
+// Keep the viewport at the chapter header only while the real pages do not exist yet.
+// As soon as reader-runtime renders page elements, never force the reader back to the top.
+if(readerStage){
+  const unlockIfPagesExist=()=>{
+    const pages=[...readerStage.querySelectorAll("[data-reader-page]")];
+    if(!pages.length)return false;
+    unlockReaderScroll();
+    pages.forEach((page,index)=>{
+      const img=page.querySelector("img");
+      if(!img)return;
+      page.classList.toggle("is-loaded",img.complete&&img.naturalWidth>0);
+      if(index<3){
+        img.loading="eager";
+        if(index===0)img.fetchPriority="high";
+      }
+      if(!img.dataset.readerStabilityBound){
+        img.dataset.readerStabilityBound="true";
+        img.addEventListener("load",()=>page.classList.add("is-loaded"),{once:true});
+        img.addEventListener("error",()=>page.classList.add("is-loaded"),{once:true});
+      }
+    });
+    requestAnimationFrame(updateProgress);
+    return true;
+  };
+  if(!unlockIfPagesExist()){
+    const pageObserver=new MutationObserver(()=>{
+      if(unlockIfPagesExist())pageObserver.disconnect();
+    });
+    pageObserver.observe(readerStage,{childList:true,subtree:true});
+  }
+}
+
 // Never render the old demo reader. Show a tiny loading state until live data arrives.
 if(readerStage && !readerStage.children.length){
   readerStage.innerHTML='<div class="reader-live-loading" role="status" aria-live="polite"><span></span><strong>Carregando capítulo '+chapter+'</strong></div>';
@@ -30,6 +69,11 @@ loadingStyle.id="readerLiveLoadingStyle";
 loadingStyle.textContent=`
 .reader-live-loading{min-height:42vh;display:grid;place-items:center;align-content:center;gap:.7rem;color:#66758a;font-size:.72rem;font-weight:750}
 .reader-live-loading span{width:1.8rem;height:1.8rem;border:3px solid rgba(83,111,148,.16);border-top-color:#5b7ea9;border-radius:50%;animation:mmReaderSpin .7s linear infinite}
+.reader-stage{overflow-anchor:auto}
+.reader-real-page{content-visibility:auto;contain-intrinsic-size:auto 1400px;overflow-anchor:auto}
+.reader-real-page img{display:block;max-width:100%;height:auto}
+.reader-real-page:not(.is-loaded){background:rgba(105,124,148,.035)}
+@media(max-width:560px){.reader-real-page{contain-intrinsic-size:auto 1150px}}
 @keyframes mmReaderSpin{to{transform:rotate(360deg)}}
 `;
 document.head.append(loadingStyle);
@@ -87,7 +131,6 @@ function updateProgress(){
   window.dispatchEvent(new CustomEvent("mangamorph:progress",{detail:{mangaId,chapterNumber:chapter,pageNumber:current,percent}}));
 }
 window.addEventListener("scroll",updateProgress,{passive:true});
-window.addEventListener("mangamorph:library-loaded",forceReaderTop);
 window.addEventListener("storage",event=>{
   if(event.key!=="mangamorph:theme")return;
   const light=event.newValue==="light";
