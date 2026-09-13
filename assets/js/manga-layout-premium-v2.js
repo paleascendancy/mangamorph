@@ -7,6 +7,13 @@
   const top = hero.querySelector('.hero-top');
   const primary = hero.querySelector('.hero-primary');
   const secondary = hero.querySelector('.hero-secondary');
+
+  const cover = top.querySelector('#detailCover');
+  const coverColumn = document.createElement('div');
+  coverColumn.className = 'mm-cover-column';
+  top.insertBefore(coverColumn, cover);
+  coverColumn.append(cover);
+
   const identity = document.createElement('div');
   identity.className = 'mm-work-identity';
   ['.eyebrow','#mangaTitle','#mangaAltTitle','.hero-badges'].forEach(selector => {
@@ -14,32 +21,39 @@
     if (node) identity.append(node);
   });
   top.append(identity);
+
   const stats = primary.querySelector('.detail-meta');
   stats.classList.add('mm-stats-grid');
   hero.insertBefore(stats, secondary);
+
   const actions = primary.querySelector('.hero-actions-premium');
   actions.classList.add('mm-actions-bar');
-  hero.insertBefore(actions, secondary);
-  // Sharing remains available in the header; the reading row stays compact.
+  coverColumn.append(actions);
+
+  // Sharing remains available in the header; favorite/list stay directly below the cover.
   document.querySelector('.topbar-actions').prepend(document.querySelector('#shareDetail'));
+
   const synopsis = document.createElement('section');
   synopsis.className = 'mm-synopsis-card';
   synopsis.innerHTML = '<h2>Sinopse</h2>';
   synopsis.append(primary.querySelector('#mangaDescription'), primary.querySelector('#toggleDescription'));
   hero.insertBefore(synopsis, secondary);
   primary.remove();
+
   secondary.classList.add('mm-details-bottom');
   const status = secondary.querySelector('.status-picker');
   const statusHeading = document.createElement('h2');
   statusHeading.textContent = 'Minha leitura';
   status.prepend(statusHeading);
   document.querySelector('.status-leading > span:last-child').textContent = 'Status de leitura';
+
   const facts = document.querySelector('.detail-facts');
   const factsHeading = document.createElement('h2');
   factsHeading.className = 'mm-facts-heading';
   factsHeading.textContent = 'Sobre a obra';
   facts.before(factsHeading);
   ['mangaStatusFact','latestChapter'].forEach(id => document.getElementById(id).parentElement.hidden = true);
+
   const author = document.querySelector('#mangaAuthorFact');
   const artist = document.querySelector('#mangaArtistFact');
   function groupCredits() {
@@ -50,8 +64,8 @@
   const creditObserver = new MutationObserver(groupCredits);
   [author,artist].forEach(node => creditObserver.observe(node,{childList:true,subtree:true,characterData:true}));
   groupCredits();
+
   // Reflect the actual cover and keep its original ratio without cropping it.
-  const cover = document.querySelector('#detailCover');
   const coverFallback = cover.querySelectorAll('.detail-cover-kicker,#coverTitle,#coverType');
   const backdrop = document.createElement('div');
   backdrop.className = 'mm-profile-backdrop';
@@ -81,6 +95,7 @@
   }
   new MutationObserver(reflectCover).observe(cover,{attributes:true,attributeFilter:['style']});
   reflectCover();
+
   // Fold long tag lists, retaining every tag behind an accessible toggle.
   const tags = document.querySelector('#mangaTags');
   const more = document.createElement('button');
@@ -98,6 +113,7 @@
   }
   new MutationObserver(foldTags).observe(tags,{childList:true});
   foldTags();
+
   const toggle = document.querySelector('#toggleDescription');
   function labelDescription() {
     const label = toggle.getAttribute('aria-expanded') === 'true' ? 'Ler menos ↑' : 'Ler mais ↓';
@@ -105,6 +121,7 @@
   }
   new MutationObserver(labelDescription).observe(toggle,{attributes:true,childList:true,characterData:true,subtree:true});
   labelDescription();
+
   // Keep the profile theme synchronized with legacy components that still read body.light.
   function setProfileTheme(theme) {
     const normalized = theme === 'light' ? 'light' : 'dark';
