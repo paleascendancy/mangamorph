@@ -13,7 +13,18 @@ cleanCoverStyle.id="mangamorphCleanMangaCovers";
 cleanCoverStyle.textContent=`
   .detail-cover-kicker,.compact-cover>strong,.compact-cover>small,.related-cover-title{display:none!important}
   .compact-cover::after{content:none!important;display:none!important}
-  .compact-cover[style*="background-image"]{background-size:auto 178%!important;background-position:center top!important;background-repeat:no-repeat!important}
+  .compact-cover[style*="background-image"]{
+    background-size:contain!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-color:var(--detail-accent,#e7ebf1)!important;
+  }
+  .related-cover[style*="background-image"]{
+    background-size:contain!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-color:var(--accent,#e7ebf1)!important;
+  }
 `;
 document.head.append(cleanCoverStyle);
 
@@ -66,7 +77,13 @@ try{
     $("#coverTitle").textContent=manga.title.toUpperCase();
     $("#coverType").textContent=(manga.type||"OBRA").toUpperCase();
     $("#detailCover").style.setProperty("--detail-accent",manga.accent||"#3a4162");
-    if(manga.cover_url){$("#detailCover").style.backgroundImage='url("'+manga.cover_url+'")';$("#detailCover").style.backgroundSize="auto 178%";$("#detailCover").style.backgroundPosition="center top";$("#detailCover").style.backgroundRepeat="no-repeat"}
+    if(manga.cover_url){
+      $("#detailCover").style.backgroundImage='url("'+manga.cover_url+'")';
+      $("#detailCover").style.backgroundSize="contain";
+      $("#detailCover").style.backgroundPosition="center";
+      $("#detailCover").style.backgroundRepeat="no-repeat";
+      $("#detailCover").style.backgroundColor=manga.accent||"#e7ebf1";
+    }
     const country=manga.country||"";$("#mangaOriginBadge").textContent=flag(country,manga.type)+" "+manga.type+(country?" · "+country:"");
     $("#mangaTypeFact").textContent=manga.type+(country?" · "+country:"");
     $("#mangaDescription").textContent=manga.synopsis||"Sem sinopse cadastrada.";
@@ -91,7 +108,7 @@ try{
 
     const related=(catalog||[]).filter(x=>Number(x.id)!==id).slice(0,8);
     $("#relatedCount").textContent=related.length+" recomendações";
-    $("#relatedGrid").innerHTML=related.map((r,index)=>'<article class="related-card related-card-premium" data-related="'+r.id+'" tabindex="0" role="link"><div class="related-cover" style="--accent:'+(r.accent||"#3a4162")+';'+(r.cover_url?'background-image:linear-gradient(180deg,transparent,rgba(4,7,12,.8)),url('+r.cover_url+');background-size:cover;background-position:center;':'')+'"><span class="related-rank">#'+String(index+1).padStart(2,"0")+'</span><span class="related-open">↗</span><strong class="related-cover-title">'+esc(r.title)+'</strong></div><div class="related-info"><strong>'+esc(r.title)+'</strong><span>'+flag(r.country,r.type)+' '+esc(r.type)+' · '+esc((r.genres||[])[0]||"Outros")+'</span><small><span>Cap. '+(Number(r.latest_chapter)||"—")+'</span><span>★ '+(Number(r.average_rating)||0).toFixed(1).replace(".",",")+'</span></small></div></article>').join("");
+    $("#relatedGrid").innerHTML=related.map((r,index)=>'<article class="related-card related-card-premium" data-related="'+r.id+'" tabindex="0" role="link"><div class="related-cover" style="--accent:'+(r.accent||"#3a4162")+';'+(r.cover_url?'background-image:url('+r.cover_url+');background-size:contain;background-repeat:no-repeat;background-position:center;background-color:'+(r.accent||"#e7ebf1")+';':'')+'"><span class="related-rank">#'+String(index+1).padStart(2,"0")+'</span><span class="related-open">↗</span><strong class="related-cover-title">'+esc(r.title)+'</strong></div><div class="related-info"><strong>'+esc(r.title)+'</strong><span>'+flag(r.country,r.type)+' '+esc(r.type)+' · '+esc((r.genres||[])[0]||"Outros")+'</span><small><span>Cap. '+(Number(r.latest_chapter)||"—")+'</span><span>★ '+(Number(r.average_rating)||0).toFixed(1).replace(".",",")+'</span></small></div></article>').join("");
 
     finishBoot();
 
