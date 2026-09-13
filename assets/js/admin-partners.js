@@ -8,6 +8,7 @@ if(!document.querySelector('link[data-mangamorph-admin-blue]')){
 }
 
 await import("./admin-partners-v2.js?v=001");
+import("./admin-live-sync.js?v=001").catch(error=>console.warn("MangaMorph admin live sync:",error));
 
 const heroNote=document.querySelector("#partnerOverview .partner-hero p");
 if(heroNote)heroNote.textContent="A Scan fornece capítulos, páginas, crédito e origem de cada capítulo. Capa e metadados do perfil ficam por conta do AniList.";
