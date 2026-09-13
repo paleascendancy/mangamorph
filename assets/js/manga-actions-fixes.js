@@ -48,5 +48,5 @@ readButton?.addEventListener("click",event=>{
   location.href="reader.html?id="+mangaId+"&chapter="+encodeURIComponent(String(firstChapter));
 },true);
 
-import("./manga-chapter-source.js?v=002").catch(error=>console.error("MangaMorph chapter source:",error));
+import("./manga-chapter-source.js?v=003").catch(error=>console.error("MangaMorph chapter source:",error));
 import("./manga-page-comments.js?v=002").catch(error=>console.error("MangaMorph page comments:",error));

@@ -78,7 +78,7 @@ try{
 
       const dateNode=numberBox.querySelector(".chapter-meta-line>span:first-child");
       const dateText=shortDate(source?.published_at);
-      if(dateNode&&dateText)dateNode.textContent="◷ "+dateText;
+      if(dateNode&&dateText&&dateNode.textContent!=="◷ "+dateText)dateNode.textContent="◷ "+dateText;
 
       if(row.querySelector(".chapter-source-line")||!source?.source_name)return;
       const line=document.createElement("span");
