@@ -1,3 +1,4 @@
+import("./nav-stability.js?v=001").catch(()=>{});
 import("./theme-system.js?v=111").catch(()=>{});
 import("./global-header.js?v=002").catch(()=>{});
 import("./profile-panel-cleanup.js?v=002").catch(()=>{});
