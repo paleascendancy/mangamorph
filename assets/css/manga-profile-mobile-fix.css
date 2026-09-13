@@ -1,0 +1,241 @@
+/* MangaMorph — mobile profile fit repair */
+@media (max-width: 760px) {
+  html, body { max-width: 100%; overflow-x: clip; }
+
+  .manga-page {
+    width: 100%;
+    max-width: 100%;
+    padding-left: .65rem !important;
+    padding-right: .65rem !important;
+  }
+
+  .manga-hero-premium.mm-organized-hero,
+  .mm-organized-hero .hero-top,
+  .mm-work-identity,
+  .mm-stats-grid,
+  .mm-synopsis-card,
+  .mm-actions-bar,
+  .mm-details-bottom,
+  .mm-facts-card {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .manga-hero-premium.mm-organized-hero {
+    width: 100%;
+    gap: .5rem !important;
+    padding: .65rem !important;
+    overflow: hidden !important;
+  }
+
+  .mm-organized-hero .hero-top {
+    grid-template-columns: minmax(88px, 30vw) minmax(0, 1fr) !important;
+    gap: .62rem !important;
+    align-items: start !important;
+  }
+
+  .mm-organized-hero .compact-cover {
+    width: 100% !important;
+    max-width: 110px !important;
+    min-width: 0 !important;
+    justify-self: start;
+    aspect-ratio: 3 / 4.18 !important;
+    min-height: 0 !important;
+  }
+
+  .mm-work-identity {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .mm-work-identity #mangaTitle {
+    max-width: 100% !important;
+    font-size: clamp(1.35rem, 6.7vw, 1.8rem) !important;
+    line-height: 1 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .mm-work-identity #mangaAltTitle {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    max-width: 100%;
+    font-size: .61rem !important;
+    line-height: 1.32 !important;
+  }
+
+  .mm-work-identity .hero-badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: .24rem !important;
+    margin-top: .18rem !important;
+  }
+
+  .mm-work-identity .hero-badges > span {
+    max-width: 100%;
+    min-width: 0;
+    min-height: 1.42rem !important;
+    padding: 0 .4rem !important;
+    font-size: .49rem !important;
+    white-space: nowrap;
+  }
+
+  .mm-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: .3rem !important;
+  }
+
+  .mm-stats-grid > span {
+    min-width: 0 !important;
+    min-height: 3rem !important;
+    padding: .5rem .45rem .44rem !important;
+    font-size: clamp(.58rem, 2.7vw, .68rem) !important;
+    overflow: hidden;
+  }
+
+  .mm-stats-grid > span::before {
+    font-size: .39rem !important;
+  }
+
+  .mm-synopsis-card {
+    padding: .62rem .66rem !important;
+  }
+
+  .mm-synopsis-card .detail-description {
+    font-size: .67rem !important;
+    line-height: 1.48 !important;
+  }
+
+  .mm-actions-bar {
+    grid-template-columns: minmax(0, 1fr) repeat(3, 2.45rem) !important;
+    grid-template-rows: 2.45rem !important;
+    align-items: stretch !important;
+    gap: .32rem !important;
+    padding: .38rem !important;
+  }
+
+  .mm-actions-bar .detail-main-action {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 2.45rem !important;
+    padding: .38rem .48rem !important;
+    overflow: hidden;
+  }
+
+  .mm-actions-bar .detail-main-action > span:last-child {
+    min-width: 0;
+  }
+
+  .mm-actions-bar .detail-main-action strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .61rem !important;
+  }
+
+  .mm-actions-bar #favoriteDetail,
+  .mm-actions-bar #markDetail,
+  .mm-actions-bar #shareDetail {
+    grid-row: 1 !important;
+    width: 2.45rem !important;
+    min-width: 2.45rem !important;
+    height: 2.45rem !important;
+    min-height: 2.45rem !important;
+  }
+
+  .mm-actions-bar #favoriteDetail { grid-column: 2 !important; }
+  .mm-actions-bar #markDetail { grid-column: 3 !important; }
+  .mm-actions-bar #shareDetail { grid-column: 4 !important; }
+
+  .mm-details-bottom {
+    gap: .34rem !important;
+    padding: .42rem !important;
+  }
+
+  .mm-details-bottom .detail-tags {
+    min-width: 0;
+    gap: .24rem !important;
+    padding: .06rem !important;
+  }
+
+  .mm-details-bottom .detail-tags span {
+    max-width: 100%;
+    padding: .25rem .38rem !important;
+    font-size: .49rem !important;
+    overflow-wrap: anywhere;
+  }
+
+  .mm-details-bottom .status-inline-button {
+    min-width: 0;
+    min-height: 2.35rem !important;
+  }
+
+  .mm-facts-card {
+    margin-top: .52rem;
+  }
+
+  .mm-facts-card .detail-facts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .manga-page {
+    padding-left: .55rem !important;
+    padding-right: .55rem !important;
+  }
+
+  .manga-hero-premium.mm-organized-hero {
+    padding: .58rem !important;
+  }
+
+  .mm-organized-hero .hero-top {
+    grid-template-columns: 86px minmax(0, 1fr) !important;
+    gap: .52rem !important;
+  }
+
+  .mm-organized-hero .compact-cover {
+    max-width: 86px !important;
+  }
+
+  .mm-work-identity #mangaTitle {
+    font-size: 1.28rem !important;
+  }
+
+  .mm-work-identity #mangaAltTitle {
+    -webkit-line-clamp: 2;
+    font-size: .57rem !important;
+  }
+
+  .mm-stats-grid > span {
+    padding-left: .35rem !important;
+    padding-right: .35rem !important;
+    font-size: .58rem !important;
+  }
+
+  .mm-actions-bar {
+    grid-template-columns: minmax(0, 1fr) repeat(3, 2.3rem) !important;
+    grid-template-rows: 2.3rem !important;
+    gap: .26rem !important;
+  }
+
+  .mm-actions-bar #favoriteDetail,
+  .mm-actions-bar #markDetail,
+  .mm-actions-bar #shareDetail {
+    width: 2.3rem !important;
+    min-width: 2.3rem !important;
+    height: 2.3rem !important;
+    min-height: 2.3rem !important;
+  }
+
+  .mm-actions-bar .detail-main-action {
+    min-height: 2.3rem !important;
+  }
+}
