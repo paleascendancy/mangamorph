@@ -82,6 +82,7 @@ function fillEditor(row){
   const aniInput=$("mangaAniListUrlInput"),aniId=Number(row.metadata_source_id);
   if(aniInput&&/anilist/i.test(String(row.metadata_source||""))&&Number.isInteger(aniId)&&aniId>0){
     aniInput.value=`https://anilist.co/manga/${aniId}`;
+    aniInput.dataset.userEdited="0";
     aniInput.dispatchEvent(new Event("input",{bubbles:true}));
   }
   const status=$("mangaCoverStatus");
@@ -118,7 +119,10 @@ async function resolveProfile(forcedId=null){
   if(message)message.textContent=forcedId?"Confirmando o perfil selecionado e salvando o vínculo…":"Busca ampliada: AniList, títulos alternativos, dados da scan e fontes de apoio…";
 
   try{
-    const explicitId=Number(forcedId)||parseAniListId($("mangaAniListUrlInput")?.value);
+    const aniInput=$("mangaAniListUrlInput");
+    const typedId=parseAniListId(aniInput?.value);
+    const userEdited=aniInput?.dataset.userEdited==="1";
+    const explicitId=Number(forcedId)||(userEdited?typedId:null);
     const {data}=await invokeResolver({manga_id:mangaId,...(explicitId?{anilist_id:explicitId}:{})});
 
     if(data?.needs_selection){
@@ -147,7 +151,7 @@ async function resolveProfile(forcedId=null){
 
 document.addEventListener("click",event=>{
   const choice=event.target.closest?.("[data-anilist-choice]");
-  if(choice){event.preventDefault();event.stopImmediatePropagation();const id=Number(choice.dataset.anilistChoice);const input=$("mangaAniListUrlInput");if(input&&Number.isInteger(id)){input.value=`https://anilist.co/manga/${id}`;input.dispatchEvent(new Event("input",{bubbles:true}))}resolveProfile(id);return}
+  if(choice){event.preventDefault();event.stopImmediatePropagation();const id=Number(choice.dataset.anilistChoice);const input=$("mangaAniListUrlInput");if(input&&Number.isInteger(id)){input.value=`https://anilist.co/manga/${id}`;input.dataset.userEdited="0";input.dispatchEvent(new Event("input",{bubbles:true}))}resolveProfile(id);return}
   const button=event.target.closest?.("#importAniListCover");
   if(!button)return;
   event.preventDefault();event.stopImmediatePropagation();resolveProfile();
