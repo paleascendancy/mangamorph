@@ -7,7 +7,20 @@ if(!document.querySelector('link[data-mangamorph-admin-blue]')){
   document.head.append(link);
 }
 
-await import("./admin-partners-v2.js?v=001");
+// The original partner synchronizer still has a legacy CORS allowlist.
+// Rewrite only that Edge Function request to the Vercel-compatible wrapper.
+const nativeFetch=window.fetch.bind(window);
+window.fetch=(input,init)=>{
+  const raw=typeof input==="string"?input:input?.url||String(input||"");
+  if(raw.includes("/functions/v1/mangamorph-sync-partners")&&!raw.includes("mangamorph-sync-partners-web")){
+    const next=raw.replace("/functions/v1/mangamorph-sync-partners","/functions/v1/mangamorph-sync-partners-web");
+    if(typeof input==="string")return nativeFetch(next,init);
+    return nativeFetch(new Request(next,input),init);
+  }
+  return nativeFetch(input,init);
+};
+
+await import("./admin-partners-v2.js?v=002");
 import("./admin-live-sync.js?v=001").catch(error=>console.warn("MangaMorph admin live sync:",error));
 
 const heroNote=document.querySelector("#partnerOverview .partner-hero p");
