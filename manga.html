@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#eef1f5">
+  <meta name="theme-color" content="#141b25">
   <meta name="description" content="Detalhes da obra no MangaMorph.">
   <title>MangaMorph — Detalhes</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="assets/css/style.css?v=038">
   <link rel="stylesheet" href="assets/css/manga.css?v=016">
-  <link rel="stylesheet" href="assets/css/manga-cover-fill.css?v=001">
+  <link rel="stylesheet" href="assets/css/manga-layout-premium-v2.css?v=003" data-mm-manga-layout-v2="true">
 </head>
-<body class="light">
+<body class="mm-profile" data-profile-theme="dark">
   <header class="topbar manga-topbar">
     <a class="brand brand-text-only" href="./" aria-label="MangaMorph — voltar ao início">
       <span class="brand-name">Manga<span>Morph</span></span>
@@ -42,8 +42,8 @@
 
           <div class="hero-badges">
             <span class="origin-badge" id="mangaOriginBadge">🇯🇵 Mangá</span>
-            <span class="publication-badge"><span class="status-dot"></span> Em lançamento</span>
-            <span class="year-badge">2026</span>
+            <span class="publication-badge"><span class="status-dot"></span><span id="publicationLabel">Em lançamento</span></span>
+            <span class="year-badge" id="mangaYearFact">—</span>
           </div>
 
           <div class="detail-meta detail-meta-compact">
@@ -107,7 +107,6 @@
       <div><dt>Status</dt><dd id="mangaStatusFact">Em lançamento</dd></div>
       <div><dt>Tipo</dt><dd id="mangaTypeFact">Mangá</dd></div>
       <div><dt>Último capítulo</dt><dd id="latestChapter">127</dd></div>
-      <div><dt>Ano</dt><dd id="mangaYearFact">2026</dd></div>
       <div><dt>Autor</dt><dd id="mangaAuthorFact">—</dd></div>
       <div><dt>Artista</dt><dd id="mangaArtistFact">—</dd></div>
     </dl>
@@ -203,10 +202,11 @@
     <p>Página de obra demonstrativa.</p>
   </footer>
 
-  <script src="assets/js/manga.js?v=017" defer></script>
-  <script type="module" src="assets/js/manga-runtime.js?v=005"></script>
+  <script src="assets/js/manga.js?v=018" defer></script>
+  <script src="assets/js/manga-layout-premium-v2.js?v=003" defer></script>
+  <script type="module" src="assets/js/manga-runtime.js?v=006"></script>
   <script type="module" src="assets/js/manga-ui-fixes.js?v=001"></script>
-  <script type="module" src="assets/js/manga-actions-fixes.js?v=002"></script>
+  <script type="module" src="assets/js/manga-actions-fixes.js?v=003"></script>
   <script type="module" src="assets/js/account-sync.js?v=002"></script>
   <script type="module" src="assets/js/manga-ratings.js?v=001"></script>
 </body>

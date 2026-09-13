@@ -11,34 +11,6 @@ const readLabel=document.querySelector("#readLatestLabel");
 const favoriteButton=document.querySelector("#favoriteDetail");
 const listButton=document.querySelector("#markDetail");
 
-const style=document.createElement("style");
-style.id="mangamorphCompactHeroActions";
-style.textContent=`
-  #favoriteDetail,#markDetail{
-    width:3rem!important;
-    min-width:3rem!important;
-    min-height:3rem!important;
-    padding:0!important;
-    gap:0!important;
-    border-radius:.82rem!important;
-  }
-  #favoriteDetail>span:last-child,#markDetail>span:last-child{display:none!important}
-  #favoriteDetail .action-glyph,#markDetail .action-glyph{
-    display:grid!important;
-    place-items:center!important;
-    width:100%!important;
-    height:100%!important;
-    font-size:1.28rem!important;
-    line-height:1!important;
-  }
-  #favoriteDetail.active .action-glyph{color:#e0b64f!important}
-  #markDetail.active .action-glyph{color:#5b8def!important}
-  @media(max-width:560px){
-    #favoriteDetail,#markDetail{width:2.9rem!important;min-width:2.9rem!important;min-height:2.9rem!important}
-  }
-`;
-document.head.append(style);
-
 if(favoriteButton){
   favoriteButton.setAttribute("title","Favoritar");
   favoriteButton.setAttribute("aria-label","Favoritar obra");
@@ -76,22 +48,5 @@ readButton?.addEventListener("click",event=>{
   location.href="reader.html?id="+mangaId+"&chapter="+encodeURIComponent(String(firstChapter));
 },true);
 
-if(!document.querySelector('link[data-mm-manga-layout-v2]')){
-  const layoutCss=document.createElement("link");
-  layoutCss.rel="stylesheet";
-  layoutCss.href="assets/css/manga-layout-premium-v2.css?v=002";
-  layoutCss.dataset.mmMangaLayoutV2="true";
-  document.head.append(layoutCss);
-}
-
-if(!document.querySelector('link[data-mm-manga-mobile-fit]')){
-  const mobileFitCss=document.createElement("link");
-  mobileFitCss.rel="stylesheet";
-  mobileFitCss.href="assets/css/manga-profile-mobile-fix.css?v=001";
-  mobileFitCss.dataset.mmMangaMobileFit="true";
-  document.head.append(mobileFitCss);
-}
-
-import("./manga-layout-premium-v2.js?v=002").catch(error=>console.error("MangaMorph organized layout:",error));
 import("./manga-chapter-source.js?v=002").catch(error=>console.error("MangaMorph chapter source:",error));
 import("./manga-page-comments.js?v=002").catch(error=>console.error("MangaMorph page comments:",error));

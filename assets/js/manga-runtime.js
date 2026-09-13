@@ -88,13 +88,14 @@ try{
     $("#mangaTypeFact").textContent=manga.type+(country?" · "+country:"");
     $("#mangaDescription").textContent=manga.synopsis||"Sem sinopse cadastrada.";
     $("#mangaTags").innerHTML=tags.map(t=>"<span>"+esc(t)+"</span>").join("");
-    $("#latestChapter").textContent=latest||"—";$("#readLatestLabel").textContent=latest?"Ler capítulo "+latest:"Sem capítulos";
+    $("#latestChapter").textContent=latest||"—";$("#readLatestLabel").textContent=latest?"Ler capítulo":"Sem capítulos";
     $("#tabChapterCount").textContent=localChapterCount;
     $("#chapterCount").textContent=localChapterCount+" capítulos publicados"+(sourceChapterCount>localChapterCount?" · "+sourceChapterCount+" na fonte":"");
     $("#mangaRating").textContent="★ "+displayedRating.toFixed(1).replace(".",",");
     $("#mangaReads").textContent="◉ "+(communityReads?compactNumber(communityReads):(manga.source_views||"0"));
     $("#mangaFavorites").textContent="☆ "+(communityFavorites?compactNumber(communityFavorites):(sourceFavorites?compactNumber(sourceFavorites):"0"));
     const statusFact=$("#mangaStatusFact");if(statusFact)statusFact.textContent=manga.publication_status||"Em lançamento";
+    $("#publicationLabel").textContent=manga.publication_status||"Em lançamento";
     const yearFact=$("#mangaYearFact");if(yearFact)yearFact.textContent=manga.year||"—";
     const authorFact=$("#mangaAuthorFact");if(authorFact)authorFact.textContent=manga.author||"—";
     const artistFact=$("#mangaArtistFact");if(artistFact)artistFact.textContent=manga.artist||"—";
@@ -118,7 +119,7 @@ try{
       const {data:progress}=await db.from("mangamorph_reading_progress").select("chapter_number,page_number,progress_percent").eq("user_id",session.user.id).eq("manga_id",id).maybeSingle();
       if(progress?.chapter_number!==null&&progress?.chapter_number!==undefined){
         targetChapter=Number(progress.chapter_number);
-        $("#readLatestLabel").textContent="Continuar capítulo "+targetChapter;
+        $("#readLatestLabel").textContent="Ler capítulo";
       }
     }
     const read=$("#readLatest");

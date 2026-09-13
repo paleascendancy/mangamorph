@@ -1,63 +1,109 @@
+/* Profile layout is local and synchronous: it never waits for the catalog API. */
 (() => {
   const hero = document.querySelector('.manga-hero-premium');
-  if (!hero || hero.dataset.mmLayoutV2 === 'true') return;
+  if (!hero || hero.dataset.mmLayoutV2) return;
   hero.dataset.mmLayoutV2 = 'true';
   hero.classList.add('mm-organized-hero');
-
   const top = hero.querySelector('.hero-top');
   const primary = hero.querySelector('.hero-primary');
   const secondary = hero.querySelector('.hero-secondary');
+  const identity = document.createElement('div');
+  identity.className = 'mm-work-identity';
+  ['.eyebrow','#mangaTitle','#mangaAltTitle','.hero-badges'].forEach(selector => {
+    const node = primary.querySelector(selector);
+    if (node) identity.append(node);
+  });
+  top.append(identity);
+  const stats = primary.querySelector('.detail-meta');
+  stats.classList.add('mm-stats-grid');
+  hero.insertBefore(stats, secondary);
+  const actions = primary.querySelector('.hero-actions-premium');
+  actions.classList.add('mm-actions-bar');
+  hero.insertBefore(actions, secondary);
+  // Sharing remains available in the header; the reading row stays compact.
+  document.querySelector('.topbar-actions').prepend(document.querySelector('#shareDetail'));
+  const synopsis = document.createElement('section');
+  synopsis.className = 'mm-synopsis-card';
+  synopsis.innerHTML = '<h2>Sinopse</h2>';
+  synopsis.append(primary.querySelector('#mangaDescription'), primary.querySelector('#toggleDescription'));
+  hero.insertBefore(synopsis, secondary);
+  primary.remove();
+  secondary.classList.add('mm-details-bottom');
+  const status = secondary.querySelector('.status-picker');
+  const statusHeading = document.createElement('h2');
+  statusHeading.textContent = 'Minha leitura';
+  status.prepend(statusHeading);
+  document.querySelector('.status-leading > span:last-child').textContent = 'Status de leitura';
+  const facts = document.querySelector('.detail-facts');
+  const factsHeading = document.createElement('h2');
+  factsHeading.className = 'mm-facts-heading';
+  factsHeading.textContent = 'Sobre a obra';
+  facts.before(factsHeading);
+  ['mangaStatusFact','latestChapter'].forEach(id => document.getElementById(id).parentElement.hidden = true);
+  const author = document.querySelector('#mangaAuthorFact');
+  const artist = document.querySelector('#mangaArtistFact');
+  function groupCredits() {
+    const same = author.textContent.trim() === artist.textContent.trim();
+    artist.parentElement.hidden = same;
+    author.previousElementSibling.textContent = same ? 'Autor e artista' : 'Autor';
+  }
+  const creditObserver = new MutationObserver(groupCredits);
+  [author,artist].forEach(node => creditObserver.observe(node,{childList:true,subtree:true,characterData:true}));
+  groupCredits();
+  // Reflect the actual cover and keep its original ratio without cropping it.
   const cover = document.querySelector('#detailCover');
-
-  if (top && primary && cover) {
-    const identity = document.createElement('div');
-    identity.className = 'mm-work-identity';
-
-    const eyebrow = primary.querySelector(':scope > .eyebrow');
-    const title = primary.querySelector('#mangaTitle');
-    const alt = primary.querySelector('#mangaAltTitle');
-    const badges = primary.querySelector('.hero-badges');
-    [eyebrow, title, alt, badges].forEach(node => node && identity.appendChild(node));
-
-    top.appendChild(identity);
-
-    const stats = primary.querySelector('.detail-meta-compact');
-    if (stats) {
-      stats.classList.add('mm-stats-grid');
-      if (secondary) hero.insertBefore(stats, secondary);
-      else hero.appendChild(stats);
-    }
-
-    const description = primary.querySelector('#mangaDescription');
-    const toggle = primary.querySelector('#toggleDescription');
-    if (description || toggle) {
-      const synopsis = document.createElement('section');
-      synopsis.className = 'mm-synopsis-card';
-      synopsis.innerHTML = '<div class="mm-block-heading"><span>Sinopse</span><small>Sobre a obra</small></div>';
-      if (description) synopsis.appendChild(description);
-      if (toggle) synopsis.appendChild(toggle);
-      if (secondary) hero.insertBefore(synopsis, secondary);
-      else hero.appendChild(synopsis);
-    }
-
-    const actions = primary.querySelector('.hero-actions-premium');
-    if (actions) {
-      actions.classList.add('mm-actions-bar');
-      if (secondary) hero.insertBefore(actions, secondary);
-      else hero.appendChild(actions);
-    }
-
-    primary.remove();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'mm-profile-backdrop';
+  backdrop.setAttribute('aria-hidden','true');
+  document.body.prepend(backdrop);
+  let currentImage = '';
+  function reflectCover() {
+    const value = cover.style.backgroundImage;
+    if (!value || value === currentImage) return;
+    currentImage = value;
+    backdrop.style.setProperty('--profile-cover', value);
+    const url = value.match(/^url\(["']?(.*?)["']?\)$/)?.[1];
+    if (!url) return;
+    const img = new Image();
+    img.onload = () => {
+      if (cover.style.backgroundImage === value && img.naturalWidth && img.naturalHeight)
+        cover.style.setProperty('--cover-ratio', `${img.naturalWidth} / ${img.naturalHeight}`);
+    };
+    img.src = url;
   }
-
-  if (secondary) secondary.classList.add('mm-details-bottom');
-
-  const facts = document.querySelector('.detail-facts-grid');
-  if (facts && !facts.closest('.mm-facts-card')) {
-    const wrapper = document.createElement('section');
-    wrapper.className = 'mm-facts-card';
-    wrapper.innerHTML = '<div class="mm-facts-heading"><div><span class="eyebrow">FICHA DA OBRA</span><strong>Informações</strong></div></div>';
-    facts.parentNode.insertBefore(wrapper, facts);
-    wrapper.appendChild(facts);
+  new MutationObserver(reflectCover).observe(cover,{attributes:true,attributeFilter:['style']});
+  reflectCover();
+  // Fold long tag lists, retaining every tag behind an accessible toggle.
+  const tags = document.querySelector('#mangaTags');
+  const more = document.createElement('button');
+  more.type = 'button'; more.className = 'mm-tags-toggle'; more.textContent = '+ tags';
+  more.setAttribute('aria-expanded','false');
+  more.addEventListener('click',() => {
+    const expanded = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded',String(expanded));
+    tags.classList.toggle('mm-tags-expanded',expanded);
+    more.textContent = expanded ? 'Menos tags' : '+ tags';
+  });
+  function foldTags() {
+    if (!tags.contains(more)) tags.append(more);
+    more.hidden = tags.querySelectorAll(':scope > span').length <= 4;
   }
+  new MutationObserver(foldTags).observe(tags,{childList:true});
+  foldTags();
+  const toggle = document.querySelector('#toggleDescription');
+  function labelDescription() {
+    const label = toggle.getAttribute('aria-expanded') === 'true' ? 'Ler menos ↑' : 'Ler mais ↓';
+    if (toggle.textContent !== label) toggle.textContent = label;
+  }
+  new MutationObserver(labelDescription).observe(toggle,{attributes:true,childList:true,characterData:true,subtree:true});
+  labelDescription();
+  // The approved profile starts dark, with a separate optional light appearance.
+  try { document.body.dataset.profileTheme = localStorage.getItem('mangamorph:profile-theme') || 'dark'; } catch {}
+  window.addEventListener('click', event => {
+    if (!event.target.closest?.('#themeToggle')) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    const theme = document.body.dataset.profileTheme === 'dark' ? 'light' : 'dark';
+    document.body.dataset.profileTheme = theme;
+    try { localStorage.setItem('mangamorph:profile-theme',theme); } catch {}
+  },true);
 })();

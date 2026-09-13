@@ -66,7 +66,7 @@ document.querySelector("#mangaFavorites").textContent = "☆ " + formatNumber(ma
 document.querySelector("#mangaDescription").textContent = manga.description;
 document.querySelector("#mangaTags").innerHTML = manga.tags.map(function(tag){ return "<span>" + tag + "</span>"; }).join("");
 document.querySelector("#latestChapter").textContent = manga.chapter;
-document.querySelector("#readLatestLabel").textContent = "Ler capítulo " + manga.chapter;
+document.querySelector("#readLatestLabel").textContent = "Ler capítulo";
 
 const history = JSON.parse(localStorage.getItem("mangamorph:history") || "[]").filter(function(historyId){ return historyId !== manga.id; });
 localStorage.setItem("mangamorph:history", JSON.stringify([manga.id].concat(history).slice(0,20)));
