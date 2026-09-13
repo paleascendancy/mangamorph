@@ -13,6 +13,22 @@ const button = el("mangaImportButton");
 const messageNode = el("mangaImportMessage");
 const resultsNode = el("mangaImportResults");
 let results = [];
+let importingIndex = -1;
+
+function ensureNativeImportStyles(){
+  if(document.querySelector('link[data-mangamorph-native-import]')) return;
+  const link=document.createElement("link");
+  link.rel="stylesheet";
+  link.href="assets/css/admin-import-native.css?v=001";
+  link.dataset.mangamorphNativeImport="1";
+  document.head.appendChild(link);
+}
+ensureNativeImportStyles();
+
+const helper=form?.parentElement?.querySelector(".admin-helper");
+if(helper){
+  helper.textContent="Pesquise pelo nome ou cole um link do AniList/MyAnimeList. Você pode revisar os dados ou importar a ficha diretamente como rascunho. Capítulos continuam separados e só entram por arquivo ou fonte parceira autorizada.";
+}
 
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -45,6 +61,7 @@ function renderResults(){
   resultsNode.innerHTML = results.map((item,index)=>{
     const meta = [item.type,item.year,item.publicationStatus].filter(Boolean).join(" · ");
     const genres = (item.genres || []).slice(0,4).join(" · ");
+    const importing = importingIndex === index;
     return `<article class="manga-import-result">
       <div class="manga-import-cover">
         ${item.coverUrl ? '<img src="'+escapeHtml(item.coverUrl)+'" alt="" loading="lazy">' : '<span>MM</span>'}
@@ -55,7 +72,10 @@ function renderResults(){
         <span>${escapeHtml(meta)}</span>
         <small>${escapeHtml(genres || "Metadados encontrados")}</small>
       </div>
-      <button type="button" data-use-import="${index}">Usar dados</button>
+      <div class="manga-import-actions">
+        <button type="button" data-use-import="${index}" ${importing ? "disabled" : ""}>Revisar</button>
+        <button class="primary" type="button" data-quick-import="${index}" ${importing ? "disabled" : ""}>${importing ? "Importando…" : "Importar"}</button>
+      </div>
     </article>`;
   }).join("");
 }
@@ -64,7 +84,6 @@ function setValue(id,value){
   const node = el(id);
   if(node) node.value = value ?? "";
 }
-
 
 function aniCountry(code){
   return ({
@@ -177,6 +196,78 @@ function useResult(item){
   el("mangaAdminForm")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
+function quickPayload(item,userId){
+  return {
+    title:String(item.title || "Sem título").trim(),
+    slug:slugify(item.title || "obra"),
+    type:item.type || "Mangá",
+    country:item.country || null,
+    original_language:item.originalLanguage || null,
+    author:item.author || null,
+    artist:item.artist || null,
+    publisher:item.publisher || null,
+    year:Number(item.year) || null,
+    publication_status:item.publicationStatus || "Em lançamento",
+    content_rating:"Livre",
+    accent:"#3a4162",
+    alternative_titles:Array.isArray(item.alternativeTitles) ? item.alternativeTitles : [],
+    genres:Array.isArray(item.genres) ? item.genres : [],
+    tags:Array.isArray(item.tags) ? item.tags : [],
+    synopsis:item.synopsis || "",
+    cover_url:item.coverUrl || null,
+    metadata_source:item.source || null,
+    metadata_source_id:item.sourceId || null,
+    metadata_source_url:item.sourceUrl || null,
+    featured:false,
+    published:false,
+    published_at:null,
+    created_by:userId,
+    updated_by:userId
+  };
+}
+
+async function quickImport(item,index){
+  if(!item || importingIndex !== -1) return;
+  importingIndex=index;
+  renderResults();
+  setMessage("Importando a ficha da obra como rascunho…");
+
+  try{
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!session) throw new Error("Entre na administração antes de importar.");
+
+    const {data:isAdmin,error:adminError}=await supabase.rpc("is_mangamorph_admin");
+    if(adminError || isAdmin !== true) throw new Error("Sua conta não possui acesso administrativo.");
+
+    const slug=slugify(item.title || "");
+    if(!slug) throw new Error("A obra encontrada não possui um título válido.");
+
+    const {data:duplicate,error:duplicateError}=await supabase
+      .from("mangamorph_mangas")
+      .select("id,title,slug")
+      .eq("slug",slug)
+      .maybeSingle();
+    if(duplicateError) throw duplicateError;
+    if(duplicate){
+      throw new Error(`A obra “${duplicate.title}” já está no MangaMorph.`);
+    }
+
+    const {data:saved,error}=await supabase
+      .from("mangamorph_mangas")
+      .insert(quickPayload(item,session.user.id))
+      .select("id,title,slug")
+      .single();
+    if(error) throw error;
+
+    setMessage(`“${saved.title}” foi importada como rascunho. Atualizando o catálogo…`);
+    setTimeout(()=>location.reload(),650);
+  }catch(error){
+    importingIndex=-1;
+    renderResults();
+    setMessage(error?.message || "Não foi possível importar a obra.",true);
+  }
+}
+
 form?.addEventListener("submit",async event=>{
   event.preventDefault();
   const query = input.value.trim();
@@ -213,7 +304,7 @@ form?.addEventListener("submit",async event=>{
     }
 
     renderResults();
-    setMessage(results.length === 1 ? "1 resultado encontrado." : results.length + " resultados encontrados.");
+    setMessage(results.length === 1 ? "1 resultado encontrado. Você pode revisar ou importar direto." : results.length + " resultados encontrados. Você pode revisar ou importar direto.");
   }catch(error){
     let text = error?.message || "Não foi possível consultar a fonte.";
     try{
@@ -222,6 +313,17 @@ form?.addEventListener("submit",async event=>{
         if(payload?.error) text = payload.error;
       }
     }catch{}
+
+    if((/anilist\.co\/manga\//i.test(query) || !/^https?:\/\//i.test(query))){
+      try{
+        results=await searchAniListDirect(query);
+        if(results.length){
+          renderResults();
+          setMessage(results.length === 1 ? "1 resultado encontrado pela busca nativa." : results.length + " resultados encontrados pela busca nativa.");
+          return;
+        }
+      }catch{}
+    }
     setMessage(String(text),true);
   }finally{
     setBusy(false);
@@ -229,8 +331,17 @@ form?.addEventListener("submit",async event=>{
 });
 
 resultsNode?.addEventListener("click",event=>{
-  const target = event.target.closest("[data-use-import]");
-  if(!target) return;
-  const item = results[Number(target.dataset.useImport)];
-  if(item) useResult(item);
+  const review = event.target.closest("[data-use-import]");
+  if(review){
+    const item = results[Number(review.dataset.useImport)];
+    if(item) useResult(item);
+    return;
+  }
+
+  const quick = event.target.closest("[data-quick-import]");
+  if(quick){
+    const index=Number(quick.dataset.quickImport);
+    const item=results[index];
+    if(item) quickImport(item,index);
+  }
 });
