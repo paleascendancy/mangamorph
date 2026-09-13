@@ -52,18 +52,26 @@
   groupCredits();
   // Reflect the actual cover and keep its original ratio without cropping it.
   const cover = document.querySelector('#detailCover');
+  const coverFallback = cover.querySelectorAll('.detail-cover-kicker,#coverTitle,#coverType');
   const backdrop = document.createElement('div');
   backdrop.className = 'mm-profile-backdrop';
   backdrop.setAttribute('aria-hidden','true');
   document.body.prepend(backdrop);
   let currentImage = '';
   function reflectCover() {
-    const value = cover.style.backgroundImage;
-    if (!value || value === currentImage) return;
+    const value = cover.style.backgroundImage || '';
+    const url = value.match(/^url\(["']?(.*?)["']?\)$/)?.[1] || '';
+    const hasImage = Boolean(url);
+    coverFallback.forEach(node => { node.hidden = hasImage; });
+    if (!hasImage) {
+      currentImage = '';
+      backdrop.style.removeProperty('--profile-cover');
+      cover.style.removeProperty('--cover-ratio');
+      return;
+    }
+    if (value === currentImage) return;
     currentImage = value;
     backdrop.style.setProperty('--profile-cover', value);
-    const url = value.match(/^url\(["']?(.*?)["']?\)$/)?.[1];
-    if (!url) return;
     const img = new Image();
     img.onload = () => {
       if (cover.style.backgroundImage === value && img.naturalWidth && img.naturalHeight)
@@ -97,13 +105,19 @@
   }
   new MutationObserver(labelDescription).observe(toggle,{attributes:true,childList:true,characterData:true,subtree:true});
   labelDescription();
-  // The approved profile starts dark, with a separate optional light appearance.
-  try { document.body.dataset.profileTheme = localStorage.getItem('mangamorph:profile-theme') || 'dark'; } catch {}
+  // Keep the profile theme synchronized with legacy components that still read body.light.
+  function setProfileTheme(theme) {
+    const normalized = theme === 'light' ? 'light' : 'dark';
+    document.body.dataset.profileTheme = normalized;
+    document.body.classList.toggle('light', normalized === 'light');
+  }
+  try { setProfileTheme(localStorage.getItem('mangamorph:profile-theme') || 'dark'); }
+  catch { setProfileTheme('dark'); }
   window.addEventListener('click', event => {
     if (!event.target.closest?.('#themeToggle')) return;
     event.preventDefault(); event.stopImmediatePropagation();
     const theme = document.body.dataset.profileTheme === 'dark' ? 'light' : 'dark';
-    document.body.dataset.profileTheme = theme;
+    setProfileTheme(theme);
     try { localStorage.setItem('mangamorph:profile-theme',theme); } catch {}
   },true);
 })();
