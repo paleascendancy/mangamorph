@@ -133,10 +133,7 @@ async function syncExistingManga(){
     if(message)message.textContent="Salve a obra primeiro.";
     return;
   }
-  if(!aniId){
-    if(message)message.textContent="Cole um link válido do AniList antes de atualizar.";
-    return;
-  }
+  if(!aniId)return;
 
   syncing=true;
   if(button){button.disabled=true;button.textContent="Atualizando dados…";}
@@ -192,9 +189,13 @@ async function syncExistingManga(){
   }
 }
 
+// Only intercept the button when an exact AniList URL exists. When the field is empty,
+// the regular admin-anilist-cover handler must receive the click and search by title.
 document.addEventListener("click",event=>{
   const button=event.target.closest("#importAniListCover");
   if(!button)return;
+  const exactId=parseAniListId($("mangaAniListUrlInput")?.value||$("mangaMetadataSourceUrl")?.value);
+  if(!exactId)return;
   event.preventDefault();
   event.stopImmediatePropagation();
   syncExistingManga();
