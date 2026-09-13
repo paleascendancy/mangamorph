@@ -71,7 +71,7 @@
 
   /* Force replacement of the old document-rewriting service worker. Reload once when the new controller takes over. */
   if("serviceWorker" in navigator){
-    const swVersion="2.0.0";
+    const swVersion="2.0.1";
     let changing=false;
     navigator.serviceWorker.addEventListener("controllerchange",()=>{
       if(changing)return;changing=true;
