@@ -1,5 +1,26 @@
 import("./theme-system.js?v=111").catch(()=>{});
-import("./global-header.js?v=002").catch(()=>{});
+import("./global-header.js?v=003").catch(()=>{});
+
+const HOME_URL=new URL("index.html",document.baseURI).href;
+function goHome(event){
+  event?.preventDefault?.();
+  event?.stopImmediatePropagation?.();
+  document.body.style.overflow="";
+  location.assign(HOME_URL);
+}
+
+// Public profile can be restored from the browser back/forward cache. Always keep
+// home navigation as a real document navigation so profile markup never survives
+// when the user asks to return to the catalog.
+document.addEventListener("click",event=>{
+  const target=event.target.closest?.(
+    '.mm-site-header .brand[href="./"],#mmGlobalMenu a[href="./"],.public-topbar .public-brand,.public-topbar .public-back,[data-mm-home]'
+  );
+  if(!target)return;
+  goHome(event);
+},true);
+window.addEventListener("pageshow",()=>{document.body.style.overflow=""});
+
 const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
 const supabase=createClient("https://fnyellunugdfesprmvzm.supabase.co","sb_publishable_clf6HlhhxdftO1_XZU7YsA_pRmkCEJK");
 const username=new URLSearchParams(location.search).get("user")||"";
