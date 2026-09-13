@@ -2,6 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import("./theme-system.js?v=110").catch(()=>{});
 import("./profile-panel-cleanup.js?v=002").catch(()=>{});
 import("./admin-access.js?v=001").catch(()=>{});
+import("./global-header.js?v=001").catch(()=>{});
 
 const db=createClient("https://fnyellunugdfesprmvzm.supabase.co","sb_publishable_clf6HlhhxdftO1_XZU7YsA_pRmkCEJK",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 let session=null,valid=new Set(),syncTimer=null,liveChannel=null;
