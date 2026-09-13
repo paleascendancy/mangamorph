@@ -12,15 +12,29 @@
   <link rel="modulepreload" href="assets/js/reader-runtime.js?v=007">
   <link rel="stylesheet" href="assets/css/style.css?v=041">
   <link rel="stylesheet" href="assets/css/reader.css?v=008">
+  <link rel="stylesheet" href="assets/css/navigation-speed.css?v=010">
   <script>
     window.__mangamorphRequestedChapter=new URLSearchParams(location.search).get("chapter");
     if("scrollRestoration" in history) history.scrollRestoration="manual";
     window.scrollTo(0,0);
   </script>
+  <script src="assets/js/navigation-speed.js?v=010" defer></script>
 </head>
 <body class="reader-body light-reader">
-  <header class="reader-header" id="readerHeader">
-    <a class="reader-back reader-home-mark" id="readerBack" href="./" aria-label="MangaMorph — voltar à página inicial" title="Início">M</a>
+  <header class="topbar mm-site-header mm-reader-site-header">
+    <div class="header-brand">
+      <button class="menu-tab" type="button" data-mm-menu aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <a class="brand brand-text-only" href="index.html" aria-label="MangaMorph — início"><span class="brand-name">Manga<span>Morph</span></span></a>
+    </div>
+    <div class="topbar-actions">
+      <button class="mm-nav-button" type="button" data-mm-search aria-label="Pesquisar" title="Pesquisar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.25"></circle><path d="M15.7 15.7 20 20"></path></svg></button>
+      <button class="mm-nav-button" type="button" data-mm-settings aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1"></circle><path d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2M18 6l-1.45 1.45M7.45 16.55 6 18M18 18l-1.45-1.45M7.45 7.45 6 6"></path><circle cx="12" cy="12" r="7.1"></circle></svg></button>
+      <button class="mm-nav-button mm-profile-button" type="button" data-mm-profile aria-label="Perfil" title="Perfil"><img class="mm-profile-image" alt="" hidden><span class="mm-profile-initials" hidden>MM</span><span class="mm-profile-guest"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6"></path></svg></span></button>
+    </div>
+  </header>
+
+  <header class="reader-header mm-reader-context" id="readerHeader">
+    <a class="reader-back reader-home-mark" id="readerBack" href="index.html" aria-label="MangaMorph — voltar à página inicial" title="Início">M</a>
     <div class="reader-heading">
       <span class="reader-brand">MangaMorph</span>
       <a class="reader-title-link" id="readerTitleLink" href="manga.html" aria-label="Abrir página da obra"><strong id="readerTitle">Carregando...</strong></a>
