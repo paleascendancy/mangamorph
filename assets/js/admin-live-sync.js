@@ -1,5 +1,6 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import("./admin-mediocre-source.js?v=001").catch(error=>console.warn("MangaMorph Medíocre source:",error));
+import("./admin-mangastop-source.js?v=001").catch(error=>console.warn("MangaMorph MangásTop source:",error));
 
 const db=createClient(
   "https://fnyellunugdfesprmvzm.supabase.co",
