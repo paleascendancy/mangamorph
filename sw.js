@@ -1,4 +1,4 @@
-const VERSION="2.0.0";
+const VERSION="2.0.1";
 const CACHE_PREFIX="mangamorph-";
 
 self.addEventListener("install",event=>{
@@ -8,8 +8,15 @@ self.addEventListener("install",event=>{
 self.addEventListener("activate",event=>{
   event.waitUntil((async()=>{
     const keys=await caches.keys();
+    const hadLegacyWorker=keys.some(key=>key.startsWith("mangamorph-v1"));
     await Promise.all(keys.filter(key=>key.startsWith(CACHE_PREFIX)).map(key=>caches.delete(key)));
     await self.clients.claim();
+    if(hadLegacyWorker){
+      const windows=await self.clients.matchAll({type:"window",includeUncontrolled:true});
+      await Promise.all(windows.map(client=>{
+        try{return client.navigate(client.url)}catch{return null}
+      }));
+    }
   })());
 });
 
