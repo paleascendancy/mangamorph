@@ -7,9 +7,10 @@ if(!document.querySelector('link[data-mangamorph-admin-blue]')){
   document.head.append(link);
 }
 
-// The professional reliability layer is independent from partner integrations.
-// Load it first so an integration failure cannot disable admin safeguards.
+// Reliability and safety layers are independent from partner integrations.
+// Load them first so an integration failure cannot disable admin safeguards.
 await import("./admin-professional.js?v=001");
+await import("./admin-safety.js?v=001");
 
 // The original partner synchronizer still has a legacy CORS allowlist.
 // Rewrite only that Edge Function request to the Vercel-compatible wrapper.
