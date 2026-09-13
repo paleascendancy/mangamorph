@@ -134,7 +134,9 @@ async function importWork(item,index){
   try{
     await getSession();
     status("Preparando obra, perfil e capítulos…");
-    for(let round=0;round<15;round++){
+    const availableHint=Math.max(0,Number(item.chapterCount)||0);
+    const maxRounds=Math.max(15,Math.min(60,Math.ceil((availableHint||150)/10)+3));
+    for(let round=0;round<maxRounds;round++){
       const {data,error}=await supabase.functions.invoke("mangamorph-import-mangastop",{body:{work_id:Number(item.sourceId),title:item.title,enrich:round===0}});
       if(error)throw error;
       if(!data?.ok)throw new Error(data?.error||"A importação do MangásTop falhou.");
