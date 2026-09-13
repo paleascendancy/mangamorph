@@ -11,20 +11,24 @@
   <link rel="stylesheet" href="assets/css/manga.css?v=016">
   <link rel="stylesheet" href="assets/css/manga-layout-premium-v2.css?v=004" data-mm-manga-layout-v2="true">
   <link rel="stylesheet" href="assets/css/manga-actions-compact.css?v=002">
+  <link rel="stylesheet" href="assets/css/navigation-speed.css?v=010">
+  <script src="assets/js/navigation-speed.js?v=010" defer></script>
 </head>
 <body class="mm-profile" data-profile-theme="dark">
-  <header class="topbar manga-topbar">
-    <a class="brand brand-text-only" href="./" aria-label="MangaMorph — voltar ao início">
-      <span class="brand-name">Manga<span>Morph</span></span>
-    </a>
+  <header class="topbar manga-topbar mm-site-header">
+    <div class="header-brand">
+      <button class="menu-tab" type="button" data-mm-menu aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <a class="brand brand-text-only" href="index.html" aria-label="MangaMorph — início"><span class="brand-name">Manga<span>Morph</span></span></a>
+    </div>
     <div class="topbar-actions">
-      <a class="manga-header-back" href="./" aria-label="Voltar para a página inicial">←</a>
-      <button class="icon-button header-action-button manga-theme-toggle" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">◐</button>
+      <button class="mm-nav-button" type="button" data-mm-search aria-label="Pesquisar" title="Pesquisar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.25"></circle><path d="M15.7 15.7 20 20"></path></svg></button>
+      <button class="mm-nav-button" type="button" data-mm-settings aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1"></circle><path d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2M18 6l-1.45 1.45M7.45 16.55 6 18M18 18l-1.45-1.45M7.45 7.45 6 6"></path><circle cx="12" cy="12" r="7.1"></circle></svg></button>
+      <button class="mm-nav-button mm-profile-button" type="button" data-mm-profile aria-label="Perfil" title="Perfil"><img class="mm-profile-image" alt="" hidden><span class="mm-profile-initials" hidden>MM</span><span class="mm-profile-guest"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6"></path></svg></span></button>
     </div>
   </header>
 
   <main class="manga-page" id="mangaPage">
-    <a class="back-link" href="./">← Voltar ao catálogo</a>
+    <a class="back-link" href="index.html">← Voltar ao catálogo</a>
 
     <section class="manga-hero-premium">
       <div class="hero-glow" aria-hidden="true"></div>
@@ -32,25 +36,25 @@
       <div class="hero-top">
         <div class="detail-cover compact-cover" id="detailCover">
           <span class="detail-cover-kicker">MANGAMORPH</span>
-          <strong id="coverTitle">NEON<br>RONIN</strong>
-          <small id="coverType">MANGÁ</small>
+          <strong id="coverTitle">MANGAMORPH</strong>
+          <small id="coverType">OBRA</small>
         </div>
 
         <div class="hero-primary">
           <p class="eyebrow">OBRA</p>
-          <h1 id="mangaTitle">Neon Ronin</h1>
+          <h1 id="mangaTitle">Carregando obra…</h1>
           <p class="detail-alt-title" id="mangaAltTitle"></p>
 
           <div class="hero-badges">
-            <span class="origin-badge" id="mangaOriginBadge">🇯🇵 Mangá</span>
-            <span class="publication-badge"><span class="status-dot"></span><span id="publicationLabel">Em lançamento</span></span>
+            <span class="origin-badge" id="mangaOriginBadge">Obra</span>
+            <span class="publication-badge"><span class="status-dot"></span><span id="publicationLabel">Carregando</span></span>
             <span class="year-badge" id="mangaYearFact">—</span>
           </div>
 
           <div class="detail-meta detail-meta-compact">
-            <span id="mangaRating">★ 9,2</span>
-            <span id="mangaReads">◉ 986 mil</span>
-            <span id="mangaFavorites">☆ 48,2 mil</span>
+            <span id="mangaRating">★ —</span>
+            <span id="mangaReads">◉ —</span>
+            <span id="mangaFavorites">☆ —</span>
           </div>
 
           <p class="detail-description collapsed" id="mangaDescription"></p>
@@ -59,7 +63,7 @@
           <div class="hero-actions-premium">
             <button class="detail-main-action" id="readLatest" type="button">
               <span>▶</span>
-              <span><small>COMEÇAR</small><strong id="readLatestLabel">Ler capítulo</strong></span>
+              <span><small>COMEÇAR</small><strong id="readLatestLabel">Carregando</strong></span>
             </button>
 
             <button class="detail-secondary-action" id="favoriteDetail" type="button" aria-label="Favoritar obra">
@@ -105,9 +109,9 @@
     </section>
 
     <dl class="detail-facts detail-facts-grid">
-      <div><dt>Status</dt><dd id="mangaStatusFact">Em lançamento</dd></div>
-      <div><dt>Tipo</dt><dd id="mangaTypeFact">Mangá</dd></div>
-      <div><dt>Último capítulo</dt><dd id="latestChapter">127</dd></div>
+      <div><dt>Status</dt><dd id="mangaStatusFact">—</dd></div>
+      <div><dt>Tipo</dt><dd id="mangaTypeFact">—</dd></div>
+      <div><dt>Último capítulo</dt><dd id="latestChapter">—</dd></div>
       <div><dt>Autor</dt><dd id="mangaAuthorFact">—</dd></div>
       <div><dt>Artista</dt><dd id="mangaArtistFact">—</dd></div>
     </dl>
@@ -148,7 +152,7 @@
             <h2>Você também pode gostar</h2>
             <p>Obras próximas por gênero e temática.</p>
           </div>
-          <span id="relatedCount">8 recomendações</span>
+          <span id="relatedCount">—</span>
         </div>
         <div class="related-grid related-grid-premium" id="relatedGrid"></div>
       </div>
@@ -199,8 +203,8 @@
   <div class="manga-toast" id="mangaToast" role="status" aria-live="polite" hidden></div>
 
   <footer class="footer">
-    <div><strong>MangaMorph</strong><span>v0.1</span></div>
-    <p>Página de obra demonstrativa.</p>
+    <div><strong>MangaMorph</strong><span>v1.0</span></div>
+    <p>Catálogo, leitura e comunidade em um só lugar.</p>
   </footer>
 
   <script src="assets/js/manga.js?v=018" defer></script>
