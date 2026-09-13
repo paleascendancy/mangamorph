@@ -1,0 +1,20 @@
+/* Compact profile actions: the chapter CTA is intentionally hidden on the work profile. */
+body.mm-profile #readLatest {
+  display: none !important;
+}
+
+body.mm-profile .mm-actions-bar {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 9px !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  margin: -4px 0 0 !important;
+  padding: 0 !important;
+}
+
+body.mm-profile #favoriteDetail,
+body.mm-profile #markDetail {
+  flex: 0 0 36px !important;
+}
