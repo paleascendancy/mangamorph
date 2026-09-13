@@ -7,6 +7,10 @@ if(!document.querySelector('link[data-mangamorph-admin-blue]')){
   document.head.append(link);
 }
 
+// The professional reliability layer is independent from partner integrations.
+// Load it first so an integration failure cannot disable admin safeguards.
+await import("./admin-professional.js?v=001");
+
 // The original partner synchronizer still has a legacy CORS allowlist.
 // Rewrite only that Edge Function request to the Vercel-compatible wrapper.
 const nativeFetch=window.fetch.bind(window);
@@ -20,7 +24,11 @@ window.fetch=(input,init)=>{
   return nativeFetch(input,init);
 };
 
-await import("./admin-partners-v2.js?v=002");
+try{
+  await import("./admin-partners-v2.js?v=002");
+}catch(error){
+  console.warn("MangaMorph partner admin:",error);
+}
 import("./admin-live-sync.js?v=002").catch(error=>console.warn("MangaMorph admin live sync:",error));
 
 const heroNote=document.querySelector("#partnerOverview .partner-hero p");
@@ -29,6 +37,3 @@ const subtitle=document.querySelector("#partnerFormSubtitle");
 if(subtitle)subtitle.textContent="Conecte a fonte autorizada dos capítulos. O perfil da obra será enriquecido separadamente pelo AniList.";
 const sourceHint=document.querySelector("#partnerSourceHint");
 if(sourceHint&&!sourceHint.textContent)sourceHint.textContent="Use a página da obra/capítulo ou uma API autorizada. Esta integração não define capa, sinopse, autor ou gêneros do perfil.";
-
-// Loaded last so it can harden the legacy editor without changing the manga data structure.
-await import("./admin-professional.js?v=001");
