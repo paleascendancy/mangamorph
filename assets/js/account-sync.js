@@ -78,6 +78,17 @@ window.addEventListener("mangamorph:notifications-global",async e=>{
   await Promise.all((rows||[]).filter(x=>x.favorite).map(row=>db.from("mangamorph_library").update({notifications_enabled:enabled}).eq("user_id",session.user.id).eq("manga_id",row.manga_id)));
 });
 
+window.addEventListener("mangamorph:profile-save",async e=>{
+  if(!session||!db)return;
+  const profile=e.detail||{};
+  const {error}=await db.from("mangamorph_profiles").update({
+    is_public:profile.isPublic!==false,
+    show_activity:profile.showActivity!==false,
+    show_favorites:profile.showFavorites!==false
+  }).eq("id",session.user.id);
+  if(error)console.warn("MangaMorph profile privacy sync unavailable:",error);
+});
+
 window.addEventListener("mangamorph:history-open",async e=>{if(!session||!db)return;const id=Number(e.detail?.mangaId);if(!valid.has(id))return;await db.from("mangamorph_history").upsert({user_id:session.user.id,manga_id:id,last_opened_at:new Date().toISOString()},{onConflict:"user_id,manga_id"})});
 window.addEventListener("mangamorph:progress",async e=>{if(!session||!db)return;const d=e.detail||{},id=Number(d.mangaId),number=Number(d.chapterNumber);if(!valid.has(id)||!number)return;const {data:chapter}=await db.from("mangamorph_chapters").select("id").eq("manga_id",id).eq("chapter_number",number).maybeSingle();await db.from("mangamorph_reading_progress").upsert({user_id:session.user.id,manga_id:id,chapter_id:chapter?.id||null,chapter_number:number,page_number:Math.max(1,Number(d.pageNumber)||1),progress_percent:Math.max(0,Math.min(100,Number(d.percent)||0)),last_read_at:new Date().toISOString()},{onConflict:"user_id,manga_id"})});
 
