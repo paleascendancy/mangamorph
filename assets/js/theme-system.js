@@ -30,6 +30,8 @@
   function updateControls(theme){
     const label=document.querySelector("#themeValue");
     if(label)label.textContent=theme==="light"?"Branco":"Cinza";
+    const readerLabel=document.querySelector("#readerThemeLabel");
+    if(readerLabel)readerLabel.textContent=theme==="light"?"Claro":"Cinza";
     document.querySelectorAll("[data-theme]").forEach(button=>{
       const value=normalize(button.dataset.theme);
       button.classList.toggle("active",value===theme);
