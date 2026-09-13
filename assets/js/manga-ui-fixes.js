@@ -7,9 +7,6 @@ const db=createClient(
 
 const mangaId=Number(new URLSearchParams(location.search).get("id"))||1;
 const $=selector=>document.querySelector(selector);
-let liveChapters=[];
-let chapterOrder=localStorage.getItem("mangamorph:chapter-order")==="asc"?"asc":"desc";
-let chapterQuery="";
 let commentsLoaded=false;
 
 function esc(value){
@@ -96,9 +93,8 @@ function installStyles(){
   style.id="mangamorphMangaUiFixStyles";
   style.textContent=`
     .manga-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .chapter-row[data-chapter-card]{cursor:pointer;outline:none}
-    .chapter-row[data-chapter-card]:focus-visible{box-shadow:0 0 0 3px rgba(91,142,224,.22);border-color:rgba(91,142,224,.42)}
-    .chapter-row[data-chapter-card]:active{transform:scale(.995)}
+    .chapter-row{cursor:pointer}
+    .chapter-row:active{transform:scale(.995)}
     .work-comments-section{padding-top:.15rem}
     .work-comments-note{margin:0 0 .65rem;padding:.62rem .72rem;border:1px solid rgba(255,255,255,.055);border-radius:.72rem;background:#0d141d;color:#7e8ca0;font-size:.62rem}
     .work-comments-list{display:grid;gap:.46rem}
@@ -131,62 +127,6 @@ function setTab(name){
   if(name==="comments")loadComments();
 }
 
-function updateSortButton(){
-  const button=$("#sortToggle");
-  if(!button)return;
-  const desc=chapterOrder==="desc";
-  button.innerHTML='<span class="sort-value">'+(desc?'Decrescente':'Crescente')+'</span><span class="sort-arrow">'+(desc?'↓':'↑')+'</span>';
-  button.setAttribute("aria-pressed",desc?"true":"false");
-  button.setAttribute("aria-label","Ordenar capítulos em ordem "+(desc?"crescente":"decrescente"));
-}
-
-function renderLiveChapters(){
-  const list=$("#chapterList");
-  if(!list)return;
-  if(!liveChapters.length){
-    list.innerHTML='<div class="chapter-empty">Nenhum capítulo publicado ainda.</div>';
-    return;
-  }
-
-  const normalized=chapterQuery.trim().toLowerCase();
-  let rows=liveChapters.slice().sort((a,b)=>chapterOrder==="desc"
-    ?Number(b.chapter_number)-Number(a.chapter_number)
-    :Number(a.chapter_number)-Number(b.chapter_number));
-  if(normalized){
-    rows=rows.filter(ch=>String(ch.chapter_number).toLowerCase().includes(normalized)||String(ch.title||"").toLowerCase().includes(normalized));
-  }
-  if(!rows.length){
-    list.innerHTML='<div class="chapter-empty">Nenhum capítulo encontrado.</div>';
-    return;
-  }
-
-  const latest=Math.max(...liveChapters.map(ch=>Number(ch.chapter_number)));
-  list.innerHTML=rows.map(ch=>{
-    const number=Number(ch.chapter_number);
-    const isLatest=number===latest;
-    return '<article class="chapter-row '+(isLatest?'latest':'')+'" id="capitulo-'+number+'" data-chapter-card="'+number+'" role="link" tabindex="0" aria-label="Abrir capítulo '+number+'">'+
-      '<div class="chapter-copy"><div class="chapter-number"><strong>Capítulo '+number+'</strong><span class="chapter-meta-line"><span>◷ '+fmtDate(ch.published_at)+'</span>'+(ch.title?'<span>'+esc(ch.title)+'</span>':'')+'</span></div>'+
-      (isLatest?'<span class="chapter-badge">NOVO</span>':'')+'</div>'+
-      '<button class="chapter-read" type="button" data-read-chapter="'+number+'" tabindex="-1">Ler <span>›</span></button></article>';
-  }).join("");
-}
-
-async function loadLiveChapters(){
-  const {data,error}=await db.from("mangamorph_chapters")
-    .select("id,chapter_number,title,published_at")
-    .eq("manga_id",mangaId)
-    .eq("published",true)
-    .order("chapter_number",{ascending:false});
-  if(error)return;
-  liveChapters=data||[];
-  const count=$("#chapterCount");
-  const tabCount=$("#tabChapterCount");
-  if(tabCount)tabCount.textContent=String(liveChapters.length);
-  if(count&&!count.textContent.includes("na fonte"))count.textContent=liveChapters.length+" capítulos publicados";
-  updateSortButton();
-  renderLiveChapters();
-}
-
 async function loadComments(){
   if(commentsLoaded)return;
   commentsLoaded=true;
@@ -201,6 +141,7 @@ async function loadComments(){
     .limit(80);
 
   if(error){
+    commentsLoaded=false;
     list.innerHTML='<div class="work-comments-empty">Não foi possível carregar os comentários agora.</div>';
     if(count)count.textContent="—";
     return;
@@ -228,8 +169,18 @@ async function loadComments(){
   }).join("");
 }
 
+function enhanceChapterRows(){
+  document.querySelectorAll("#chapterList .chapter-row").forEach(row=>{
+    const button=row.querySelector("[data-read-chapter]");
+    if(button?.dataset.readChapter)row.dataset.chapterCard=button.dataset.readChapter;
+  });
+}
+
 installStyles();
 installCommentsTab();
+enhanceChapterRows();
+const chapterList=$("#chapterList");
+if(chapterList)new MutationObserver(()=>enhanceChapterRows()).observe(chapterList,{childList:true});
 
 document.addEventListener("click",event=>{
   const tab=event.target.closest(".manga-tab");
@@ -237,17 +188,6 @@ document.addEventListener("click",event=>{
     event.preventDefault();
     event.stopImmediatePropagation();
     setTab(tab.dataset.tab);
-    return;
-  }
-
-  const sort=event.target.closest("#sortToggle");
-  if(sort){
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    chapterOrder=chapterOrder==="desc"?"asc":"desc";
-    localStorage.setItem("mangamorph:chapter-order",chapterOrder);
-    updateSortButton();
-    renderLiveChapters();
     return;
   }
 
@@ -259,27 +199,10 @@ document.addEventListener("click",event=>{
     return;
   }
 
-  const chapterCard=event.target.closest("[data-chapter-card]");
+  if(event.target.closest("[data-read-chapter]"))return;
+  const chapterCard=event.target.closest("#chapterList .chapter-row[data-chapter-card]");
   if(chapterCard){
     event.preventDefault();
-    event.stopImmediatePropagation();
     openChapter(chapterCard.dataset.chapterCard);
   }
 },true);
-
-document.addEventListener("keydown",event=>{
-  if(event.key!=="Enter"&&event.key!==" ")return;
-  const chapterCard=event.target.closest?.("[data-chapter-card]");
-  if(!chapterCard)return;
-  event.preventDefault();
-  openChapter(chapterCard.dataset.chapterCard);
-},true);
-
-document.addEventListener("input",event=>{
-  if(event.target?.id!=="chapterSearch")return;
-  event.stopImmediatePropagation();
-  chapterQuery=event.target.value||"";
-  renderLiveChapters();
-},true);
-
-await loadLiveChapters();
