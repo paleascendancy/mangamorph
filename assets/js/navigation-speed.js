@@ -1,6 +1,6 @@
 (()=>{
-  if(window.__mmNavSpeedV11)return;
-  window.__mmNavSpeedV11=true;
+  if(window.__mmNavSpeedV12)return;
+  window.__mmNavSpeedV12=true;
 
   const d=document;
   const root=d.documentElement;
@@ -73,13 +73,25 @@
   bar.setAttribute("aria-hidden","true");
   root.appendChild(bar);
 
+  let progressSafetyTimer=0;
   const finish=()=>{
+    clearTimeout(progressSafetyTimer);
+    progressSafetyTimer=0;
     bar.classList.remove("active");
     bar.classList.add("done");
     setTimeout(()=>bar.classList.remove("done"),240);
   };
+  const startProgress=()=>{
+    clearTimeout(progressSafetyTimer);
+    bar.classList.remove("done");
+    bar.classList.add("active");
+    // If a later script cancels a route or a browser aborts it, never leave the
+    // interface looking permanently stuck at 68%.
+    progressSafetyTimer=setTimeout(finish,1800);
+  };
   addEventListener("pageshow",finish);
   addEventListener("load",finish,{once:true});
+  addEventListener("pagehide",()=>clearTimeout(progressSafetyTimer));
 
   function internalLink(anchor){
     if(!anchor?.href||anchor.target==="_blank"||anchor.hasAttribute("download"))return null;
@@ -131,8 +143,7 @@
     if(!url.hash){
       try{sessionStorage.setItem("mangamorph:nav-reset",url.pathname+url.search)}catch{}
     }
-    bar.classList.remove("done");
-    bar.classList.add("active");
+    startProgress();
   },{capture:true});
 
   try{
@@ -154,7 +165,7 @@
   setTimeout(normalizeAccountIndicator,40);
 
   if("serviceWorker" in navigator){
-    const swVersion="2.1.1";
+    const swVersion="2.2.0";
     let changing=false;
     navigator.serviceWorker.addEventListener("controllerchange",()=>{
       if(changing)return;
