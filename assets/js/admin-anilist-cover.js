@@ -14,10 +14,50 @@ function parseAniListId(raw){
   const id=Number(match?.[1]);
   return Number.isInteger(id)&&id>0?id:null;
 }
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[c])}
+function setValue(id,value){const node=$(id);if(node)node.value=value??""}
+function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 
-function setValue(id,value){
-  const node=$(id);
-  if(node)node.value=value??"";
+function ensureCandidateUi(){
+  if(!document.getElementById("mangamorphAniResolverStyles")){
+    const style=document.createElement("style");
+    style.id="mangamorphAniResolverStyles";
+    style.textContent=`
+      .anilist-candidates{display:grid;gap:.42rem;margin-top:.5rem}
+      .anilist-candidate{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:.48rem;align-items:center;padding:.46rem;border:1px solid rgba(105,157,238,.13);border-radius:.68rem;background:rgba(9,21,38,.48)}
+      .anilist-candidate img,.anilist-candidate-cover{width:46px;aspect-ratio:3/4;border-radius:.45rem;object-fit:cover;background:#132236;display:grid;place-items:center;color:#7e98bd;font-size:.52rem;font-weight:850}
+      .anilist-candidate-copy{min-width:0}.anilist-candidate-copy strong,.anilist-candidate-copy span,.anilist-candidate-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .anilist-candidate-copy strong{font-size:.62rem;color:#edf5ff}.anilist-candidate-copy span{margin-top:.08rem;color:#8da0b9;font-size:.5rem}.anilist-candidate-copy small{margin-top:.12rem;color:#667b98;font-size:.45rem}
+      .anilist-candidate button{min-height:2rem;padding:0 .55rem;border:1px solid rgba(98,153,239,.22);border-radius:.52rem;background:#16305a;color:#dcecff;font-size:.5rem;font-weight:800}
+      @media(max-width:520px){.anilist-candidate{grid-template-columns:42px minmax(0,1fr)}.anilist-candidate img,.anilist-candidate-cover{width:42px}.anilist-candidate button{grid-column:1/-1;width:100%}}
+    `;
+    document.head.append(style);
+  }
+  let list=$("anilistCandidateList");
+  if(!list){
+    list=document.createElement("div");
+    list.id="anilistCandidateList";
+    list.className="anilist-candidates";
+    list.hidden=true;
+    const message=$("anilistCoverMessage");
+    if(message)message.insertAdjacentElement("afterend",list);
+    else $("importAniListCover")?.insertAdjacentElement("afterend",list);
+  }
+  return list;
+}
+function clearCandidates(){const list=$("anilistCandidateList");if(list){list.innerHTML="";list.hidden=true}}
+function renderCandidates(items){
+  const list=ensureCandidateUi();
+  const candidates=Array.isArray(items)?items.filter(x=>Number.isInteger(Number(x?.id))):[];
+  if(!candidates.length){clearCandidates();return}
+  list.innerHTML=candidates.map(item=>{
+    const meta=[item.type,item.country,item.year].filter(Boolean).join(" · ");
+    const subtitle=item.romaji&&item.romaji!==item.title?item.romaji:(item.native||"");
+    const score=Number(item.score);const confidence=Number.isFinite(score)?`${Math.round(score*100)}% de compatibilidade`:"Perfil possível";
+    const cover=item.cover_url?`<img src="${escapeHtml(item.cover_url)}" alt="" loading="lazy">`:'<span class="anilist-candidate-cover">AL</span>';
+    return `<article class="anilist-candidate">${cover}<div class="anilist-candidate-copy"><strong>${escapeHtml(item.title||"Perfil AniList")}</strong><span>${escapeHtml(subtitle||meta||"AniList")}</span><small>${escapeHtml([meta,confidence].filter(Boolean).join(" · "))}</small></div><button type="button" data-anilist-choice="${Number(item.id)}">Usar este perfil</button></article>`;
+  }).join("");
+  list.hidden=false;
 }
 
 function fillEditor(row){
@@ -39,83 +79,78 @@ function fillEditor(row){
   setValue("mangaMetadataSourceId",row.metadata_source_id||"");
   setValue("mangaMetadataSourceUrl",row.metadata_source_url||"");
 
-  const aniInput=$("mangaAniListUrlInput");
-  const aniId=Number(row.metadata_source_id);
+  const aniInput=$("mangaAniListUrlInput"),aniId=Number(row.metadata_source_id);
   if(aniInput&&/anilist/i.test(String(row.metadata_source||""))&&Number.isInteger(aniId)&&aniId>0){
     aniInput.value=`https://anilist.co/manga/${aniId}`;
     aniInput.dispatchEvent(new Event("input",{bubbles:true}));
   }
-
   const status=$("mangaCoverStatus");
   if(status)status.textContent=row.cover_url?"Capa salva no MangaMorph e perfil sincronizado pelo AniList.":"Perfil sincronizado; o AniList não retornou capa.";
   const preview=$("anilistCoverPreview");
-  if(preview&&row.cover_url){preview.src=row.cover_url;preview.hidden=false;}
+  if(preview&&row.cover_url){preview.src=row.cover_url;preview.hidden=false}
 }
 
 async function readInvokeError(error){
-  try{
-    if(error?.context&&typeof error.context.clone==="function"){
-      const payload=await error.context.clone().json();
-      return payload?.error||payload?.message||"";
-    }
-  }catch{}
+  try{if(error?.context&&typeof error.context.clone==="function"){const payload=await error.context.clone().json();return payload?.error||payload?.message||""}}catch{}
   return error?.message||"";
 }
-
-async function resolveProfile(){
-  if(resolving)return;
-  const mangaId=Number($("mangaIdInput")?.value);
-  const button=$("importAniListCover");
-  const message=$("anilistCoverMessage");
-  if(!Number.isInteger(mangaId)||mangaId<1){
-    if(message)message.textContent="Salve a obra primeiro.";
-    return;
-  }
-
-  resolving=true;
-  if(button){button.disabled=true;button.textContent="Localizando perfil…";}
-  if(message)message.textContent="Localizando a obra pelo AniList, títulos alternativos e dados da scan…";
-
-  try{
+async function invokeResolver(body){
+  let lastError=null;
+  for(let attempt=0;attempt<2;attempt++){
     const {data:{session}}=await supabase.auth.getSession();
     if(!session)throw new Error("Entre novamente no painel administrativo.");
-
-    const explicitId=parseAniListId($("mangaAniListUrlInput")?.value);
     supabase.functions.setAuth(session.access_token);
-    const {data,error}=await supabase.functions.invoke("mangamorph-import-anilist-cover",{
-      body:{manga_id:mangaId,...(explicitId?{anilist_id:explicitId}:{})}
-    });
-    if(error)throw error;
+    const result=await supabase.functions.invoke("mangamorph-import-anilist-cover",{body});
+    if(!result.error)return result;
+    lastError=result.error;
+    if(attempt===0)await delay(650);
+  }
+  throw lastError||new Error("Não foi possível consultar o resolvedor do AniList.");
+}
+
+async function resolveProfile(forcedId=null){
+  if(resolving)return;
+  const mangaId=Number($("mangaIdInput")?.value),button=$("importAniListCover"),message=$("anilistCoverMessage");
+  if(!Number.isInteger(mangaId)||mangaId<1){if(message)message.textContent="Salve a obra primeiro.";return}
+
+  resolving=true;clearCandidates();
+  if(button){button.disabled=true;button.textContent=forcedId?"Confirmando perfil…":"Localizando perfil…"}
+  if(message)message.textContent=forcedId?"Confirmando o perfil selecionado e salvando o vínculo…":"Busca ampliada: AniList, títulos alternativos, dados da scan e fontes de apoio…";
+
+  try{
+    const explicitId=Number(forcedId)||parseAniListId($("mangaAniListUrlInput")?.value);
+    const {data}=await invokeResolver({manga_id:mangaId,...(explicitId?{anilist_id:explicitId}:{})});
+
+    if(data?.needs_selection){
+      renderCandidates(data.candidates||[]);
+      if(message)message.textContent=data.error||"Encontrei perfis possíveis. Confirme o correto abaixo.";
+      return;
+    }
     if(!data?.ok)throw new Error(data?.error||"Não foi possível localizar a obra no AniList.");
 
     const {data:row,error:rowError}=await supabase.from("mangamorph_mangas")
       .select("id,type,country,original_language,author,artist,publisher,year,publication_status,alternative_titles,genres,tags,synopsis,cover_url,metadata_source,metadata_source_id,metadata_source_url")
       .eq("id",mangaId).maybeSingle();
     if(rowError)throw rowError;
-    fillEditor(row);
+    fillEditor(row);clearCandidates();
 
-    if(message){
-      const score=Number(data.match_score);
-      const certainty=Number.isFinite(score)?` · ${Math.round(score*100)}%`:"";
-      message.textContent=`Pronto: ${data.anilist_title||"perfil encontrado"}${certainty}.`;
-    }
-
+    if(message){const score=Number(data.match_score),certainty=Number.isFinite(score)?` · ${Math.round(score*100)}%`:"";message.textContent=`Pronto: ${data.anilist_title||"perfil encontrado"}${certainty}. Este vínculo ficou salvo para as próximas atualizações.`}
     setTimeout(()=>window.dispatchEvent(new CustomEvent("mangamorph:admin-cover-imported",{detail:data})),80);
   }catch(error){
     const text=await readInvokeError(error);
-    if(message)message.textContent=text||"Não foi possível sincronizar o perfil agora.";
+    if(message)message.textContent=text||"Não foi possível sincronizar o perfil agora. A busca será tentada novamente quando você tocar no botão.";
   }finally{
     resolving=false;
-    if(button){button.disabled=false;button.textContent="✨ Atualizar perfil pelo AniList";}
+    if(button){button.disabled=false;button.textContent="✨ Atualizar perfil pelo AniList"}
   }
 }
 
-// This module loads before admin-anilist-direct-sync.js and owns the button first.
-// The server resolver prevents stale translated titles and duplicate client matching.
 document.addEventListener("click",event=>{
+  const choice=event.target.closest?.("[data-anilist-choice]");
+  if(choice){event.preventDefault();event.stopImmediatePropagation();const id=Number(choice.dataset.anilistChoice);const input=$("mangaAniListUrlInput");if(input&&Number.isInteger(id)){input.value=`https://anilist.co/manga/${id}`;input.dispatchEvent(new Event("input",{bubbles:true}))}resolveProfile(id);return}
   const button=event.target.closest?.("#importAniListCover");
   if(!button)return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  resolveProfile();
+  event.preventDefault();event.stopImmediatePropagation();resolveProfile();
 },true);
+
+document.addEventListener("click",event=>{if(event.target.closest?.("[data-edit-manga],#newMangaButton"))clearCandidates()});
