@@ -60,3 +60,10 @@
 .partner-feed-help p{margin:.45rem 0 0;line-height:1.5}
 @media(max-width:900px){.partner-admin-grid{grid-template-columns:1fr}}
 @media(max-width:560px){.partner-row{grid-template-columns:1fr}.partner-row-actions{justify-content:flex-start}.partner-row-actions button{flex:1}}
+
+/* Native one-click manga importer */
+.manga-import-actions{display:flex;gap:.32rem;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.manga-import-actions button{min-height:2.1rem;padding:0 .55rem;border:1px solid rgba(93,146,233,.16);border-radius:.52rem;background:#16243a;color:#b9d1f7;font-size:.48rem;font-weight:800;cursor:pointer}
+.manga-import-actions button.primary{background:#edf2f7;color:#121821;border-color:#edf2f7}
+.manga-import-actions button:disabled{opacity:.55;cursor:default}
+@media(max-width:520px){.manga-import-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.manga-import-actions button{width:100%}}
