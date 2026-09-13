@@ -6,8 +6,16 @@ const supabase = createClient(SUPABASE_URL,SUPABASE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
 });
 
-let mangaId = Math.max(1,Number(new URLSearchParams(location.search).get("id")) || 1);
-let chapter = Math.max(1,Number(new URLSearchParams(location.search).get("chapter")) || 1);
+function routeNumber(value,fallback,{integer=false,min=0}={}){
+  if(value===null||value===undefined||String(value).trim()==="")return fallback;
+  const parsed=Number(value);
+  if(!Number.isFinite(parsed)||parsed<min||(integer&&!Number.isInteger(parsed)))return fallback;
+  return parsed;
+}
+
+const routeParams=new URLSearchParams(location.search);
+let mangaId = routeNumber(routeParams.get("id"),1,{integer:true,min:1});
+let chapter = routeNumber(routeParams.get("chapter"),1,{min:0});
 let session = null;
 let profile = null;
 let comments = [];
@@ -157,7 +165,6 @@ function renderComments(){
   const count = comments.length;
   commentCount.textContent = count + (count === 1 ? " comentário" : " comentários");
   commentEmpty.hidden = count > 0;
-
   const ordered=comments.slice().sort((a,b)=>{
     if(commentSort==="top"){
       const scoreA=voteCount(a.id,1)-voteCount(a.id,-1),scoreB=voteCount(b.id,1)-voteCount(b.id,-1);
@@ -421,8 +428,8 @@ reactionButtons.addEventListener("click",async event => {
 });
 
 window.addEventListener("mangamorph:reader-chapter-change",async event => {
-  mangaId = Number(event.detail?.mangaId) || mangaId;
-  chapter = Number(event.detail?.chapter) || chapter;
+  mangaId = routeNumber(event.detail?.mangaId,mangaId,{integer:true,min:1});
+  chapter = routeNumber(event.detail?.chapter,chapter,{min:0});
   comments = [];
   votes = [];
   reactions = [];
