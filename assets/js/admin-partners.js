@@ -29,3 +29,6 @@ const subtitle=document.querySelector("#partnerFormSubtitle");
 if(subtitle)subtitle.textContent="Conecte a fonte autorizada dos capítulos. O perfil da obra será enriquecido separadamente pelo AniList.";
 const sourceHint=document.querySelector("#partnerSourceHint");
 if(sourceHint&&!sourceHint.textContent)sourceHint.textContent="Use a página da obra/capítulo ou uma API autorizada. Esta integração não define capa, sinopse, autor ou gêneros do perfil.";
+
+// Loaded last so it can harden the legacy editor without changing the manga data structure.
+await import("./admin-professional.js?v=001");
