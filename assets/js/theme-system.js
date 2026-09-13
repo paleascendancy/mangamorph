@@ -1,3 +1,4 @@
+import("./global-header.js?v=002").catch(()=>{});
 (function(){
   const LEGACY_KEY="mangamorph:theme";
   const KEY="mangamorph:theme-v2";
@@ -99,7 +100,7 @@
   });
 
   channel?.addEventListener("message",event=>{
-    if(event.data?.theme)apply(event.data.theme);
+    if(event.data?.theme)apply(readTheme());
   });
 
   window.addEventListener("pageshow",()=>apply(readTheme()));
