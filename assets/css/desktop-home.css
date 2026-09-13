@@ -92,3 +92,32 @@
   body.mm-home .hero-feature{grid-template-columns:minmax(220px,285px) minmax(0,540px)!important;gap:36px!important}
   body.mm-home .featured-cover,body.mm-home .featured-cover[style*="background-image"]{width:245px!important}
 }
+
+/* Desktop rail recovery: isolated above 980px so mobile geometry is untouched. */
+@media (min-width:981px){
+  body.mm-home .catalog-section .horizontal-rail{
+    display:grid!important;
+    grid-auto-flow:column!important;
+    align-items:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    visibility:visible!important;
+    opacity:1!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+  }
+  body.mm-home .catalog-section .horizontal-rail>.manga-card,
+  body.mm-home .catalog-section .horizontal-rail>.premium-manga-card,
+  body.mm-home .catalog-section .horizontal-rail>.see-more-card{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    min-width:0!important;
+    height:auto!important;
+  }
+  body.mm-home .catalog-section .horizontal-rail>.see-more-card{
+    display:flex!important;
+  }
+}
