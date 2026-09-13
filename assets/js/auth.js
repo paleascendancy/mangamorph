@@ -52,6 +52,20 @@ function normalizeUsername(value){
   return String(value || "").toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);
 }
 
+function generatedUsername(name,email){
+  const rawBase = normalizeUsername(name) || normalizeUsername(String(email || "").split("@")[0]) || "reader";
+  const base = rawBase.slice(0,14) || "reader";
+  let suffix = "";
+  try {
+    const bytes = new Uint8Array(2);
+    crypto.getRandomValues(bytes);
+    suffix = Array.from(bytes,value => value.toString(36)).join("").slice(0,5);
+  } catch {
+    suffix = Math.random().toString(36).slice(2,7);
+  }
+  return normalizeUsername(base + "_" + suffix).slice(0,20);
+}
+
 function mapError(error){
   const msg = String(error?.message || error || "");
   if (/invalid login credentials/i.test(msg)) return "E-mail ou senha incorretos.";
@@ -65,31 +79,35 @@ function mapError(error){
 }
 
 function setMessage(element,message,isError=false){
+  if (!element) return;
   element.textContent = message || "";
   element.hidden = !message;
   element.classList.toggle("error",Boolean(isError));
 }
 
 function setLoading(form,loading){
+  if (!form) return;
   form.querySelectorAll("button,input").forEach(el => el.disabled = loading);
 }
 
 function closePanels(){
-  loginPanel.hidden = true;
-  registerPanel.hidden = true;
+  if (loginPanel) loginPanel.hidden = true;
+  if (registerPanel) registerPanel.hidden = true;
   document.body.style.overflow = "";
 }
 
 function openLogin(mode="login"){
+  if (!loginPanel || !registerPanel) return;
   registerPanel.hidden = true;
   loginPanel.hidden = false;
   document.body.style.overflow = "hidden";
   const forgot = mode === "forgot";
   const recovery = mode === "recovery";
-  loginForm.hidden = forgot || recovery;
-  forgotForm.hidden = !forgot;
-  recoveryForm.hidden = !recovery;
-  document.querySelector("#openRegisterFromLogin").hidden = recovery;
+  if (loginForm) loginForm.hidden = forgot || recovery;
+  if (forgotForm) forgotForm.hidden = !forgot;
+  if (recoveryForm) recoveryForm.hidden = !recovery;
+  const registerSwitch = document.querySelector("#openRegisterFromLogin");
+  if (registerSwitch) registerSwitch.hidden = recovery;
   setMessage(loginMessage,"");
   requestAnimationFrame(() => {
     (recovery ? recoveryPassword : forgot ? forgotEmail : loginEmail)?.focus();
@@ -97,16 +115,18 @@ function openLogin(mode="login"){
 }
 
 function openRegister(){
+  if (!loginPanel || !registerPanel) return;
   loginPanel.hidden = true;
   registerPanel.hidden = false;
   document.body.style.overflow = "hidden";
   setMessage(registerMessage,"");
-  const local = JSON.parse(localStorage.getItem("mangamorph:profile") || "null");
+  let local = null;
+  try { local = JSON.parse(localStorage.getItem("mangamorph:profile") || "null"); } catch {}
   if (local) {
-    registerName.value ||= local.name || "";
-    registerUsername.value ||= local.username || "";
+    if (registerName) registerName.value ||= local.name || "";
+    if (registerUsername) registerUsername.value ||= local.username || "";
   }
-  requestAnimationFrame(() => registerName.focus());
+  requestAnimationFrame(() => registerName?.focus());
 }
 
 async function loadProfile(session){
@@ -180,13 +200,13 @@ async function publishSession(session){
   return profile;
 }
 
-loginForm.addEventListener("submit",async event => {
+loginForm?.addEventListener("submit",async event => {
   event.preventDefault();
   setLoading(loginForm,true);
   setMessage(loginMessage,"");
   const { data,error } = await supabase.auth.signInWithPassword({
-    email:loginEmail.value.trim(),
-    password:loginPassword.value
+    email:loginEmail?.value.trim() || "",
+    password:loginPassword?.value || ""
   });
   setLoading(loginForm,false);
   if (error) return setMessage(loginMessage,mapError(error),true);
@@ -197,16 +217,18 @@ loginForm.addEventListener("submit",async event => {
   window.dispatchEvent(new CustomEvent("mangamorph:auth-message",{detail:{message:"Login realizado com sucesso."}}));
 });
 
-registerForm.addEventListener("submit",async event => {
+registerForm?.addEventListener("submit",async event => {
   event.preventDefault();
-  const name = registerName.value.trim();
-  const username = normalizeUsername(registerUsername.value);
-  const email = registerEmail.value.trim();
-  const password = registerPassword.value;
+  const name = registerName?.value.trim() || "Leitor";
+  const email = registerEmail?.value.trim() || "";
+  const password = registerPassword?.value || "";
+  const username = registerUsername
+    ? normalizeUsername(registerUsername.value)
+    : generatedUsername(name,email);
 
   if (username.length < 3) return setMessage(registerMessage,"O @usuário precisa ter pelo menos 3 caracteres.",true);
   if (password.length < 8) return setMessage(registerMessage,"A senha precisa ter pelo menos 8 caracteres.",true);
-  if (password !== registerPasswordConfirm.value) return setMessage(registerMessage,"As senhas não são iguais.",true);
+  if (registerPasswordConfirm && password !== registerPasswordConfirm.value) return setMessage(registerMessage,"As senhas não são iguais.",true);
 
   setLoading(registerForm,true);
   setMessage(registerMessage,"");
@@ -240,10 +262,10 @@ registerForm.addEventListener("submit",async event => {
   }
 });
 
-forgotForm.addEventListener("submit",async event => {
+forgotForm?.addEventListener("submit",async event => {
   event.preventDefault();
   setLoading(forgotForm,true);
-  const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.value.trim(),{
+  const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail?.value.trim() || "",{
     redirectTo:baseRedirect() + "?reset=1"
   });
   setLoading(forgotForm,false);
@@ -251,9 +273,9 @@ forgotForm.addEventListener("submit",async event => {
   setMessage(loginMessage,"Enviamos um link de recuperação para o seu e-mail.");
 });
 
-recoveryForm.addEventListener("submit",async event => {
+recoveryForm?.addEventListener("submit",async event => {
   event.preventDefault();
-  if (recoveryPassword.value.length < 8) return setMessage(loginMessage,"A senha precisa ter pelo menos 8 caracteres.",true);
+  if ((recoveryPassword?.value || "").length < 8) return setMessage(loginMessage,"A senha precisa ter pelo menos 8 caracteres.",true);
   setLoading(recoveryForm,true);
   const { error } = await supabase.auth.updateUser({password:recoveryPassword.value});
   setLoading(recoveryForm,false);
@@ -277,11 +299,11 @@ async function oauth(provider,source){
   }
 }
 
-document.querySelector("#authGoogleLogin").addEventListener("click",() => oauth("google","login"));
-document.querySelector("#authGoogleRegister").addEventListener("click",() => oauth("google","register"));
+document.querySelector("#authGoogleLogin")?.addEventListener("click",() => oauth("google","login"));
+document.querySelector("#authGoogleRegister")?.addEventListener("click",() => oauth("google","register"));
 
-document.querySelector("#authMagicLink").addEventListener("click",async () => {
-  const email = loginEmail.value.trim();
+document.querySelector("#authMagicLink")?.addEventListener("click",async () => {
+  const email = loginEmail?.value.trim() || "";
   if (!email) return setMessage(loginMessage,"Digite seu e-mail primeiro.",true);
   setLoading(loginForm,true);
   const { error } = await supabase.auth.signInWithOtp({
@@ -297,20 +319,21 @@ document.querySelector("#authMagicLink").addEventListener("click",async () => {
 document.querySelectorAll("[data-toggle-password]").forEach(button => {
   button.addEventListener("click",() => {
     const input = document.querySelector("#" + button.dataset.togglePassword);
+    if (!input) return;
     const showing = input.type === "text";
     input.type = showing ? "password" : "text";
     button.textContent = showing ? "Mostrar" : "Ocultar";
   });
 });
 
-document.querySelector("#loginClose").addEventListener("click",closePanels);
-document.querySelector("#registerClose").addEventListener("click",closePanels);
-document.querySelector("[data-close-login]").addEventListener("click",closePanels);
-document.querySelector("[data-close-register]").addEventListener("click",closePanels);
-document.querySelector("#openRegisterFromLogin").addEventListener("click",openRegister);
-document.querySelector("#openLoginFromRegister").addEventListener("click",() => openLogin());
-document.querySelector("#openForgotPassword").addEventListener("click",() => openLogin("forgot"));
-document.querySelector("#backToLogin").addEventListener("click",() => openLogin());
+document.querySelector("#loginClose")?.addEventListener("click",closePanels);
+document.querySelector("#registerClose")?.addEventListener("click",closePanels);
+document.querySelector("[data-close-login]")?.addEventListener("click",closePanels);
+document.querySelector("[data-close-register]")?.addEventListener("click",closePanels);
+document.querySelector("#openRegisterFromLogin")?.addEventListener("click",openRegister);
+document.querySelector("#openLoginFromRegister")?.addEventListener("click",() => openLogin());
+document.querySelector("#openForgotPassword")?.addEventListener("click",() => openLogin("forgot"));
+document.querySelector("#backToLogin")?.addEventListener("click",() => openLogin());
 
 window.addEventListener("mangamorph:open-login",() => openLogin());
 window.addEventListener("mangamorph:open-register",openRegister);
@@ -401,13 +424,12 @@ supabase.auth.onAuthStateChange((event,session) => {
 });
 
 document.addEventListener("keydown",event => {
-  if (event.key === "Escape" && (!loginPanel.hidden || !registerPanel.hidden)) closePanels();
+  if (event.key === "Escape" && ((loginPanel && !loginPanel.hidden) || (registerPanel && !registerPanel.hidden))) closePanels();
 });
 
 const { data:{session} } = await supabase.auth.getSession();
 await publishSession(session);
 if (new URLSearchParams(location.search).get("reset") === "1" && session) openLogin("recovery");
-
 
 const authParams = new URLSearchParams(location.search);
 const requestedReturn = safeReturnTarget(authParams.get("return"));
