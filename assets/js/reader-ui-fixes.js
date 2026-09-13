@@ -23,6 +23,21 @@ style.textContent=`
 `;
 document.head.append(style);
 
+function installReaderPageWidthFix(){
+  document.querySelector("#readerPageWidthFix")?.remove();
+  const pageStyle=document.createElement("style");
+  pageStyle.id="readerPageWidthFix";
+  pageStyle.textContent=`
+    html,body.reader-body{max-width:100%;overflow-x:hidden!important}
+    body.reader-body .reader-main,body.reader-body .reader-stage{width:100%!important;max-width:100vw!important;min-width:0!important;box-sizing:border-box!important;overflow-x:hidden!important}
+    body.reader-body .reader-real-page{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0 auto!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important}
+    body.reader-body .reader-real-page img{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;margin:0 auto!important;object-fit:contain!important;object-position:center top!important;box-sizing:border-box!important}
+    body.reader-body.reader-width-comfortable .reader-stage{width:min(100%,760px)!important;max-width:760px!important;margin-inline:auto!important}
+    @media(max-width:760px){body.reader-body .reader-stage,body.reader-body .reader-real-page,body.reader-body .reader-real-page img{max-width:100vw!important}}
+  `;
+  document.head.append(pageStyle);
+}
+
 function installReaderControlFixes(){
   document.querySelector("#readerControlLayoutFix")?.remove();
   const controlStyle=document.createElement("style");
@@ -36,6 +51,7 @@ function installReaderControlFixes(){
   `;
   document.head.append(controlStyle);
 }
+installReaderPageWidthFix();
 installReaderControlFixes();
 
 document.addEventListener("click",event=>{
@@ -48,14 +64,14 @@ document.addEventListener("click",event=>{
 
 function loadCinematicHero(){
   if(document.querySelector('script[data-reader-hero]')){
-    requestAnimationFrame(installReaderControlFixes);
+    requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()});
     return;
   }
   const script=document.createElement("script");
   script.src="assets/js/reader-hero.js?v=002";
   script.defer=true;
   script.dataset.readerHero="true";
-  script.onload=()=>requestAnimationFrame(installReaderControlFixes);
+  script.onload=()=>requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()});
   document.body.append(script);
 }
 
@@ -66,19 +82,19 @@ if(!document.querySelector('link[data-reader-hero-style]')){
   link.dataset.readerHeroStyle="true";
   link.onload=()=>{
     loadCinematicHero();
-    requestAnimationFrame(installReaderControlFixes);
+    requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()});
   };
   link.onerror=()=>{
     loadCinematicHero();
-    requestAnimationFrame(installReaderControlFixes);
+    requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()});
   };
   document.head.append(link);
 }else{
   loadCinematicHero();
-  requestAnimationFrame(installReaderControlFixes);
+  requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()});
 }
 
-window.addEventListener("resize",()=>requestAnimationFrame(installReaderControlFixes),{passive:true});
+window.addEventListener("resize",()=>requestAnimationFrame(()=>{installReaderPageWidthFix();installReaderControlFixes()}),{passive:true});
 
 // Prioritize the first pages as soon as the live reader mounts them.
 (function installReaderImagePriority(){
