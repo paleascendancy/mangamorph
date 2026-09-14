@@ -34,7 +34,7 @@ if (!source.includes('Partials.Reaction')) {
   changed = true;
 }
 
-if (!source.includes('guild.id !== PALE_GUILD_ID && setupReactionRoles')) {
+if (!source.includes("if (guild.id !== PALE_GUILD_ID) {\n    await setupReactionRoles(guild, client)")) {
   source = source.replace(
     'async function setupGuild(guild) {',
     "async function setupGuild(guild) {\n  if (guild.id !== PALE_GUILD_ID) {\n    await setupReactionRoles(guild, client).catch((error) => {\n      console.error(`Falha ao preparar cargos em ${guild.name}:`, error);\n    });\n  }\n"
