@@ -18,18 +18,20 @@ if (!source.includes("from './suggestions.js'")) {
   changed = true;
 }
 
-if (!source.includes('guild.id !== PALE_GUILD_ID) {\n    await setupSuggestions')) {
+const setupMarker = `guild.id !== '${PALE_GUILD_ID}'`;
+if (!source.includes(`${setupMarker}) {\n    await setupSuggestions`)) {
   source = source.replace(
     'async function setupGuild(guild) {',
-    "async function setupGuild(guild) {\n  if (guild.id !== PALE_GUILD_ID) {\n    await setupSuggestions(guild, client).catch((error) => {\n      console.error(`Falha ao preparar sugestões em ${guild.name}:`, error);\n    });\n  }\n"
+    `async function setupGuild(guild) {\n  if (guild.id !== '${PALE_GUILD_ID}') {\n    await setupSuggestions(guild, client).catch((error) => {\n      console.error(\`Falha ao preparar sugestões em \${guild.name}:\`, error);\n    });\n  }\n`
   );
   changed = true;
 }
 
-if (!source.includes('interaction.guildId !== PALE_GUILD_ID && await handleSuggestionInteraction')) {
+const interactionMarker = `interaction.guildId !== '${PALE_GUILD_ID}' && await handleSuggestionInteraction`;
+if (!source.includes(interactionMarker)) {
   source = source.replace(
     "    if (!interaction.inGuild()) return;",
-    "    if (!interaction.inGuild()) return;\n\n    if (interaction.guildId !== PALE_GUILD_ID && await handleSuggestionInteraction(interaction)) return;"
+    `    if (!interaction.inGuild()) return;\n\n    if (interaction.guildId !== '${PALE_GUILD_ID}' && await handleSuggestionInteraction(interaction)) return;`
   );
   changed = true;
 }
