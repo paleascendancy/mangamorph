@@ -2,6 +2,7 @@ import 'dotenv/config';
 import {
   ChannelType,
   Client,
+  Events,
   GatewayIntentBits
 } from 'discord.js';
 
@@ -21,7 +22,7 @@ const normalize = (value = '') => value
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
 
-client.once('ready', async () => {
+client.once(Events.ClientReady, async () => {
   try {
     const guild = await client.guilds.fetch(PALE_GUILD_ID).catch(() => null);
     if (!guild) {
