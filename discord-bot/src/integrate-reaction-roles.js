@@ -34,19 +34,21 @@ if (!source.includes('Partials.Reaction')) {
   changed = true;
 }
 
-if (!source.includes("if (guild.id !== PALE_GUILD_ID) {\n    await setupReactionRoles(guild, client)")) {
+const setupMarker = `guild.id !== '${PALE_GUILD_ID}'`;
+if (!source.includes(`${setupMarker}) {\n    await setupReactionRoles`)) {
   source = source.replace(
     'async function setupGuild(guild) {',
-    "async function setupGuild(guild) {\n  if (guild.id !== PALE_GUILD_ID) {\n    await setupReactionRoles(guild, client).catch((error) => {\n      console.error(`Falha ao preparar cargos em ${guild.name}:`, error);\n    });\n  }\n"
+    `async function setupGuild(guild) {\n  if (guild.id !== '${PALE_GUILD_ID}') {\n    await setupReactionRoles(guild, client).catch((error) => {\n      console.error(\`Falha ao preparar cargos em \${guild.name}:\`, error);\n    });\n  }\n`
   );
   changed = true;
 }
 
-if (!source.includes('reaction.message.guildId !== PALE_GUILD_ID')) {
+const reactionMarker = `reaction.message.guildId !== '${PALE_GUILD_ID}'`;
+if (!source.includes(reactionMarker)) {
   const handlers = [
     "client.on(Events.MessageReactionAdd, async (reaction, user) => {",
     "  try {",
-    "    if (reaction.message.guildId !== PALE_GUILD_ID) await handleReactionRoleAdd(reaction, user);",
+    `    if (reaction.message.guildId !== '${PALE_GUILD_ID}') await handleReactionRoleAdd(reaction, user);`,
     "  } catch (error) {",
     "    console.error('Falha ao processar adição de cargo por reação:', error);",
     "  }",
@@ -54,7 +56,7 @@ if (!source.includes('reaction.message.guildId !== PALE_GUILD_ID')) {
     "",
     "client.on(Events.MessageReactionRemove, async (reaction, user) => {",
     "  try {",
-    "    if (reaction.message.guildId !== PALE_GUILD_ID) await handleReactionRoleRemove(reaction, user);",
+    `    if (reaction.message.guildId !== '${PALE_GUILD_ID}') await handleReactionRoleRemove(reaction, user);`,
     "  } catch (error) {",
     "    console.error('Falha ao processar remoção de cargo por reação:', error);",
     "  }",
