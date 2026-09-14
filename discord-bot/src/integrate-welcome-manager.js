@@ -18,28 +18,30 @@ if (!source.includes("from './welcome-manager.js'")) {
   changed = true;
 }
 
-if (!source.includes('guild.id !== PALE_GUILD_ID) {\n    await setupWelcomeManager')) {
+const setupMarker = `guild.id !== '${PALE_GUILD_ID}'`;
+if (!source.includes(`${setupMarker}) {\n    await setupWelcomeManager`)) {
   source = source.replace(
     'async function setupGuild(guild) {',
-    "async function setupGuild(guild) {\n  if (guild.id !== PALE_GUILD_ID) {\n    await setupWelcomeManager(guild, client).catch((error) => {\n      console.error(`Falha ao registrar boas-vindas em ${guild.name}:`, error);\n    });\n  }\n"
+    `async function setupGuild(guild) {\n  if (guild.id !== '${PALE_GUILD_ID}') {\n    await setupWelcomeManager(guild, client).catch((error) => {\n      console.error(\`Falha ao registrar boas-vindas em \${guild.name}:\`, error);\n    });\n  }\n`
   );
   changed = true;
 }
 
-if (!source.includes('interaction.guildId !== PALE_GUILD_ID && await handleWelcomeManagerInteraction')) {
+const interactionMarker = `interaction.guildId !== '${PALE_GUILD_ID}' && await handleWelcomeManagerInteraction`;
+if (!source.includes(interactionMarker)) {
   source = source.replace(
     '    if (!interaction.inGuild()) return;',
-    '    if (!interaction.inGuild()) return;\n\n    if (interaction.guildId !== PALE_GUILD_ID && await handleWelcomeManagerInteraction(interaction, client)) return;'
+    `    if (!interaction.inGuild()) return;\n\n    if (interaction.guildId !== '${PALE_GUILD_ID}' && await handleWelcomeManagerInteraction(interaction, client)) return;`
   );
   changed = true;
 }
 
-if (!source.includes('const customWelcomeHandled = await sendConfiguredWelcome(member, client)')) {
+if (!source.includes('const customWelcomeHandled = member.guild.id !==')) {
   const startMarker = '    const welcomeChannel = await findTextChannel(\n      member.guild,';
   if (source.includes(startMarker)) {
     source = source.replace(
       startMarker,
-      "    const customWelcomeHandled = member.guild.id !== PALE_GUILD_ID && await sendConfiguredWelcome(member, client).catch((error) => {\n      console.error('[WELCOME] Falha ao enviar boas-vindas personalizadas:', error);\n      return true;\n    });\n\n    if (!customWelcomeHandled) {\n" + startMarker
+      `    const customWelcomeHandled = member.guild.id !== '${PALE_GUILD_ID}' && await sendConfiguredWelcome(member, client).catch((error) => {\n      console.error('[WELCOME] Falha ao enviar boas-vindas personalizadas:', error);\n      return true;\n    });\n\n    if (!customWelcomeHandled) {\n` + startMarker
     );
 
     const endMarker = "    } else {\n      console.warn('Canal de boas-vindas não encontrado.');\n    }\n\n    await sendLog(member.guild, 'Novo membro'";
