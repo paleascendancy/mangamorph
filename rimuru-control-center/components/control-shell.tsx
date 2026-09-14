@@ -6,11 +6,14 @@ import { createBrowserSupabase } from '@/lib/supabase/client';
 
 const items = [
   ['⌂','Dashboard','/dashboard'],
+  ['◈','Rimuru OS','/dashboard/controle'],
   ['◉','Monitoramento','/dashboard/monitoramento'],
   ['▥','Analytics','/dashboard/analytics'],
   ['♙','Usuários','/dashboard/usuarios'],
   ['♟','Grupos','/dashboard/grupos'],
+  ['▦','Servidores','/dashboard/servidores'],
   ['⌘','Comandos','/dashboard/comandos'],
+  ['⚑','Feature Flags','/dashboard/feature-flags'],
   ['▤','Logs','/dashboard/logs'],
   ['!','Erros','/dashboard/erros'],
   ['△','Incidentes','/dashboard/incidentes'],
@@ -31,6 +34,8 @@ export function ControlShell({ children, adminName, role, status = 'offline' }: 
     router.refresh();
   }
 
+  const active = (href: string) => pathname === href || (href !== '/dashboard' && pathname.startsWith(`${href}/`));
+
   return (
     <div className="shell">
       <aside className="sidebar" aria-label="Navegação principal">
@@ -40,7 +45,7 @@ export function ControlShell({ children, adminName, role, status = 'offline' }: 
         </div>
         <nav className="nav">
           {items.map(([icon,label,href]) => (
-            <Link key={href} className={pathname === href ? 'active' : ''} href={href} title={label}>
+            <Link key={href} className={active(href) ? 'active' : ''} href={href} title={label}>
               <b aria-hidden>{icon}</b><span>{label}</span>
             </Link>
           ))}
@@ -55,7 +60,7 @@ export function ControlShell({ children, adminName, role, status = 'offline' }: 
       </aside>
       <main className="main">
         <header className="header">
-          <div><h1>{pathname === '/dashboard' ? 'Dashboard' : 'Rimuru Control Center'}</h1></div>
+          <div><h1>{pathname === '/dashboard' ? 'Dashboard' : pathname.includes('/controle') ? 'Rimuru OS' : 'Rimuru Control Center'}</h1></div>
           <div className="header-actions">
             <input className="search" aria-label="Pesquisar" placeholder="Buscar usuários, grupos, comandos…" />
             <span className="status-pill"><span className={`dot ${status}`}></span> Rimuru {status === 'online' ? 'Online' : status === 'degraded' ? 'Instável' : 'Offline'}</span>
