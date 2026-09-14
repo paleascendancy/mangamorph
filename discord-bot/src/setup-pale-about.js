@@ -1,8 +1,5 @@
 import 'dotenv/config';
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   ChannelType,
   Client,
   EmbedBuilder,
@@ -18,46 +15,24 @@ if (!DISCORD_TOKEN) {
   process.exit(1);
 }
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
-const normalize = (value = '') => value
+const normalize = (value = '') => String(value)
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
-
-const EDITORS = [
-  {
-    label: 'Smookecut',
-    emoji: '⭐',
-    url: 'https://www.tiktok.com/@smookecut?_r=1&_t=ZS-99cfIpszrwT',
-    description: 'Editor de promoção • participa da produção de serviços solicitados.'
-  },
-  {
-    label: 'Shyrez',
-    emoji: '🎬',
-    url: 'https://www.tiktok.com/@shyrez2?_r=1&_t=ZS-99cfebo7Irl',
-    description: 'Editor da comunidade • participa da produção de serviços solicitados.'
-  },
-  {
-    label: 'Mangaká',
-    emoji: '✒️',
-    url: 'https://www.tiktok.com/@mangaka.studio?_r=1&_t=ZS-99cfhNvZFGX',
-    description: 'Editor da comunidade • participa da produção de serviços solicitados.'
-  },
-  {
-    label: 'Dexsi',
-    emoji: '🎞️',
-    url: 'https://www.tiktok.com/@dexsi.m?_r=1&_t=ZS-99cfkA8hAGb',
-    description: 'Editor da comunidade • participa da produção de serviços solicitados.'
-  }
-];
 
 function findTextChannel(channels, names) {
   const wanted = new Set(names.map(normalize));
   return channels.find((channel) =>
     channel?.type === ChannelType.GuildText && wanted.has(normalize(channel.name))
   ) || null;
+}
+
+function mentionOrFallback(channels, names, fallback) {
+  const channel = findTextChannel(channels, names);
+  return channel ? `${channel}` : `\`${fallback}\``;
 }
 
 client.once(Events.ClientReady, async () => {
@@ -68,7 +43,9 @@ client.once(Events.ClientReady, async () => {
       return;
     }
 
+    await guild.members.fetch().catch(() => null);
     const channels = await guild.channels.fetch();
+    const roles = await guild.roles.fetch();
     const introCategory = channels.find((channel) =>
       channel?.type === ChannelType.GuildCategory && normalize(channel.name) === 'painicio'
     ) || null;
@@ -80,14 +57,14 @@ client.once(Events.ClientReady, async () => {
         name: '🌐・sobre-a-comunidade',
         type: ChannelType.GuildText,
         parent: introCategory?.id || null,
-        topic: 'Conheça a Pale Ascendancy, nossos editores e como solicitar serviços.',
+        topic: 'Conheça a Pale Ascendancy: comunidade, profissionais, aprendizado e contratação de serviços criativos.',
         reason: 'Criar apresentação oficial da comunidade Pale Ascendancy'
       });
     } else {
       await channel.edit({
         name: '🌐・sobre-a-comunidade',
         parent: introCategory?.id || channel.parentId,
-        topic: 'Conheça a Pale Ascendancy, nossos editores e como solicitar serviços.'
+        topic: 'Conheça a Pale Ascendancy: comunidade, profissionais, aprendizado e contratação de serviços criativos.'
       }).catch(() => {});
     }
 
@@ -110,49 +87,58 @@ client.once(Events.ClientReady, async () => {
     }).catch(() => {});
 
     const freshChannels = await guild.channels.fetch();
-    const serviceChannel = findTextChannel(freshChannels, ['solicitar-serviço', 'pedir-serviço']);
-    const serviceMention = serviceChannel ? `<#${serviceChannel.id}>` : '`🧾・solicitar-serviço`';
+    const startMention = mentionOrFallback(freshChannels, ['comece-aqui'], '#comece-aqui');
+    const serviceMention = mentionOrFallback(freshChannels, ['solicitar-serviço', 'pedir-serviço'], '#solicitar-serviço');
+    const recruitmentMention = mentionOrFallback(freshChannels, ['recrutamento'], '#recrutamento');
+    const galleryMention = mentionOrFallback(freshChannels, ['artes-e-edits', 'arteseedits', 'midia-e-artes'], '#artes-e-edits');
+    const suggestionsMention = mentionOrFallback(freshChannels, ['sugestões', 'sugestoes'], '#sugestões');
+
+    const editorRole = roles.find((role) => normalize(role.name) === 'editorprofissional') || null;
+    const designerRole = roles.find((role) => normalize(role.name) === 'designerprofissional') || null;
+    const verifiedEditors = editorRole?.members?.filter((member) => !member.user.bot).size || 0;
+    const verifiedDesigners = designerRole?.members?.filter((member) => !member.user.bot).size || 0;
 
     const header = new EmbedBuilder()
       .setColor(0x7b61ff)
       .setAuthor({
-        name: 'Pale Ascendancy • Comunidade Criativa',
+        name: 'Pale Ascendancy • Comunidade Criativa Profissional',
         iconURL: guild.iconURL({ size: 128 }) || client.user.displayAvatarURL()
       })
-      .setTitle('🌐 Sobre a comunidade')
+      .setTitle('🌐 Sobre a Pale Ascendancy')
       .setDescription(
-        'A **Pale Ascendancy** é uma comunidade criativa voltada para edição, design e produção digital. ' +
-        'Além de reunir criadores, conectamos clientes aos nossos editores para a realização de serviços solicitados dentro da comunidade.\n\n' +
-        `Para contratar, utilize ${serviceMention}. A equipe recebe o pedido, organiza as informações e encaminha para o editor adequado.`
+        'A **Pale Ascendancy** é uma comunidade para quem cria e para quem precisa de criação. Reunimos **editores de vídeo, designers, motion designers, criadores e clientes** em um ambiente organizado para aprender, mostrar trabalho, fazer networking e contratar serviços.\n\n' +
+        'Nosso foco não é quantidade vazia de membros: queremos uma comunidade onde talento consiga **evoluir, ser descoberto e receber oportunidades reais**.'
       );
 
-    const editors = new EmbedBuilder()
+    const paths = new EmbedBuilder()
       .setColor(0x2b2f3a)
-      .setTitle('🎬 Editores de promoção e serviços')
+      .setTitle('🧭 Encontre seu caminho')
       .setDescription(
-        EDITORS.map((editor) => `${editor.emoji} **${editor.label}**\n${editor.description}`).join('\n\n')
-      )
-      .setFooter({ text: 'Pale Ascendancy • Criatividade, organização e entrega' });
+        `🧭 **Novo por aqui?** Comece em ${startMention}.\n` +
+        `💼 **Quer contratar?** Envie um briefing em ${serviceMention}.\n` +
+        `🎨 **Quer mostrar seu trabalho?** Publique em ${galleryMention}.\n` +
+        `✅ **Quer entrar para a rede profissional?** Candidate-se em ${recruitmentMention}.\n` +
+        `💡 **Tem uma ideia para melhorar a comunidade?** Use ${suggestionsMention}.`
+      );
 
-    const buttons = EDITORS.map((editor) =>
-      new ButtonBuilder()
-        .setLabel(editor.label)
-        .setEmoji(editor.emoji)
-        .setStyle(ButtonStyle.Link)
-        .setURL(editor.url)
-    );
+    const trust = new EmbedBuilder()
+      .setColor(0x232833)
+      .setTitle('✅ Rede profissional verificada')
+      .setDescription(
+        'Os cargos **Editor Profissional** e **Designer Profissional** não são entregues automaticamente. A equipe analisa o perfil antes de liberar o selo, ajudando clientes a diferenciar participantes da comunidade de profissionais verificados.\n\n' +
+        `🎬 **Editores verificados:** ${verifiedEditors}\n` +
+        `🎨 **Designers verificados:** ${verifiedDesigners}\n\n` +
+        'Use **`/profissionais`** para consultar a lista atual.'
+      )
+      .setFooter({ text: 'rimuru-bot • Pale Ascendancy' });
 
     const recent = await channel.messages.fetch({ limit: 50 }).catch(() => null);
     const panels = recent?.filter((message) =>
       message.author.id === client.user.id &&
-      message.embeds.some((embed) => embed.title === '🌐 Sobre a comunidade')
+      message.embeds.some((embed) => ['🌐 Sobre a comunidade', '🌐 Sobre a Pale Ascendancy'].includes(embed.title))
     );
 
-    const payload = {
-      embeds: [header, editors],
-      components: [new ActionRowBuilder().addComponents(...buttons)]
-    };
-
+    const payload = { embeds: [header, paths, trust] };
     const primary = panels?.first() || null;
     if (primary) {
       await primary.edit(payload);
@@ -164,7 +150,7 @@ client.once(Events.ClientReady, async () => {
       await channel.send(payload);
     }
 
-    console.log('[PA-ABOUT] 🌐・sobre-a-comunidade configurado.');
+    console.log('[PA-ABOUT] 🌐・sobre-a-comunidade atualizado com posicionamento profissional dinâmico.');
   } catch (error) {
     console.error('[PA-ABOUT] Falha ao configurar sobre a comunidade:', error);
     process.exitCode = 1;
