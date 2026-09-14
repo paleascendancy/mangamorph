@@ -2,6 +2,7 @@ import { ChannelType } from 'discord.js';
 import { setupPaleWelcome } from './pale.js';
 import { setupPaleCommunity } from './pale-community.js';
 import { setupPaleGrowth } from './pale-growth.js';
+import { setupPalePanelEditor } from './pale-panel-editor.js';
 
 const normalize = (value = '') => value
   .normalize('NFD')
@@ -25,6 +26,10 @@ export async function setupPaleRuntime(guild) {
 
   await setupPaleGrowth(guild).catch((error) => {
     console.error('[PA-GROWTH] Falha ao sincronizar painéis públicos:', error);
+  });
+
+  await setupPalePanelEditor(guild).catch((error) => {
+    console.error('[PA-PANEL] Falha ao preparar editor de painéis:', error);
   });
 
   await setupPaleWelcome(guild).catch((error) => {
