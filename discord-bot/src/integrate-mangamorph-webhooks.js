@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const indexPath = path.join(__dirname, 'index.js');
+const PALE_GUILD_ID = '1513757281311916042';
 
 let source = fs.readFileSync(indexPath, 'utf8');
 let changed = false;
@@ -17,36 +18,25 @@ if (!source.includes("from './mangamorph-webhooks.js'")) {
   changed = true;
 }
 
-if (!source.includes('await setupMangaMorphWebhookTools(guild)')) {
-  const proBlock = `  await setupMangaMorphProTools(guild).catch((error) => {\n    console.error(\`Falha ao registrar ferramentas avançadas em \${guild.name}:\`, error);\n  });\n`;
-  const webhookBlock = `  await setupMangaMorphWebhookTools(guild).catch((error) => {\n    console.error(\`Falha ao registrar webhooks de embed em \${guild.name}:\`, error);\n  });\n`;
-
-  if (source.includes(proBlock)) {
-    source = source.replace(proBlock, proBlock + webhookBlock);
-  } else {
-    source = source.replace('async function setupGuild(guild) {', `async function setupGuild(guild) {\n${webhookBlock}`);
-  }
+const setupMarker = `guild.id !== '${PALE_GUILD_ID}'`;
+if (!source.includes(`${setupMarker}) {\n    await setupMangaMorphWebhookTools`)) {
+  const webhookBlock = `  if (guild.id !== '${PALE_GUILD_ID}') {\n    await setupMangaMorphWebhookTools(guild).catch((error) => {\n      console.error(\`Falha ao registrar webhooks de embed em \${guild.name}:\`, error);\n    });\n  }\n`;
+  source = source.replace('async function setupGuild(guild) {', `async function setupGuild(guild) {\n${webhookBlock}`);
   changed = true;
 }
 
-if (!source.includes('await handleMangaMorphWebhookInteraction(interaction, client)')) {
-  const proHandler = '    if (await handleMangaMorphProToolsInteraction(interaction, client)) return;';
-  const webhookHandler = '    if (await handleMangaMorphWebhookInteraction(interaction, client)) return;\n\n';
-
-  if (source.includes(proHandler)) {
-    source = source.replace(proHandler, webhookHandler + proHandler);
-  } else {
-    source = source.replace(
-      '    if (!interaction.inGuild()) return;',
-      '    if (!interaction.inGuild()) return;\n\n    if (await handleMangaMorphWebhookInteraction(interaction, client)) return;'
-    );
-  }
+const handlerMarker = `interaction.guildId !== '${PALE_GUILD_ID}' && await handleMangaMorphWebhookInteraction`;
+if (!source.includes(handlerMarker)) {
+  source = source.replace(
+    '    if (!interaction.inGuild()) return;',
+    `    if (!interaction.inGuild()) return;\n\n    if (interaction.guildId !== '${PALE_GUILD_ID}' && await handleMangaMorphWebhookInteraction(interaction, client)) return;`
+  );
   changed = true;
 }
 
 if (changed) {
   fs.writeFileSync(indexPath, source, 'utf8');
-  console.log('[MM-WEBHOOK] Ferramentas de webhook integradas ao index.js.');
+  console.log('[MM-WEBHOOK] Ferramentas de webhook preservadas fora da Pale.');
 } else {
   console.log('[MM-WEBHOOK] Ferramentas de webhook já integradas.');
 }
