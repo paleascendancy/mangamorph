@@ -10,8 +10,8 @@ const normalize = (value = '') => value
 
 export async function setupPaleRuntime(guild) {
   const me = await guild.members.fetchMe().catch(() => null);
-  if (me?.manageable && me.nickname !== 'Pale Ascendancy') {
-    await me.setNickname('Pale Ascendancy', 'Identidade visual do bot neste servidor').catch(() => {});
+  if (me?.manageable && me.nickname !== 'rimuru-bot') {
+    await me.setNickname('rimuru-bot', 'Identidade visual do assistente da Pale Ascendancy').catch(() => {});
   }
 
   await setupPaleWelcome(guild).catch((error) => {
@@ -43,5 +43,5 @@ export async function setupPaleRuntime(guild) {
     console.error('[Pale Ascendancy] Falha ao preparar comunidade:', error);
   });
 
-  console.log(`[Pale Ascendancy] Runtime preparado.`);
+  console.log(`[Pale Ascendancy] Runtime preparado com rimuru-bot.`);
 }
