@@ -4,7 +4,7 @@ import fs from 'node:fs';
 const STARTED_AT = new Date().toISOString();
 const INSTANCE_ID = process.env.RIMURU_TELEMETRY_INSTANCE_ID || 'discord-primary';
 const SUPABASE_URL = process.env.RIMURU_TELEMETRY_SUPABASE_URL;
-const SUPABASE_KEY = process.env.RIMURU_TELEMETRY_SUPABASE_KEY;
+const TELEMETRY_ENDPOINT = process.env.RIMURU_TELEMETRY_ENDPOINT || (SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/rimuru-telemetry-ingest` : null);
 const TELEMETRY_TOKEN = process.env.RIMURU_TELEMETRY_TOKEN;
 const HASH_SALT = process.env.RIMURU_TELEMETRY_HASH_SALT || TELEMETRY_TOKEN || 'rimuru';
 const HEARTBEAT_MS = 30_000;
@@ -75,19 +75,18 @@ function safeError(error, operation = 'runtime') {
 }
 
 async function ingest(payload) {
-  if (!SUPABASE_URL || !SUPABASE_KEY || !TELEMETRY_TOKEN) return false;
+  if (!TELEMETRY_ENDPOINT || !TELEMETRY_TOKEN) return false;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 4500);
   const started = Date.now();
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/rimuru_ingest_telemetry`, {
+    const response = await fetch(TELEMETRY_ENDPOINT, {
       method: 'POST',
       headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-rimuru-telemetry-token': TELEMETRY_TOKEN
       },
-      body: JSON.stringify({ p_token: TELEMETRY_TOKEN, p_payload: payload }),
+      body: JSON.stringify(payload),
       signal: controller.signal
     });
     if (!response.ok) throw new Error(`telemetry http ${response.status}`);
@@ -138,7 +137,7 @@ async function flush(client, includeMetric = false) {
       commands: commandBatch,
       events: eventBatch,
       errors: errorBatch,
-      metadata: { runtime: process.version, telemetry: 'v1' }
+      metadata: { runtime: process.version, telemetry: 'v1-edge' }
     };
     const ok = await ingest(payload);
     if (!ok) {
@@ -158,8 +157,8 @@ export function installRimuruTelemetry(client) {
   if (client.__rimuruTelemetryInstalled) return;
   client.__rimuruTelemetryInstalled = true;
 
-  if (!SUPABASE_URL || !SUPABASE_KEY || !TELEMETRY_TOKEN) {
-    console.warn('[RIMURU-TELEMETRY] desativada: variáveis ausentes.');
+  if (!TELEMETRY_ENDPOINT || !TELEMETRY_TOKEN) {
+    console.warn('[RIMURU-TELEMETRY] desativada: endpoint/token ausentes.');
     return;
   }
 
@@ -231,7 +230,7 @@ export function installRimuruTelemetry(client) {
     boundedPush(errors, safeError(error, 'uncaught_exception'));
   });
 
-  client.once('ready', () => {
+  client.once('clientReady', () => {
     boundedPush(events, { type: 'bot_ready', severity: 'info', occurred_at: new Date().toISOString(), metadata: { version } });
     flush(client, true).catch(() => {});
   });
@@ -239,5 +238,5 @@ export function installRimuruTelemetry(client) {
   setInterval(() => flush(client, false).catch(() => {}), FLUSH_MS).unref();
   setInterval(() => flush(client, true).catch(() => {}), HEARTBEAT_MS).unref();
 
-  console.log('[RIMURU-TELEMETRY] coletor assíncrono instalado.');
+  console.log('[RIMURU-TELEMETRY] coletor assíncrono instalado via Edge Function.');
 }
