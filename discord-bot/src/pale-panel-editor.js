@@ -1,6 +1,5 @@
 import {
   ActionRowBuilder,
-  EmbedBuilder,
   Events,
   ModalBuilder,
   PermissionFlagsBits,
@@ -12,14 +11,13 @@ import {
 
 const PALE_GUILD_ID = '1513757281311916042';
 const INSTALL_KEY = Symbol.for('pale.panel.editor.listener');
+const STAFF_ROLES = new Set(['dono', 'desenvolvedor', 'administrador']);
 
 const normalize = (value = '') => String(value)
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
-
-const STAFF_ROLES = new Set(['dono', 'desenvolvedor', 'administrador']);
 
 const panelCommand = new SlashCommandBuilder()
   .setName('painel')
@@ -39,6 +37,7 @@ async function registerCommand(guild) {
   const existing = commands.find((command) => command.name === data.name) || null;
   if (existing) await existing.edit(data);
   else await guild.commands.create(data);
+  console.log('[PA-PANEL] /painel registrado no servidor.');
 }
 
 function findTextChannel(channels, aliases) {
@@ -47,40 +46,32 @@ function findTextChannel(channels, aliases) {
 }
 
 function hasComponent(message, customId) {
-  return message.components.some((row) =>
-    row.components.some((component) => component.customId === customId)
-  );
+  return message.components.some((row) => row.components.some((component) => component.customId === customId));
 }
 
 async function findPanelTarget(guild, target) {
   const channels = await guild.channels.fetch();
-  const isStart = target === 'start';
-  const channel = isStart
+  const start = target === 'start';
+  const channel = start
     ? findTextChannel(channels, ['comece-aqui'])
     : findTextChannel(channels, ['sobre-a-comunidade', 'nossa-comunidade', 'institucional']);
-
   if (!channel) return null;
+
   const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
   if (!messages) return null;
 
-  let message = null;
-  if (isStart) {
-    message = messages.find((item) => item.author.id === guild.client.user.id && hasComponent(item, 'pa_growth_intent')) || null;
-  } else {
-    message = messages.find((item) => item.author.id === guild.client.user.id && item.embeds.length >= 1) || null;
-  }
+  const message = start
+    ? messages.find((item) => item.author.id === guild.client.user.id && hasComponent(item, 'pa_growth_intent'))
+    : messages.find((item) => item.author.id === guild.client.user.id && item.embeds.length >= 1);
   if (!message) return null;
 
-  let embedIndex = 0;
-  if (target === 'about-trust') embedIndex = Math.min(1, Math.max(0, message.embeds.length - 1));
-  if (!message.embeds[embedIndex]) return null;
-
-  return { channel, message, embedIndex, embed: message.embeds[embedIndex] };
+  const embedIndex = target === 'about-trust' ? Math.min(1, message.embeds.length - 1) : 0;
+  const embed = message.embeds[embedIndex];
+  return embed ? { channel, message, embedIndex, embed } : null;
 }
 
 function colorHex(embed) {
-  const value = embed.color ?? 0x5865f2;
-  return `#${Number(value).toString(16).padStart(6, '0').toUpperCase()}`;
+  return `#${Number(embed.color ?? 0x5865f2).toString(16).padStart(6, '0').toUpperCase()}`;
 }
 
 function encodeFields(fields = []) {
@@ -95,59 +86,45 @@ function decodeFields(value = '') {
   if (!value.trim()) return [];
   return value.split('\n').map((line) => line.trim()).filter(Boolean).slice(0, 25).map((line) => {
     const [rawName = '', rawValue = '', rawInline = 'não'] = line.split('||').map((part) => part.trim());
-    const name = rawName.replace(/\\n/g, '\n').slice(0, 256) || 'Campo';
-    const fieldValue = rawValue.replace(/\\n/g, '\n').slice(0, 1024) || '—';
-    const inline = ['sim', 'yes', 'true', '1'].includes(rawInline.toLowerCase());
-    return { name, value: fieldValue, inline };
+    return {
+      name: (rawName.replace(/\\n/g, '\n') || 'Campo').slice(0, 256),
+      value: (rawValue.replace(/\\n/g, '\n') || '—').slice(0, 1024),
+      inline: ['sim', 'yes', 'true', '1'].includes(rawInline.toLowerCase())
+    };
   });
 }
 
 function parseColor(value) {
   const clean = String(value || '').trim().replace('#', '');
-  if (!/^[0-9a-fA-F]{6}$/.test(clean)) return null;
-  return Number.parseInt(clean, 16);
+  return /^[0-9a-fA-F]{6}$/.test(clean) ? Number.parseInt(clean, 16) : null;
 }
 
-function panelPicker() {
-  const select = new StringSelectMenuBuilder()
-    .setCustomId('pa_panel_pick')
-    .setPlaceholder('Qual parte você quer editar?')
-    .addOptions(
-      {
-        label: 'Comece aqui',
-        description: 'Painel de entrada e escolha de objetivo',
-        value: 'start',
-        emoji: '🧭'
-      },
-      {
-        label: 'Sobre a comunidade',
-        description: 'Apresentação principal da Pale Ascendancy',
-        value: 'about-main',
-        emoji: '🌐'
-      },
-      {
-        label: 'Rede profissional',
-        description: 'Bloco de profissionais verificados',
-        value: 'about-trust',
-        emoji: '✅'
-      }
-    );
-  return new ActionRowBuilder().addComponents(select);
+function pickerRow() {
+  return new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId('pa_panel_pick')
+      .setPlaceholder('Qual parte você quer editar?')
+      .addOptions(
+        { label: 'Comece aqui', description: 'Entrada e escolha de objetivo', value: 'start', emoji: '🧭' },
+        { label: 'Sobre a comunidade', description: 'Apresentação principal da Pale', value: 'about-main', emoji: '🌐' },
+        { label: 'Rede profissional', description: 'Profissionais verificados', value: 'about-trust', emoji: '✅' }
+      )
+  );
 }
 
-function inputRow(customId, label, style, value, options = {}) {
+function inputRow(id, label, style, value, { required = false, maxLength = 4000, placeholder } = {}) {
   const input = new TextInputBuilder()
-    .setCustomId(customId)
+    .setCustomId(id)
     .setLabel(label)
     .setStyle(style)
-    .setRequired(options.required ?? false)
-    .setMaxLength(options.maxLength || (style === TextInputStyle.Paragraph ? 4000 : 256));
-  if (value) input.setValue(String(value).slice(0, options.maxLength || 4000));
-  if (options.placeholder) input.setPlaceholder(options.placeholder);
+    .setRequired(required)
+    .setMaxLength(maxLength);
+  if (value) input.setValue(String(value).slice(0, maxLength));
+  if (placeholder) input.setPlaceholder(placeholder);
   return new ActionRowBuilder().addComponents(input);
 }
 
-async function showEditorModal(interaction, target) {
+async function showModal(interaction, target) {
   const found = await findPanelTarget(interaction.guild, target);
   if (!found) {
     await interaction.reply({ content: 'Não encontrei esse painel no servidor.', ephemeral: true });
@@ -156,15 +133,14 @@ async function showEditorModal(interaction, target) {
 
   const modal = new ModalBuilder()
     .setCustomId(`pa_panel_modal:${target}`)
-    .setTitle('Editor de painel • Pale Ascendancy');
-
-  modal.addComponents(
-    inputRow('title', 'Título', TextInputStyle.Short, found.embed.title || '', { required: true, maxLength: 256 }),
-    inputRow('description', 'Descrição', TextInputStyle.Paragraph, found.embed.description || '', { required: true, maxLength: 4000 }),
-    inputRow('color', 'Cor hexadecimal', TextInputStyle.Short, colorHex(found.embed), { required: true, maxLength: 7, placeholder: '#5865F2' }),
-    inputRow('fields', 'Campos: Nome || Valor || sim/não', TextInputStyle.Paragraph, encodeFields(found.embed.fields), { required: false, maxLength: 4000, placeholder: 'Título || Texto || não' }),
-    inputRow('footer', 'Rodapé', TextInputStyle.Short, found.embed.footer?.text || '', { required: false, maxLength: 2048 })
-  );
+    .setTitle('Editor de painel • Pale Ascendancy')
+    .addComponents(
+      inputRow('title', 'Título', TextInputStyle.Short, found.embed.title || '', { required: true, maxLength: 256 }),
+      inputRow('description', 'Descrição', TextInputStyle.Paragraph, found.embed.description || '', { required: true, maxLength: 4000 }),
+      inputRow('color', 'Cor hexadecimal', TextInputStyle.Short, colorHex(found.embed), { required: true, maxLength: 7, placeholder: '#5865F2' }),
+      inputRow('fields', 'Campos: Nome || Valor || sim/não', TextInputStyle.Paragraph, encodeFields(found.embed.fields), { maxLength: 4000, placeholder: 'Título || Texto || não' }),
+      inputRow('footer', 'Rodapé', TextInputStyle.Short, found.embed.footer?.text || '', { maxLength: 2048 })
+    );
 
   await interaction.showModal(modal);
 }
@@ -178,7 +154,7 @@ async function saveModal(interaction, target) {
 
   const color = parseColor(interaction.fields.getTextInputValue('color'));
   if (color === null) {
-    await interaction.reply({ content: 'A cor precisa estar no formato `#5865F2`.', ephemeral: true });
+    await interaction.reply({ content: 'Use uma cor hexadecimal como `#5865F2`.', ephemeral: true });
     return;
   }
 
@@ -194,10 +170,10 @@ async function saveModal(interaction, target) {
 
   const embeds = found.message.embeds.map((embed) => embed.toJSON());
   embeds[found.embedIndex] = data;
-
   await found.message.edit({ embeds });
+
   await interaction.reply({
-    content: `✅ Painel atualizado em ${found.channel}. A alteração foi salva na própria mensagem e será preservada nos reinícios do bot.`,
+    content: `✅ Painel atualizado em ${found.channel}. Essa edição será preservada nos reinícios do rimuru-bot.`,
     ephemeral: true,
     allowedMentions: { parse: [] }
   });
@@ -205,7 +181,6 @@ async function saveModal(interaction, target) {
 
 async function handleInteraction(interaction) {
   if (!interaction.inGuild() || interaction.guildId !== PALE_GUILD_ID) return;
-
   const relevant =
     (interaction.isChatInputCommand() && interaction.commandName === 'painel') ||
     (interaction.isStringSelectMenu() && interaction.customId === 'pa_panel_pick') ||
@@ -214,7 +189,7 @@ async function handleInteraction(interaction) {
 
   if (!isAuthorized(interaction)) {
     if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({ content: 'Você não tem permissão para editar os painéis da Pale Ascendancy.', ephemeral: true });
+      await interaction.reply({ content: 'Você não tem permissão para editar os painéis.', ephemeral: true });
     }
     return;
   }
@@ -222,27 +197,20 @@ async function handleInteraction(interaction) {
   try {
     if (interaction.isChatInputCommand()) {
       await interaction.reply({
-        content: '**Editor visual da Pale Ascendancy**\nEscolha abaixo a parte que deseja alterar. As mudanças aparecem imediatamente para todos.',
-        components: [panelPicker()],
+        content: '**Editor visual da Pale Ascendancy**\nEscolha a parte que deseja alterar.',
+        components: [pickerRow()],
         ephemeral: true
       });
-      return;
-    }
-
-    if (interaction.isStringSelectMenu()) {
-      await showEditorModal(interaction, interaction.values[0]);
-      return;
-    }
-
-    if (interaction.isModalSubmit()) {
-      const target = interaction.customId.split(':')[1];
-      await saveModal(interaction, target);
+    } else if (interaction.isStringSelectMenu()) {
+      await showModal(interaction, interaction.values[0]);
+    } else if (interaction.isModalSubmit()) {
+      await saveModal(interaction, interaction.customId.split(':')[1]);
     }
   } catch (error) {
     console.error('[PA-PANEL] Falha no editor:', error);
-    const payload = { content: 'Não consegui salvar essa alteração. Tente novamente ou avise a equipe técnica.', ephemeral: true };
-    if (interaction.replied || interaction.deferred) await interaction.followUp(payload).catch(() => {});
-    else await interaction.reply(payload).catch(() => {});
+    const reply = { content: 'Não consegui salvar essa alteração. Tente novamente.', ephemeral: true };
+    if (interaction.replied || interaction.deferred) await interaction.followUp(reply).catch(() => {});
+    else await interaction.reply(reply).catch(() => {});
   }
 }
 
@@ -271,12 +239,11 @@ async function sanitizeVisibleMarkers(guild) {
       if (changed) await message.edit({ embeds }).catch(() => {});
     }
   }
+  console.log('[PA-PANEL] Identificadores internos removidos dos rodapés públicos.');
 }
 
 export async function setupPalePanelEditor(guild) {
   if (guild.id !== PALE_GUILD_ID) return false;
-  await registerCommand(guild);
-  await sanitizeVisibleMarkers(guild);
 
   const client = guild.client;
   if (!client[INSTALL_KEY]) {
@@ -284,6 +251,14 @@ export async function setupPalePanelEditor(guild) {
     client.on(Events.InteractionCreate, handleInteraction);
   }
 
-  console.log('[PA-PANEL] /painel pronto • editor visual protegido para staff.');
+  console.log('[PA-PANEL] Listener do editor visual ativo.');
+
+  void registerCommand(guild).catch((error) => {
+    console.error('[PA-PANEL] Falha ao registrar /painel:', error?.message || error);
+  });
+  void sanitizeVisibleMarkers(guild).catch((error) => {
+    console.error('[PA-PANEL] Falha ao limpar rodapés internos:', error?.message || error);
+  });
+
   return true;
 }
