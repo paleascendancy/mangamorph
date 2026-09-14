@@ -1,6 +1,7 @@
 import { ChannelType } from 'discord.js';
 import { setupPaleWelcome } from './pale.js';
 import { setupPaleCommunity } from './pale-community.js';
+import { setupPaleGrowth } from './pale-growth.js';
 
 const normalize = (value = '') => value
   .normalize('NFD')
@@ -21,6 +22,10 @@ export async function setupPaleRuntime(guild) {
   if (me?.manageable && me.nickname !== 'rimuru-bot') {
     await me.setNickname('rimuru-bot', 'Identidade visual do assistente da Pale Ascendancy').catch(() => {});
   }
+
+  await setupPaleGrowth(guild).catch((error) => {
+    console.error('[PA-GROWTH] Falha ao sincronizar painéis públicos:', error);
+  });
 
   await setupPaleWelcome(guild).catch((error) => {
     console.error('[PA-WELCOME] Falha ao preparar boas-vindas:', error);
@@ -51,5 +56,5 @@ export async function setupPaleRuntime(guild) {
     console.error('[Pale Ascendancy] Falha ao preparar comunidade:', error);
   });
 
-  console.log(`[Pale Ascendancy] Runtime preparado com rimuru-bot.`);
+  console.log('[Pale Ascendancy] Runtime preparado com rimuru-bot.');
 }
