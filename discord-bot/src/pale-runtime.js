@@ -9,6 +9,14 @@ const normalize = (value = '') => value
   .replace(/[^a-z0-9]/g, '');
 
 export async function setupPaleRuntime(guild) {
+  const botUser = guild.client.user;
+  if (botUser?.username !== 'rimuru-bot') {
+    await botUser.setUsername('rimuru-bot').catch((error) => {
+      console.warn('[RIMURU] Não foi possível alterar o username global agora:', error?.message || error);
+    });
+  }
+  botUser?.setActivity('Pale Ascendancy • editores & designers');
+
   const me = await guild.members.fetchMe().catch(() => null);
   if (me?.manageable && me.nickname !== 'rimuru-bot') {
     await me.setNickname('rimuru-bot', 'Identidade visual do assistente da Pale Ascendancy').catch(() => {});
