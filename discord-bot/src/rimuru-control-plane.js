@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { PermissionFlagsBits } from 'discord.js';
 
 const ENDPOINT = process.env.RIMURU_CONTROL_ENDPOINT;
 const TOKEN = process.env.RIMURU_TELEMETRY_TOKEN;
@@ -18,40 +19,26 @@ const state = {
 
 const blockedInteractions = new WeakSet();
 
-function configKey(scopeType, scopeId, module) {
-  return `${scopeType}:${scopeId || '*'}:${module}`;
-}
-
+function configKey(scopeType, scopeId, module) { return `${scopeType}:${scopeId || '*'}:${module}`; }
 function mergeDeep(target = {}, source = {}) {
   const out = { ...target };
   for (const [key, value] of Object.entries(source || {})) {
-    if (value && typeof value === 'object' && !Array.isArray(value) && typeof out[key] === 'object' && !Array.isArray(out[key])) {
-      out[key] = mergeDeep(out[key], value);
-    } else {
-      out[key] = value;
-    }
+    if (value && typeof value === 'object' && !Array.isArray(value) && typeof out[key] === 'object' && !Array.isArray(out[key])) out[key] = mergeDeep(out[key], value);
+    else out[key] = value;
   }
   return out;
 }
-
 function roleIds(interaction) {
   const cache = interaction.member?.roles?.cache;
   if (cache?.values) return [...cache.values()].map(role => role.id);
   const raw = interaction.member?.roles;
-  if (Array.isArray(raw)) return raw;
-  return [];
+  return Array.isArray(raw) ? raw : [];
 }
 
 export function getRimuruConfig(module, context = {}) {
   let merged = {};
   let enabled = true;
-  const chain = [
-    ['global', null],
-    context.guildId ? ['guild', context.guildId] : null,
-    context.channelId ? ['channel', context.channelId] : null,
-    ...(context.roleIds || []).map(id => ['role', id])
-  ].filter(Boolean);
-
+  const chain = [['global', null], context.guildId ? ['guild', context.guildId] : null, context.channelId ? ['channel', context.channelId] : null, ...(context.roleIds || []).map(id => ['role', id])].filter(Boolean);
   for (const [scopeType, scopeId] of chain) {
     const doc = state.configs.get(configKey(scopeType, scopeId, module));
     if (!doc) continue;
@@ -77,53 +64,31 @@ function applyPayload(payload) {
   for (const doc of payload.configs || []) state.configs.set(configKey(doc.scope_type, doc.scope_id, doc.module), doc);
   for (const flag of payload.flags || []) state.flags.set(flag.key, flag);
   state.serverTime = payload.server_time || null;
-  state.lastSync = new Date().toISOString();
+  state.lastSync = payload.server_time || new Date().toISOString();
   state.ready = true;
 }
 
 async function request(url, init = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 4_500);
-  try {
-    return await fetch(url, {
-      ...init,
-      headers: { 'x-rimuru-token': TOKEN, 'Content-Type': 'application/json', ...(init.headers || {}) },
-      signal: controller.signal
-    });
-  } finally {
-    clearTimeout(timer);
-  }
+  try { return await fetch(url, { ...init, headers: { 'x-rimuru-token': TOKEN, 'Content-Type': 'application/json', ...(init.headers || {}) }, signal: controller.signal }); }
+  finally { clearTimeout(timer); }
 }
-
 async function acknowledge(actionId, status, result = {}) {
   if (!ENDPOINT || !TOKEN) return;
   await request(ENDPOINT, { method: 'POST', body: JSON.stringify({ action_id: actionId, status, result }) }).catch(() => {});
 }
-
 async function executeAction(client, action) {
   try {
     switch (action.action) {
-      case 'refresh_config':
-        state.lastSync = null;
-        break;
-      case 'set_presence': {
-        const text = String(action.payload?.text || 'Pale Ascendancy');
-        client.user?.setActivity(text.slice(0, 128));
-        break;
-      }
-      case 'clear_runtime_cache':
-        state.cooldowns.clear();
-        state.rateWindows.clear();
-        break;
-      default:
-        throw new Error(`unsupported_action:${action.action}`);
+      case 'refresh_config': state.lastSync = null; break;
+      case 'set_presence': client.user?.setActivity(String(action.payload?.text || 'Pale Ascendancy').slice(0, 128)); break;
+      case 'clear_runtime_cache': state.cooldowns.clear(); state.rateWindows.clear(); break;
+      default: throw new Error(`unsupported_action:${action.action}`);
     }
     await acknowledge(action.id, 'succeeded', { applied_at: new Date().toISOString() });
-  } catch (error) {
-    await acknowledge(action.id, 'failed', { message: String(error?.message || error).slice(0, 500) });
-  }
+  } catch (error) { await acknowledge(action.id, 'failed', { message: String(error?.message || error).slice(0, 500) }); }
 }
-
 async function sync(client, forceFull = false) {
   if (!ENDPOINT || !TOKEN || state.syncing) return;
   state.syncing = true;
@@ -136,44 +101,36 @@ async function sync(client, forceFull = false) {
     const payload = await response.json();
     applyPayload(payload);
     for (const action of payload.actions || []) await executeAction(client, action);
-  } catch (error) {
-    console.warn('[RIMURU-CONTROL] sync falhou:', error?.message || error);
-  } finally {
-    state.syncing = false;
-  }
+  } catch (error) { console.warn('[RIMURU-CONTROL] sync falhou:', error?.message || error); }
+  finally { state.syncing = false; }
 }
-
 function commandRule(interaction) {
   if (!interaction.isChatInputCommand?.()) return { enabled: true, config: {} };
-  const context = {
-    guildId: interaction.guildId,
-    channelId: interaction.channelId,
-    roleIds: roleIds(interaction)
-  };
-  return getRimuruConfig(`command.${interaction.commandName}`, context);
+  return getRimuruConfig(`command.${interaction.commandName}`, { guildId: interaction.guildId, channelId: interaction.channelId, roleIds: roleIds(interaction) });
 }
-
 function takeRate(key, limit, windowMs = 60_000) {
   if (!limit || limit <= 0) return true;
   const now = Date.now();
   const values = (state.rateWindows.get(key) || []).filter(ts => now - ts < windowMs);
-  if (values.length >= limit) {
-    state.rateWindows.set(key, values);
-    return false;
-  }
-  values.push(now);
-  state.rateWindows.set(key, values);
-  return true;
+  if (values.length >= limit) { state.rateWindows.set(key, values); return false; }
+  values.push(now); state.rateWindows.set(key, values); return true;
 }
 
 export async function rimuruControlGate(interaction) {
   if (!interaction?.inGuild?.() || !interaction.isChatInputCommand?.()) return true;
   if (blockedInteractions.has(interaction)) return false;
+  const context = { guildId: interaction.guildId, channelId: interaction.channelId, roleIds: roleIds(interaction) };
+  const core = getRimuruConfig('core', context);
 
-  const core = getRimuruConfig('core', { guildId: interaction.guildId, channelId: interaction.channelId, roleIds: roleIds(interaction) });
   if (core.config?.maintenance_mode === true) {
     blockedInteractions.add(interaction);
     if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '🛠️ O Rimuru está em manutenção rápida. Tente novamente em alguns instantes.', ephemeral: true }).catch(() => {});
+    return false;
+  }
+
+  if (core.config?.safe_mode === true && !interaction.memberPermissions?.has?.(PermissionFlagsBits.Administrator)) {
+    blockedInteractions.add(interaction);
+    if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '🛡️ O Rimuru está em Safe Mode. Apenas administradores podem executar comandos agora.', ephemeral: true }).catch(() => {});
     return false;
   }
 
@@ -181,6 +138,12 @@ export async function rimuruControlGate(interaction) {
   if (!rule.enabled || rule.config?.enabled === false) {
     blockedInteractions.add(interaction);
     if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '⛔ Este comando está temporariamente desativado.', ephemeral: true }).catch(() => {});
+    return false;
+  }
+
+  if (rule.config?.feature_flag && !isRimuruFeatureEnabled(String(rule.config.feature_flag), interaction.guildId)) {
+    blockedInteractions.add(interaction);
+    if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '🧪 Este recurso ainda não está liberado neste servidor.', ephemeral: true }).catch(() => {});
     return false;
   }
 
@@ -203,31 +166,20 @@ export async function rimuruControlGate(interaction) {
     if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '⚠️ Você atingiu o limite temporário deste comando.', ephemeral: true }).catch(() => {});
     return false;
   }
-
   const globalLimit = Number(rule.config?.global_rate_limit || 0);
   if (!takeRate(`g:${interaction.commandName}`, globalLimit)) {
     blockedInteractions.add(interaction);
     if (!interaction.replied && !interaction.deferred) await interaction.reply({ content: '⚠️ Este comando está com muita demanda. Tente novamente em instantes.', ephemeral: true }).catch(() => {});
     return false;
   }
-
   return true;
 }
 
 export function installRimuruControlPlane(client) {
   if (client.__rimuruControlInstalled) return;
   client.__rimuruControlInstalled = true;
-  client.rimuruControl = {
-    getConfig: getRimuruConfig,
-    isFeatureEnabled: isRimuruFeatureEnabled,
-    snapshot: () => ({ ready: state.ready, lastSync: state.lastSync, configs: state.configs.size, flags: state.flags.size })
-  };
-
-  if (!ENDPOINT || !TOKEN) {
-    console.warn('[RIMURU-CONTROL] desativado: endpoint/token ausentes.');
-    return;
-  }
-
+  client.rimuruControl = { getConfig: getRimuruConfig, isFeatureEnabled: isRimuruFeatureEnabled, snapshot: () => ({ ready: state.ready, lastSync: state.lastSync, configs: state.configs.size, flags: state.flags.size }) };
+  if (!ENDPOINT || !TOKEN) { console.warn('[RIMURU-CONTROL] desativado: endpoint/token ausentes.'); return; }
   client.once('clientReady', () => sync(client, true).catch(() => {}));
   setTimeout(() => sync(client, true).catch(() => {}), 2_500).unref?.();
   setInterval(() => sync(client, false).catch(() => {}), REFRESH_MS).unref?.();
