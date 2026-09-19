@@ -19,15 +19,19 @@ export function parseChapterSourceUrl(input: string): ChapterSource {
     throw new Error('Fonte ainda não suportada.');
   }
 
-  const match = url.pathname.match(/^\/obra\/(\d+)\/?$/);
+  const match = url.pathname.match(/^\/obra\/(\d+)(?:\/([a-z0-9%_-]+))?\/?$/i);
 
   if (!match) {
     throw new Error('URL de obra do MangásTop inválida.');
   }
 
+  const pathname = match[2]
+    ? `/obra/${match[1]}/${match[2]}`
+    : `/obra/${match[1]}`;
+
   return {
     source: 'mangastop',
-    profileUrl: `https://mangastop.net/obra/${match[1]}`,
+    profileUrl: `https://mangastop.net${pathname}`,
     externalWorkId: match[1],
   };
 }
