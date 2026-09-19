@@ -29,6 +29,20 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
   if (titleQuery) {
     try {
       sourceMatches = await searchMangaStopWorks(titleQuery);
+
+      const exactMatch = sourceMatches.find(
+        (match) => normalizeTitle(match.title) === normalizeTitle(titleQuery),
+      );
+
+      if (!sourceUrl && exactMatch) {
+        try {
+          inspection = await inspectCatalogSource(exactMatch.url, exactMatch.title);
+        } catch (error) {
+          inspectionError = error instanceof Error
+            ? error.message
+            : 'Não foi possível analisar a obra encontrada.';
+        }
+      }
     } catch {
       sourceSearchFailed = true;
     }
@@ -36,7 +50,10 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
 
   if (sourceUrl) {
     try {
-      inspection = await inspectCatalogSource(sourceUrl, titleHint || undefined);
+      inspection = await inspectCatalogSource(
+        sourceUrl,
+        titleHint || titleQuery || undefined,
+      );
     } catch (error) {
       inspectionError = error instanceof Error
         ? error.message
@@ -104,7 +121,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
                   {sourceMatches.map((match) => (
                     <a
                       className="admin-result-item"
-                      href={`/admin/catalog/new?source=${encodeURIComponent(match.url)}&titleHint=${encodeURIComponent(match.title)}`}
+                      href={`/admin/catalog/new?source=${encodeURIComponent(match.url)}&title=${encodeURIComponent(match.title)}&titleHint=${encodeURIComponent(match.title)}`}
                       key={match.url}
                     >
                       <span>
