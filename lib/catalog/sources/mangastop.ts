@@ -19,17 +19,33 @@ function stripTags(value: string): string {
   return decodeHtml(value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim());
 }
 
+function isGenericSiteTitle(value: string): boolean {
+  const normalized = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+
+  return normalized.includes('mangastop - ler mangas')
+    || normalized.includes('mangas top - ler mangas');
+}
+
 function extractTitle(html: string): string | null {
-  const heading = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
-  if (heading) {
-    const title = stripTags(heading);
-    if (title) return title;
+  for (const tag of ['h1', 'h2', 'h3']) {
+    const heading = html.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'))?.[1];
+
+    if (heading) {
+      const title = stripTags(heading);
+      if (title && !isGenericSiteTitle(title)) return title;
+    }
   }
 
   const openGraph = html.match(/<meta\b[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i)?.[1]
     ?? html.match(/<meta\b[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["'][^>]*>/i)?.[1];
 
-  return openGraph ? stripTags(openGraph) : null;
+  if (!openGraph) return null;
+
+  const title = stripTags(openGraph);
+  return title && !isGenericSiteTitle(title) ? title : null;
 }
 
 function extractChapters(html: string, baseUrl: string) {
@@ -116,7 +132,50 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
     throw new Error('A página da fonte excede o limite permitido.');
   }
 
-  const title = extractTitle(html);
+  let title = extractTitle(html);
+  let chapters = extractChapters(html, source.profileUrl);
+
+  const sourceUrl = new URL(source.profileUrl);
+  const slug = sourceUrl.pathname.match(/^\/obra\/\d+\/([^/]+)\/?$/i)?.[1] ?? null;
+
+  // A rota nova de obra pode devolver apenas o shell genérico no HTML do servidor.
+  // Quando isso acontece, a página pública de categoria da mesma obra é usada
+  // somente como fallback de metadados básicos e lista de capítulos.
+  if (slug && (!title || chapters.length === 0)) {
+    const legacyUrl = `https://mangastop.net/Categorias/${slug}/`;
+
+    try {
+      const legacyResponse = await fetch(legacyUrl, {
+        headers: {
+          Accept: 'text/html,application/xhtml+xml',
+          'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
+        },
+        redirect: 'manual',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+
+      if (legacyResponse.ok) {
+        const legacyType = legacyResponse.headers.get('content-type') ?? '';
+        const legacyLength = Number(legacyResponse.headers.get('content-length') ?? 0);
+
+        if (legacyType.includes('text/html') && legacyLength <= MAX_HTML_BYTES) {
+          const legacyHtml = await legacyResponse.text();
+
+          if (new TextEncoder().encode(legacyHtml).byteLength <= MAX_HTML_BYTES) {
+            title = title ?? extractTitle(legacyHtml);
+
+            if (chapters.length === 0) {
+              chapters = extractChapters(legacyHtml, legacyUrl);
+            }
+          }
+        }
+      }
+    } catch {
+      // O fallback legado é opcional; a análise principal continua abaixo.
+    }
+  }
+
   if (!title) {
     throw new Error('Não foi possível identificar o título da obra com segurança.');
   }
@@ -124,6 +183,6 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
   return {
     ...source,
     title,
-    chapters: extractChapters(html, source.profileUrl),
+    chapters,
   };
 }
