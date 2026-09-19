@@ -261,6 +261,71 @@ function extractDirectTitle(html: string): string | null {
   return null;
 }
 
+function findBestVisibleTitle(html: string, query: string): string | null {
+  const $ = cheerio.load(html);
+  const candidates = new Set<string>();
+
+  $('h1,h2,h3,h4,h5,h6').each((_, element) => {
+    const value = cleanText($(element).text());
+    if (value && !isGenericTitle(value)) candidates.add(value);
+  });
+
+  $('img[alt]').each((_, element) => {
+    const value = cleanText($(element).attr('alt') ?? '');
+    if (value && !isGenericTitle(value)) candidates.add(value);
+  });
+
+  $('[title]').each((_, element) => {
+    const value = cleanText($(element).attr('title') ?? '');
+    if (value && !isGenericTitle(value)) candidates.add(value);
+  });
+
+  let best: { title: string; score: number } | null = null;
+
+  for (const title of candidates) {
+    const score = titleSimilarity(query, title);
+
+    if (score >= 0.7 && (!best || score > best.score)) {
+      best = { title, score };
+    }
+  }
+
+  return best?.title ?? null;
+}
+
+async function scrapeVisibleTitle(query: string): Promise<string | null> {
+  const cleanQuery = cleanText(query);
+  if (!cleanQuery) return null;
+
+  const surfaces = [
+    `/?s=${encodeURIComponent(cleanQuery)}`,
+    `/?q=${encodeURIComponent(cleanQuery)}`,
+    '/',
+    '/page/2/',
+    '/page/3/',
+    '/page/4/',
+  ];
+
+  let best: { title: string; score: number } | null = null;
+
+  for (const path of surfaces) {
+    try {
+      const { html } = await fetchHtml(new URL(path, MANGASTOP_ORIGIN).href);
+      const title = findBestVisibleTitle(html, cleanQuery);
+      if (!title) continue;
+
+      const score = titleSimilarity(cleanQuery, title);
+      if (!best || score > best.score) best = { title, score };
+
+      if (normalizeTitle(title) === normalizeTitle(cleanQuery)) break;
+    } catch {
+      // Continua tentando outras superfícies públicas do próprio MangásTop.
+    }
+  }
+
+  return best?.title ?? null;
+}
+
 function extractDirectChapters(html: string, baseUrl: string): SourceChapter[] {
   const $ = cheerio.load(html);
   const chapters = new Map<string, SourceChapter>();
@@ -384,6 +449,10 @@ export async function scrapeMangaStopWork(
     if (best) {
       title = title ?? best.title;
       if (chapters.length === 0) chapters = best.chapters;
+    }
+
+    if (!title) {
+      title = await scrapeVisibleTitle(query);
     }
   }
 
