@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { normalizeTitle } from '../../../../lib/catalog/title-resolver';
-import { translateGenresPtBr } from '../../../../lib/catalog/translation';
+import { translateSynopsisPtBr } from '../../../../lib/catalog/translate-description';
+import { translateGenresPtBr, translateStatusPtBr } from '../../../../lib/catalog/translation';
 import { createClient } from '../../../../lib/supabase/server';
 import { saveCatalogWork } from './actions';
 import { SaveWorkButton } from './SaveWorkButton';
@@ -100,14 +101,26 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
     ? inspection.metadata.candidate
     : null;
 
-  const previewSynopsis = matchedMetadata?.description
-    ?.replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .trim() ?? null;
+  let previewSynopsis: string | null = null;
+
+  if (matchedMetadata?.description) {
+    previewSynopsis = await translateSynopsisPtBr(matchedMetadata.description);
+
+    if (!previewSynopsis) {
+      previewSynopsis = matchedMetadata.description
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .trim() || null;
+    }
+  }
 
   const previewGenres = matchedMetadata
     ? translateGenresPtBr(matchedMetadata.genres)
     : [];
+
+  const previewStatus = matchedMetadata
+    ? translateStatusPtBr(matchedMetadata.status)
+    : null;
 
   return (
     <section className="admin-page">
@@ -293,10 +306,10 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
                         </div>
                       ) : null}
 
-                      {matchedMetadata?.status ? (
+                      {previewStatus ? (
                         <div>
                           <dt>Status</dt>
-                          <dd>{matchedMetadata.status}</dd>
+                          <dd>{previewStatus}</dd>
                         </div>
                       ) : null}
                     </dl>
