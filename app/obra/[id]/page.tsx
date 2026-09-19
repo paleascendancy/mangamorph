@@ -23,7 +23,7 @@ export default async function PublicWorkPage({ params }: PageProps) {
       .select('id, external_id, chapter_number, title, source_url')
       .eq('work_id', id)
       .order('chapter_number', { ascending: false })
-      .limit(100),
+      .limit(500),
     supabase
       .from('catalog_metadata_links')
       .select('id, provider, external_id, profile_url, is_primary')
@@ -106,9 +106,9 @@ export default async function PublicWorkPage({ params }: PageProps) {
           ) : (
             <div className="work-profile-chapters">
               {(chapters ?? []).map((chapter) => (
-                <a href={chapter.source_url} target="_blank" rel="noreferrer" key={chapter.id}>
+                <a href={`/obra/${work.id}/capitulo/${chapter.id}`} key={chapter.id}>
                   <span>{chapter.title}</span>
-                  <small>Abrir na fonte</small>
+                  <small>Ler no MangaMorph</small>
                 </a>
               ))}
             </div>
