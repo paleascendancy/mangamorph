@@ -139,7 +139,7 @@ function chapterFromAnchor(
 
 function collectChaptersAround(
   $: cheerio.CheerioAPI,
-  element: cheerio.Element,
+  element: Parameters<cheerio.CheerioAPI>[0],
   baseUrl: string,
 ): SourceChapter[] {
   const chapters = new Map<string, SourceChapter>();
@@ -172,7 +172,7 @@ function collectChaptersAround(
 
 function titleNearAnchor(
   $: cheerio.CheerioAPI,
-  anchor: cheerio.Element,
+  anchor: Parameters<cheerio.CheerioAPI>[0],
 ): string | null {
   const link = $(anchor);
   const direct = [
