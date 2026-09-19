@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { requireAdmin } from '../../../../lib/admin/require-admin';
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { translateSynopsisPtBr } from '../../../../lib/catalog/translate-description';
-import { translateGenresPtBr } from '../../../../lib/catalog/translation';
+import { translateGenresPtBr, translateStatusPtBr } from '../../../../lib/catalog/translation';
 import type { SourceChapter } from '../../../../lib/catalog/types';
 import { createClient } from '../../../../lib/supabase/server';
 
@@ -91,7 +91,7 @@ export async function saveCatalogWork(formData: FormData) {
           genresPtBr: translateGenresPtBr(matchedMetadata.genres),
           authors: matchedMetadata.authors,
           artists: matchedMetadata.artists,
-          status: matchedMetadata.status,
+          status: translateStatusPtBr(matchedMetadata.status),
           countryOrigin: matchedMetadata.countryOfOrigin,
           coverUrl: matchedMetadata.coverUrl,
           bannerUrl: matchedMetadata.bannerUrl,
