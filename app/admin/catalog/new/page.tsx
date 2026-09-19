@@ -1,6 +1,7 @@
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { normalizeTitle } from '../../../../lib/catalog/title-resolver';
-export const maxDuration = 30;
+import { saveCatalogWork } from './actions';
+export const maxDuration = 60;
 
 import {
   searchMangaStopWorks,
@@ -13,6 +14,7 @@ type PageProps = {
     title?: string;
     chapter?: string;
     titleHint?: string;
+    error?: string;
   }>;
 };
 
@@ -22,6 +24,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
   const titleQuery = typeof params.title === 'string' ? params.title.trim() : '';
   const chapterQuery = typeof params.chapter === 'string' ? params.chapter.trim() : '';
   const titleHint = typeof params.titleHint === 'string' ? params.titleHint.trim() : '';
+  const saveError = typeof params.error === 'string' ? params.error : '';
 
   let inspection: Awaited<ReturnType<typeof inspectCatalogSource>> | null = null;
   let inspectionError: string | null = null;
@@ -164,6 +167,18 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
           </div>
         )}
 
+        {saveError && (
+          <div className="admin-feedback" role="status">
+            <strong>Não foi possível salvar.</strong>
+            <span>
+              {saveError === 'already-exists' && 'Essa obra já está cadastrada no MangaMorph.'}
+              {saveError === 'inspect-before-save' && 'A fonte mudou ou não pôde ser analisada novamente antes de salvar.'}
+              {saveError === 'missing-source' && 'Informe a fonte da obra.'}
+              {!['already-exists', 'inspect-before-save', 'missing-source'].includes(saveError) && 'Tente novamente após revisar os dados da obra.'}
+            </span>
+          </div>
+        )}
+
         {inspection && (
           <section className="admin-inspection" aria-labelledby="inspection-title">
             <div className="admin-inspection-heading">
@@ -203,6 +218,34 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
                 Foram encontrados {inspection.metadata.candidates.length} candidatos. Nenhum será associado automaticamente até existir uma etapa de revisão.
               </div>
             )}
+
+            <form action={saveCatalogWork} className="admin-save-work">
+              <input type="hidden" name="source" value={inspection.source.profileUrl} />
+              <input type="hidden" name="titleHint" value={inspection.source.title} />
+
+              <div>
+                <span className="admin-card-label">Sincronização</span>
+                <h3>Salvar obra no MangaMorph</h3>
+                <p>
+                  Ao salvar, entra primeiro o capítulo inicial disponível. Enquanto o catálogo estiver sendo alcançado,
+                  a sincronização começa em 3 minutos e desacelera automaticamente conforme o progresso.
+                </p>
+              </div>
+
+              <label htmlFor="syncMode">
+                Depois de alcançar a fonte
+                <select id="syncMode" name="syncMode" defaultValue="1h">
+                  <option value="5m">A cada 5 minutos</option>
+                  <option value="30m">A cada 30 minutos</option>
+                  <option value="1h">A cada 1 hora</option>
+                  <option value="7d">A cada 7 dias</option>
+                </select>
+              </label>
+
+              <button className="admin-primary-action" type="submit">
+                Salvar obra e iniciar sincronização
+              </button>
+            </form>
 
             <div className="admin-chapter-search">
               <div>
