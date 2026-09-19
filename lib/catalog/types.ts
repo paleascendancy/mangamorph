@@ -32,6 +32,9 @@ export type MetadataCandidate = {
   countryOfOrigin: string | null;
   status: string | null;
   genres: string[];
+  authors: string[];
+  artists: string[];
+  profileUrl: string | null;
   linkedIds: Partial<Record<MetadataProvider, string>>;
 };
 
