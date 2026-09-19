@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { resolveMetadata } from '../../../../lib/catalog/resolve-metadata';
 import { fetchMangasTopWork } from '../../../../lib/catalog/sources/mangastop';
+import { translateSynopsisPtBr } from '../../../../lib/catalog/translate-description';
 import { translateGenresPtBr } from '../../../../lib/catalog/translation';
 
 export const maxDuration = 60;
@@ -72,6 +73,16 @@ export async function POST(request: Request) {
 
     if (metadataDecision.status === 'matched') {
       const metadata = metadataDecision.candidate;
+      let synopsisPtBr: string | null = null;
+
+      try {
+        synopsisPtBr = await translateSynopsisPtBr(metadata.description);
+      } catch (error) {
+        console.warn('[MangaMorph sync] synopsis translation failed', {
+          sourceId: job.source_id,
+          message: error instanceof Error ? error.message : 'unknown',
+        });
+      }
 
       const { error: metadataError } = await supabase.rpc(
         'apply_catalog_sync_metadata',
@@ -82,7 +93,7 @@ export async function POST(request: Request) {
             externalId: metadata.externalId,
             profileUrl: metadata.profileUrl,
             synopsisOriginal: metadata.description,
-            synopsisPtBr: null,
+            synopsisPtBr,
             genresOriginal: metadata.genres,
             genresPtBr: translateGenresPtBr(metadata.genres),
             authors: metadata.authors,
