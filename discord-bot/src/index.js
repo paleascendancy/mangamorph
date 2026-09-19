@@ -45,6 +45,12 @@ const normalize = (value = '') => value
   .toLowerCase()
   .replace(/[^a-z0-9]/g, '');
 
+function userIdentity(user, member = null) {
+  const displayName = member?.displayName || user.globalName || user.username;
+  const username = user.username ? `@${user.username}` : 'sem username';
+  return `${displayName} (${username}) • ID: ${user.id}`;
+}
+
 const TICKET_REASONS = {
   tecnico: { label: 'Problema técnico', emoji: '🛠️' },
   obra: { label: 'Obra ou capítulo', emoji: '📚' },
@@ -632,7 +638,7 @@ async function createTicket(interaction, reasonKey) {
     .setTitle(`${reason.emoji} ${reason.label}`)
     .setDescription(
       reasonKey === 'candidatura'
-        ? `${user}, sua candidatura foi recebida. A equipe poderá conversar com você por este canal durante a análise.`
+        ? `${interaction.member?.displayName || user.globalName || user.username}, sua candidatura foi recebida. A equipe poderá conversar com você por este canal durante a análise.`
         : `${user}, seu atendimento foi aberto. Explique o que aconteceu e envie as informações necessárias para a equipe analisar.\n\nA conversa deste canal é privada entre você e a equipe do MangaMorph.`
     )
     .addFields(
@@ -646,7 +652,7 @@ async function createTicket(interaction, reasonKey) {
   await channel.send({ content: `${user}`, embeds: [embed], components: [actions] });
   await interaction.reply({ content: `${reasonKey === 'candidatura' ? 'Candidatura' : 'Ticket'} criado: ${channel}`, ephemeral: true });
 
-  await sendLog(guild, reasonKey === 'candidatura' ? 'Nova candidatura' : 'Ticket aberto', `${user} abriu ${channel}.`, [
+  await sendLog(guild, reasonKey === 'candidatura' ? 'Nova candidatura' : 'Ticket aberto', `${userIdentity(user, interaction.member)} abriu ${channel}.`, [
     { name: 'Motivo', value: reason.label, inline: true },
     { name: 'Canal', value: `${channel}`, inline: true }
   ]);
