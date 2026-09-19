@@ -3,6 +3,7 @@ import { parseChapterSourceUrl } from '../source-url';
 
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_HTML_BYTES = 2_000_000;
+const MAX_REDIRECTS = 3;
 
 function decodeHtml(value: string): string {
   return value
@@ -38,7 +39,7 @@ function extractChapters(html: string, baseUrl: string) {
   for (const match of html.matchAll(anchorPattern)) {
     const href = decodeHtml(match[1]);
     const label = stripTags(match[2]);
-    const chapterMatch = label.match(/cap(?:í|i)tulo\s*([0-9]+(?:\.[0-9]+)?)/i);
+    const chapterMatch = label.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
 
     if (!chapterMatch) continue;
 
@@ -65,18 +66,39 @@ function extractChapters(html: string, baseUrl: string) {
 export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWorkSnapshot> {
   const source = parseChapterSourceUrl(profileUrl);
 
-  const response = await fetch(source.profileUrl, {
-    headers: {
-      Accept: 'text/html,application/xhtml+xml',
-      'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
-    },
-    redirect: 'error',
-    cache: 'no-store',
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let currentUrl = source.profileUrl;
+  let response: Response | null = null;
 
-  if (!response.ok) {
-    throw new Error(`MangásTop respondeu com status ${response.status}.`);
+  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+    response = await fetch(currentUrl, {
+      headers: {
+        Accept: 'text/html,application/xhtml+xml',
+        'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
+      },
+      redirect: 'manual',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+
+    if (![301, 302, 303, 307, 308].includes(response.status)) break;
+
+    const location = response.headers.get('location');
+    if (!location || redirectCount === MAX_REDIRECTS) {
+      throw new Error('A fonte excedeu o limite seguro de redirecionamentos.');
+    }
+
+    const nextUrl = new URL(location, currentUrl);
+    const nextSource = parseChapterSourceUrl(nextUrl.href);
+
+    if (nextSource.externalWorkId !== source.externalWorkId) {
+      throw new Error('A fonte tentou redirecionar para outra obra.');
+    }
+
+    currentUrl = nextSource.profileUrl;
+  }
+
+  if (!response?.ok) {
+    throw new Error(`MangásTop respondeu com status ${response?.status ?? 'desconhecido'}.`);
   }
 
   const contentType = response.headers.get('content-type') ?? '';
