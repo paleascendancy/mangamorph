@@ -3,7 +3,7 @@ import Image from 'next/image';
 export type HomeWork = {
   id: string;
   title: string;
-  coverUrl: string;
+  coverUrl?: string;
   href: string;
 };
 
@@ -31,7 +31,9 @@ function WorkSection({ id, eyebrow, title, works }: WorkSectionProps) {
           <article className="work-card" key={work.id}>
             <a className="work-card-link" href={work.href} aria-label={work.title}>
               <div className="work-card-cover">
-                <Image src={work.coverUrl} alt={`Capa de ${work.title}`} fill sizes="(max-width: 560px) 42vw, (max-width: 900px) 28vw, 210px" />
+                {work.coverUrl ? (
+                  <Image src={work.coverUrl} alt={`Capa de ${work.title}`} fill sizes="(max-width: 560px) 42vw, (max-width: 900px) 28vw, 210px" />
+                ) : null}
               </div>
               <h3 className="work-card-title">{work.title}</h3>
             </a>
