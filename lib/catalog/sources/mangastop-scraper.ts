@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import type { SourceChapter } from '../types';
 import { parseChapterSourceUrl } from '../source-url';
 import { normalizeTitle, titleSimilarity } from '../title-resolver';
+import { scrapeMangaStopWithBrowser } from './mangastop-browser';
 
 const MANGASTOP_ORIGIN = 'https://mangastop.net';
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -456,9 +457,30 @@ export async function scrapeMangaStopWork(
     }
   }
 
+  let canonicalUrl = safeSourceUrl(finalUrl) ?? source.profileUrl;
+
+  if (!title || chapters.length === 0) {
+    try {
+      const browserResult = await scrapeMangaStopWithBrowser(source.profileUrl, titleHint);
+
+      title = title ?? browserResult.title;
+
+      if (chapters.length === 0 && browserResult.chapters.length > 0) {
+        chapters = browserResult.chapters;
+      }
+
+      canonicalUrl = safeSourceUrl(browserResult.finalUrl) ?? canonicalUrl;
+    } catch (error) {
+      console.warn('[MangaMorph scraper] browser fallback failed', {
+        externalWorkId: source.externalWorkId,
+        message: error instanceof Error ? error.message : 'unknown',
+      });
+    }
+  }
+
   return {
     title,
     chapters,
-    canonicalUrl: safeSourceUrl(finalUrl) ?? source.profileUrl,
+    canonicalUrl,
   };
 }
