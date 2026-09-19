@@ -1,5 +1,11 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '../../../../lib/supabase/server';
+import {
+  restoreAutomaticMetadata,
+  syncCatalogNow,
+  updateCatalogSyncMode,
+  updateCatalogWork,
+} from './actions';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -94,6 +100,25 @@ export default async function CatalogWorkAdminPage({ params }: PageProps) {
                 <span>{source.last_error}</span>
               </div>
             )}
+
+            <div className="admin-sync-actions">
+              <form action={updateCatalogSyncMode}>
+                <input type="hidden" name="workId" value={work.id} />
+                <label htmlFor="syncMode">Modo após alcançar a fonte</label>
+                <select id="syncMode" name="syncMode" defaultValue={source.sync_mode}>
+                  <option value="5m">A cada 5 minutos</option>
+                  <option value="30m">A cada 30 minutos</option>
+                  <option value="1h">A cada 1 hora</option>
+                  <option value="7d">A cada 7 dias</option>
+                </select>
+                <button className="admin-secondary-action" type="submit">Atualizar modo</button>
+              </form>
+
+              <form action={syncCatalogNow}>
+                <input type="hidden" name="workId" value={work.id} />
+                <button className="admin-primary-action" type="submit">Sincronizar agora</button>
+              </form>
+            </div>
           </article>
 
           <article className="admin-card">
@@ -125,6 +150,72 @@ export default async function CatalogWorkAdminPage({ params }: PageProps) {
             </div>
           </article>
         </div>
+
+        <section className="admin-inspection">
+          <div className="admin-inspection-heading">
+            <span className="admin-card-label">Informações editáveis</span>
+            <h2>Perfil da obra</h2>
+          </div>
+
+          <form action={updateCatalogWork} className="admin-metadata-form">
+            <input type="hidden" name="workId" value={work.id} />
+
+            <label>
+              Título
+              <input name="title" defaultValue={work.title} required />
+            </label>
+
+            <label>
+              Sinopse em português
+              <textarea name="synopsisPtBr" defaultValue={work.synopsis_pt_br ?? ''} rows={7} />
+            </label>
+
+            <label>
+              Gêneros em português
+              <input name="genresPtBr" defaultValue={(work.genres_pt_br ?? []).join(', ')} />
+            </label>
+
+            <label>
+              Autores
+              <input name="authors" defaultValue={(work.authors ?? []).join(', ')} />
+            </label>
+
+            <label>
+              Artistas
+              <input name="artists" defaultValue={(work.artists ?? []).join(', ')} />
+            </label>
+
+            <label>
+              Status
+              <input name="status" defaultValue={work.status ?? ''} />
+            </label>
+
+            <label>
+              Capa
+              <input name="coverUrl" type="url" defaultValue={work.cover_url ?? ''} />
+            </label>
+
+            <label>
+              Banner
+              <input name="bannerUrl" type="url" defaultValue={work.banner_url ?? ''} />
+            </label>
+
+            <p className="admin-result-note">
+              Ao salvar manualmente, esses campos ficam protegidos contra sobrescrita automática.
+            </p>
+
+            <button className="admin-primary-action" type="submit">Salvar alterações</button>
+          </form>
+
+          {work.locked_fields?.length > 0 && (
+            <form action={restoreAutomaticMetadata} className="admin-restore-form">
+              <input type="hidden" name="workId" value={work.id} />
+              <button className="admin-secondary-action" type="submit">
+                Voltar metadados para atualização automática
+              </button>
+            </form>
+          )}
+        </section>
 
         <section className="admin-inspection">
           <div className="admin-inspection-heading">
