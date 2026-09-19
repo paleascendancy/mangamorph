@@ -129,8 +129,18 @@ export async function scrapeMangaStopWithBrowser(
     ).catch(() => undefined);
 
     await page.evaluate(async () => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      let previousHeight = 0;
+
+      for (let index = 0; index < 8; index += 1) {
+        const currentHeight = document.body.scrollHeight;
+
+        window.scrollTo({ top: currentHeight, behavior: 'auto' });
+        await new Promise((resolve) => setTimeout(resolve, 350));
+
+        if (currentHeight === previousHeight) break;
+        previousHeight = currentHeight;
+      }
+
       window.scrollTo({ top: 0, behavior: 'auto' });
     });
 
@@ -154,32 +164,60 @@ export async function scrapeMangaStopWithBrowser(
         document.title,
       ].filter(Boolean);
 
-      const chapters = Array.from(document.querySelectorAll<HTMLElement>('a[href],button,[role="button"],li,div'))
-        .map((element) => {
-          const label = (
-            element.textContent
-            || element.getAttribute('title')
-            || element.getAttribute('aria-label')
-            || ''
-          ).replace(/\s+/g, ' ').trim();
+      const chapterPattern = /cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i;
+      const chapterCandidates: Array<{ externalId: string; title: string; url: string }> = [];
+      const seen = new Set<string>();
 
-          const match = label.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
-          if (!match) return null;
+      const addChapter = (anchor: HTMLAnchorElement, rawLabel: string) => {
+        const label = rawLabel.replace(/\s+/g, ' ').trim();
+        const match = label.match(chapterPattern);
 
-          const anchor = element.matches('a[href]')
-            ? element as HTMLAnchorElement
-            : element.closest('a[href]') as HTMLAnchorElement | null
-              ?? element.querySelector('a[href]') as HTMLAnchorElement | null;
+        if (!match || !anchor.href) return;
 
-          if (!anchor?.href) return null;
+        const externalId = match[1];
+        const key = `${anchor.href}::${externalId}`;
+        if (seen.has(key)) return;
 
-          return {
-            externalId: match[1],
-            title: label,
-            url: anchor.href,
-          };
-        })
-        .filter((value): value is { externalId: string; title: string; url: string } => Boolean(value));
+        seen.add(key);
+
+        chapterCandidates.push({
+          externalId,
+          title: `Capítulo ${externalId}`,
+          url: anchor.href,
+        });
+      };
+
+      // 1) Preferimos links que já representam uma linha de capítulo.
+      for (const anchor of Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href]'))) {
+        const label = (
+          anchor.textContent
+          || anchor.getAttribute('title')
+          || anchor.getAttribute('aria-label')
+          || ''
+        ).replace(/\s+/g, ' ').trim();
+
+        if (!chapterPattern.test(label)) continue;
+        addChapter(anchor, label);
+      }
+
+      // 2) Fallback para interfaces em que o texto fica fora do <a>, mas ainda
+      // pertence a uma única linha. Ignoramos containers que agregam vários capítulos.
+      for (const element of Array.from(
+        document.querySelectorAll<HTMLElement>('li,[role="listitem"],tr,article,section,div'),
+      )) {
+        const label = (element.textContent ?? '').replace(/\s+/g, ' ').trim();
+        const occurrences = label.match(/cap(?:[íi]tulo|\.)?\s*[0-9]+(?:\.[0-9]+)?/gi) ?? [];
+
+        if (occurrences.length !== 1 || label.length > 220) continue;
+
+        const anchor = element.closest('a[href]') as HTMLAnchorElement | null
+          ?? element.querySelector('a[href]') as HTMLAnchorElement | null;
+
+        if (!anchor?.href) continue;
+        addChapter(anchor, label);
+      }
+
+      const chapters = chapterCandidates;
 
       return { titleCandidates, chapters };
     });
