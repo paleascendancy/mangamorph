@@ -217,3 +217,14 @@ button, input { font: inherit; } button, a { color: inherit; } button { -webkit-
   .admin-chapter-search form { grid-template-columns:1fr; }
   .admin-secondary-action { width:100%; }
 }
+
+
+/* ADMIN SYNC */
+.admin-save-work { margin-top:24px; padding:20px; display:grid; gap:18px; border:1px solid var(--border-subtle); border-radius:18px; background:var(--bg-elevated); }
+.admin-save-work h3 { margin:7px 0 8px; font-family:var(--font-display); font-size:18px; }
+.admin-save-work p { margin:0; color:var(--text-secondary); font-size:13px; line-height:1.6; }
+.admin-save-work label { display:grid; gap:8px; color:var(--text-secondary); font-size:13px; font-weight:500; }
+.admin-save-work select { height:44px; padding:0 12px; border:1px solid var(--border-default); border-radius:12px; outline:none; background:var(--bg-base); color:var(--text-primary); font:inherit; }
+.admin-save-work select:focus-visible { border-color:var(--brand-primary); box-shadow:0 0 0 3px rgba(66,134,203,.22); }
+.admin-grid-single { grid-template-columns:1fr; }
+.admin-feedback { display:grid; gap:5px; }
