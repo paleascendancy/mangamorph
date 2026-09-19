@@ -85,25 +85,23 @@ export async function POST(request: Request) {
       }
 
       const { error: metadataError } = await supabase.rpc(
-        'apply_catalog_sync_metadata',
+        'apply_catalog_sync_metadata_v2',
         {
           p_token: token,
-          p_metadata: {
-            provider: metadata.provider,
-            externalId: metadata.externalId,
-            profileUrl: metadata.profileUrl,
-            synopsisOriginal: metadata.description,
-            synopsisPtBr,
-            genresOriginal: metadata.genres,
-            genresPtBr: translateGenresPtBr(metadata.genres),
-            authors: metadata.authors,
-            artists: metadata.artists,
-            status: metadata.status,
-            countryOrigin: metadata.countryOfOrigin,
-            coverUrl: metadata.coverUrl,
-            bannerUrl: metadata.bannerUrl,
-            myAnimeListId: metadata.linkedIds.myanimelist ?? null,
-          },
+          p_provider: metadata.provider,
+          p_external_id: metadata.externalId,
+          p_profile_url: metadata.profileUrl,
+          p_synopsis_original: metadata.description,
+          p_synopsis_pt_br: synopsisPtBr,
+          p_genres_original: metadata.genres,
+          p_genres_pt_br: translateGenresPtBr(metadata.genres),
+          p_authors: metadata.authors,
+          p_artists: metadata.artists,
+          p_status: metadata.status,
+          p_country_origin: metadata.countryOfOrigin,
+          p_cover_url: metadata.coverUrl,
+          p_banner_url: metadata.bannerUrl,
+          p_myanimelist_id: metadata.linkedIds.myanimelist ?? null,
         },
       );
 
