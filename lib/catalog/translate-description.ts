@@ -67,7 +67,10 @@ export async function translateSynopsisPtBr(text: string | null): Promise<string
 
   try {
     const deepL = await translateWithDeepL(sourceText);
-    if (deepL) return deepL;
+    if (deepL) {
+      console.info('[MangaMorph translation] completed', { provider: 'deepl' });
+      return deepL;
+    }
   } catch (error) {
     console.warn('[MangaMorph translation] DeepL failed', {
       message: error instanceof Error ? error.message : 'unknown',
@@ -75,7 +78,13 @@ export async function translateSynopsisPtBr(text: string | null): Promise<string
   }
 
   try {
-    return await translateWithAiGateway(sourceText);
+    const translated = await translateWithAiGateway(sourceText);
+
+    if (translated) {
+      console.info('[MangaMorph translation] completed', { provider: 'vercel-ai-gateway' });
+    }
+
+    return translated;
   } catch (error) {
     console.warn('[MangaMorph translation] AI Gateway failed', {
       message: error instanceof Error ? error.message : 'unknown',
