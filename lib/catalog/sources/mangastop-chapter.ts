@@ -33,9 +33,14 @@ function isPrivateHostname(hostname: string): boolean {
     || host.endsWith('.local')
     || host.endsWith('.internal')
     || host === '::1'
-    || host.startsWith('fc')
-    || host.startsWith('fd')
-    || host.startsWith('fe80:')
+    || (
+      host.includes(':')
+      && (
+        host.startsWith('fc')
+        || host.startsWith('fd')
+        || host.startsWith('fe80:')
+      )
+    )
   ) {
     return true;
   }
@@ -55,6 +60,8 @@ function isPrivateHostname(hostname: string): boolean {
     || (a === 169 && b === 254)
     || (a === 172 && b >= 16 && b <= 31)
     || (a === 192 && b === 168)
+    || (a === 100 && b >= 64 && b <= 127)
+    || (a === 198 && (b === 18 || b === 19))
     || a === 0
   );
 }
