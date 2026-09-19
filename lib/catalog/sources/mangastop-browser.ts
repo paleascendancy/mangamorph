@@ -358,26 +358,43 @@ export async function scrapeMangaStopWithBrowser(
         element?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
       const primaryHeading = document.querySelector('main h1, article h1, h1');
-      const structuralAliases: string[] = [];
+      const structuralAliases = new Set<string>();
+      const ignoredUi = /^(escolher status|cap[ií]tulos|coment[aá]rios|arte|relacionados?|autor|artist|genres?|publication|publica[cç][aã]o|ver mais)$/i;
+
+      const considerAlias = (value: string) => {
+        const clean = value.replace(/\s+/g, ' ').trim();
+
+        if (
+          clean.length >= 3
+          && clean.length <= 140
+          && !ignoredUi.test(clean)
+          && !/^cap(?:[íi]tulo|\.)?\s*\d+/i.test(clean)
+        ) {
+          structuralAliases.add(clean);
+        }
+      };
 
       if (primaryHeading) {
+        considerAlias(textOf(primaryHeading));
+
         let sibling = primaryHeading.nextElementSibling;
 
-        for (let index = 0; sibling && index < 4; index += 1, sibling = sibling.nextElementSibling) {
-          const value = textOf(sibling);
+        for (let index = 0; sibling && index < 8; index += 1, sibling = sibling.nextElementSibling) {
+          considerAlias(textOf(sibling));
+        }
 
-          if (
-            value.length >= 3
-            && value.length <= 140
-            && !/^(escolher status|cap[ií]tulos|coment[aá]rios|arte|relacionados?)$/i.test(value)
-          ) {
-            structuralAliases.push(value);
+        let container: Element | null = primaryHeading.parentElement;
+
+        for (let depth = 0; container && depth < 3; depth += 1, container = container.parentElement) {
+          for (const element of Array.from(
+            container.querySelectorAll('h2,h3,p,span,[class*="subtitle"],[class*="alternative"],[class*="alias"]'),
+          )) {
+            considerAlias(textOf(element));
           }
         }
       }
 
       const titleCandidates = [
-        textOf(primaryHeading),
         ...structuralAliases,
         document.querySelector('meta[property="og:title"]')?.getAttribute('content') ?? '',
         document.querySelector('meta[name="twitter:title"]')?.getAttribute('content') ?? '',
@@ -513,6 +530,7 @@ export async function scrapeMangaStopWithBrowser(
       networkChapterCount: networkChapters.length,
       visibleChapterCount: scrolledChapterNumbers.length,
       synthesizedChapterCount: synthesizedChapters.length,
+      alternativeTitles,
     });
 
     return {
