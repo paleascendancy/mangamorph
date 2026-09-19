@@ -57,6 +57,10 @@ function pickBestTitle(candidates: string[], query: string | null): string | nul
   return best && best.score >= 0.55 ? best.title : null;
 }
 
+function readerSlugFromTitle(title: string): string {
+  return normalizeTitle(title).replace(/\s+/g, '-');
+}
+
 function chapterIdFromRecord(record: Record<string, unknown>): string | null {
   const directKeys = [
     'chapter',
@@ -307,20 +311,36 @@ export async function scrapeMangaStopWithBrowser(
       { timeout: 7000 },
     ).catch(() => undefined);
 
-    await page.evaluate(async () => {
+    const scrolledChapterNumbers = await page.evaluate(async () => {
+      const found = new Set<string>();
       let previousHeight = 0;
 
-      for (let index = 0; index < 12; index += 1) {
-        const currentHeight = document.body.scrollHeight;
+      const captureVisibleChapters = () => {
+        const text = document.body.innerText;
+        const pattern = /cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/gi;
 
+        for (const match of text.matchAll(pattern)) {
+          if (match[1]) found.add(match[1]);
+        }
+      };
+
+      for (let index = 0; index < 20; index += 1) {
+        captureVisibleChapters();
+
+        const currentHeight = document.body.scrollHeight;
         window.scrollTo({ top: currentHeight, behavior: 'auto' });
+
         await new Promise((resolve) => setTimeout(resolve, 450));
+        captureVisibleChapters();
 
         if (currentHeight === previousHeight) break;
         previousHeight = currentHeight;
       }
 
       window.scrollTo({ top: 0, behavior: 'auto' });
+      captureVisibleChapters();
+
+      return [...found];
     });
 
     await new Promise((resolve) => setTimeout(resolve, 700));
@@ -454,8 +474,25 @@ export async function scrapeMangaStopWithBrowser(
     )].slice(0, 6);
     const chapters = new Map<string, SourceChapter>();
     const networkChapters = collectNetworkChapterCandidates(networkPayloads, finalUrl);
+    const synthesizedChapters: SourceChapter[] = [];
 
-    for (const chapter of [...snapshot.chapters, ...networkChapters]) {
+    if (title) {
+      const readerSlug = readerSlugFromTitle(title);
+
+      for (const externalId of scrolledChapterNumbers) {
+        synthesizedChapters.push({
+          externalId,
+          title: `Capítulo ${externalId}`,
+          url: `https://mangastop.net/${readerSlug}-capitulo-${externalId}/`,
+        });
+      }
+    }
+
+    for (const chapter of [
+      ...snapshot.chapters,
+      ...networkChapters,
+      ...synthesizedChapters,
+    ]) {
       try {
         const url = new URL(chapter.url);
 
@@ -474,6 +511,8 @@ export async function scrapeMangaStopWithBrowser(
       chapterCount: chapters.size,
       networkPayloadCount: networkPayloads.length,
       networkChapterCount: networkChapters.length,
+      visibleChapterCount: scrolledChapterNumbers.length,
+      synthesizedChapterCount: synthesizedChapters.length,
     });
 
     return {
