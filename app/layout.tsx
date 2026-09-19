@@ -10,8 +10,8 @@ export const metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const userId = data?.claims?.sub;
+  const { data } = await supabase.auth.getUser();
+  const userId = data.user?.id;
 
   let role: 'user' | 'admin' | null = null;
 
