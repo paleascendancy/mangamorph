@@ -1,5 +1,6 @@
 import type { SourceWorkSnapshot } from '../types';
 import { parseChapterSourceUrl } from '../source-url';
+import { searchMangaStopChapters } from './mangastop-search';
 
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_HTML_BYTES = 2_000_000;
@@ -105,7 +106,7 @@ function isSafeWorkRedirect(
   );
 }
 
-export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWorkSnapshot> {
+export async function fetchMangasTopWork(profileUrl: string, titleHint?: string): Promise<SourceWorkSnapshot> {
   const source = parseChapterSourceUrl(profileUrl);
   let resolvedSource = source;
 
@@ -163,6 +164,10 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
   let title = extractTitle(html);
   let chapters = extractChapters(html, currentUrl);
 
+  if ((!title || isGenericSiteTitle(title)) && titleHint?.trim()) {
+    title = titleHint.trim();
+  }
+
   const slug = getSourceSlug(resolvedSource.profileUrl);
 
   // A rota nova de obra pode devolver apenas o shell genérico no HTML do servidor.
@@ -205,6 +210,14 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
 
   if (!title) {
     throw new Error('Não foi possível identificar o título da obra com segurança.');
+  }
+
+  if (chapters.length === 0) {
+    try {
+      chapters = await searchMangaStopChapters(title);
+    } catch {
+      // A busca por capítulos é fallback; a obra ainda pode ser analisada sem capítulos.
+    }
   }
 
   return {
