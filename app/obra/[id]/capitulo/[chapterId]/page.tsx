@@ -13,12 +13,17 @@ export default async function MangaMorphChapterPage({ params }: PageProps) {
   const { id, chapterId } = await params;
   const supabase = await createClient();
 
-  const [{ data: work }, { data: chapter }, { data: chapterList }] = await Promise.all([
+  const [{ data: work }, { data: source }, { data: chapter }, { data: chapterList }] = await Promise.all([
     supabase
       .from('catalog_works')
       .select('id,title,is_published')
       .eq('id', id)
       .eq('is_published', true)
+      .maybeSingle(),
+    supabase
+      .from('catalog_work_sources')
+      .select('profile_url,external_work_id')
+      .eq('work_id', id)
       .maybeSingle(),
     supabase
       .from('catalog_chapters')
@@ -47,7 +52,11 @@ export default async function MangaMorphChapterPage({ params }: PageProps) {
   let readerError: string | null = null;
 
   try {
-    const snapshot = await getChapterReaderSnapshot(chapter.source_url);
+    const snapshot = await getChapterReaderSnapshot(
+      chapter.source_url,
+      source?.profile_url ?? null,
+      chapter.external_id,
+    );
     pages = snapshot.images;
 
     if (pages.length === 0) {
