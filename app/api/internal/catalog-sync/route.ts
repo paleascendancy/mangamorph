@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { resolveMetadata } from '../../../../lib/catalog/resolve-metadata';
 import { fetchMangasTopWork } from '../../../../lib/catalog/sources/mangastop';
+import { translateGenresPtBr } from '../../../../lib/catalog/translation';
 
 export const maxDuration = 60;
 
@@ -62,6 +64,45 @@ export async function POST(request: Request) {
       job.profile_url,
       job.source_title ?? undefined,
     );
+
+    const metadataDecision = await resolveMetadata(
+      snapshot.title,
+      snapshot.alternativeTitles,
+    );
+
+    if (metadataDecision.status === 'matched') {
+      const metadata = metadataDecision.candidate;
+
+      const { error: metadataError } = await supabase.rpc(
+        'apply_catalog_sync_metadata',
+        {
+          p_token: token,
+          p_metadata: {
+            provider: metadata.provider,
+            externalId: metadata.externalId,
+            profileUrl: metadata.profileUrl,
+            synopsisOriginal: metadata.description,
+            synopsisPtBr: null,
+            genresOriginal: metadata.genres,
+            genresPtBr: translateGenresPtBr(metadata.genres),
+            authors: metadata.authors,
+            artists: metadata.artists,
+            status: metadata.status,
+            countryOrigin: metadata.countryOfOrigin,
+            coverUrl: metadata.coverUrl,
+            bannerUrl: metadata.bannerUrl,
+            myAnimeListId: metadata.linkedIds.myanimelist ?? null,
+          },
+        },
+      );
+
+      if (metadataError) {
+        console.warn('[MangaMorph sync] metadata update failed', {
+          sourceId: job.source_id,
+          message: metadataError.message,
+        });
+      }
+    }
 
     const payload = {
       title: snapshot.title,
