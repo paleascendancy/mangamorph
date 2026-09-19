@@ -90,6 +90,34 @@ function getSourceSlug(profileUrl: string): string | null {
     ?? null;
 }
 
+function titleFromSourceSlug(profileUrl: string): string | null {
+  const slug = getSourceSlug(profileUrl);
+  if (!slug) return null;
+
+  const words = decodeURIComponent(slug)
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean);
+
+  if (words.length === 0) return null;
+
+  const smallWords = new Set([
+    'a', 'as', 'o', 'os', 'de', 'da', 'das', 'do', 'dos',
+    'e', 'em', 'na', 'nas', 'no', 'nos', 'por', 'para',
+  ]);
+
+  return words
+    .map((word, index) => {
+      const lower = word.toLowerCase();
+
+      if (index > 0 && smallWords.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
+}
+
 function isSafeWorkRedirect(
   original: ReturnType<typeof parseChapterSourceUrl>,
   next: ReturnType<typeof parseChapterSourceUrl>,
@@ -173,6 +201,16 @@ export async function fetchMangasTopWork(profileUrl: string, titleHint?: string)
       title = await resolveMangaStopTitleFromSourceUrl(resolvedSource.profileUrl);
     } catch {
       // Continua para os fallbacks seguintes.
+    }
+  }
+
+  if (!title || isGenericSiteTitle(title)) {
+    title = titleFromSourceSlug(resolvedSource.profileUrl);
+
+    if (title) {
+      console.info('[MangaMorph catalog] title recovered from MangaStop source slug', {
+        externalWorkId: resolvedSource.externalWorkId,
+      });
     }
   }
 
