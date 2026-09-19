@@ -13,7 +13,7 @@ export async function inspectCatalogSource(
   titleHint?: string,
 ): Promise<CatalogInspection> {
   const source = await fetchMangasTopWork(profileUrl, titleHint);
-  const metadata = await resolveMetadata(source.title);
+  const metadata = await resolveMetadata(source.title, source.alternativeTitles);
 
   return { source, metadata };
 }
