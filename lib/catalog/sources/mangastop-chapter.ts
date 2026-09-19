@@ -72,6 +72,7 @@ export async function scrapeMangaStopChapter(
 
   try {
     const page = await browser.newPage();
+    const requestedImageUrls: string[] = [];
 
     await page.setUserAgent(
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36',
@@ -82,7 +83,13 @@ export async function scrapeMangaStopChapter(
     page.on('request', (request) => {
       const resourceType = request.resourceType();
 
-      if (['image', 'media', 'font'].includes(resourceType)) {
+      if (resourceType === 'image') {
+        requestedImageUrls.push(request.url());
+        request.abort().catch(() => undefined);
+        return;
+      }
+
+      if (['media', 'font'].includes(resourceType)) {
         request.abort().catch(() => undefined);
         return;
       }
@@ -150,11 +157,13 @@ export async function scrapeMangaStopChapter(
           image.getAttribute('data-original'),
           image.getAttribute('data-url'),
           image.getAttribute('data-image'),
+          image.parentElement?.querySelector('source')?.getAttribute('src'),
         ].filter((value): value is string => Boolean(value));
 
         const srcsetValues = [
           image.srcset,
           image.getAttribute('data-srcset') ?? '',
+          image.parentElement?.querySelector('source')?.getAttribute('srcset') ?? '',
         ]
           .flatMap((srcset) => srcset
             .split(',')
@@ -190,13 +199,15 @@ export async function scrapeMangaStopChapter(
         if (!isUsableImageUrl(absolute)) continue;
 
         const label = `${candidate.alt} ${candidate.className}`.toLowerCase();
+        const path = new URL(absolute).pathname.toLowerCase();
         let score = 0;
 
         if (candidate.width >= 300) score += 3;
         if (candidate.height >= 300) score += 2;
         if (candidate.top > 250) score += 1;
-        if (/page|chapter|reader|reading|webtoon|comic|manga/.test(label)) score += 3;
-        if (/cover|thumb|avatar|logo|icon|profile|banner/.test(label)) score -= 5;
+        if (/page|chapter|reader|reading|webtoon|comic|manga|scan/.test(label)) score += 3;
+        if (/page|chapter|capitulo|reader|reading|webtoon|comic|manga|scan|upload/.test(path)) score += 3;
+        if (/cover|thumb|avatar|logo|icon|profile|banner|favicon|emoji|advert|ads?/.test(`${label} ${path}`)) score -= 5;
 
         const previous = images.get(absolute);
 
@@ -210,8 +221,56 @@ export async function scrapeMangaStopChapter(
       }
     }
 
+    const requestGroups = new Map<string, number>();
+    const normalizedRequests = [...new Set(requestedImageUrls)]
+      .filter(isUsableImageUrl);
+
+    for (const imageUrl of normalizedRequests) {
+      try {
+        const url = new URL(imageUrl);
+        const parts = url.pathname.split('/').filter(Boolean);
+        const group = `${url.origin}/${parts.slice(0, -1).join('/')}`;
+        requestGroups.set(group, (requestGroups.get(group) ?? 0) + 1);
+      } catch {
+        continue;
+      }
+    }
+
+    let requestOrder = snapshot.candidates.length + 1;
+
+    for (const imageUrl of normalizedRequests) {
+      try {
+        const url = new URL(imageUrl);
+        const path = url.pathname.toLowerCase();
+        const parts = url.pathname.split('/').filter(Boolean);
+        const group = `${url.origin}/${parts.slice(0, -1).join('/')}`;
+        const groupSize = requestGroups.get(group) ?? 0;
+
+        let score = 0;
+
+        if (/\.(?:jpe?g|png|webp|avif)(?:$|\?)/i.test(imageUrl)) score += 2;
+        if (/page|chapter|capitulo|reader|reading|webtoon|comic|manga|scan|upload/.test(path)) score += 4;
+        if (groupSize >= 5) score += 3;
+        if (/assets?|icons?|logo|avatar|favicon|emoji|advert|ads?|banner|thumb/.test(path)) score -= 6;
+
+        const previous = images.get(imageUrl);
+
+        if (!previous || score > previous.score) {
+          images.set(imageUrl, {
+            url: imageUrl,
+            order: requestOrder,
+            score,
+          });
+        }
+
+        requestOrder += 1;
+      } catch {
+        continue;
+      }
+    }
+
     const ranked = [...images.values()]
-      .filter((image) => image.score >= 2)
+      .filter((image) => image.score >= 4)
       .sort((left, right) => left.order - right.order)
       .slice(0, MAX_READER_IMAGES)
       .map((image) => image.url);
@@ -219,6 +278,8 @@ export async function scrapeMangaStopChapter(
     console.info('[MangaMorph reader] chapter rendered', {
       path: final.pathname,
       imageCount: ranked.length,
+      domCandidateCount: snapshot.candidates.length,
+      requestedImageCount: normalizedRequests.length,
     });
 
     return {
