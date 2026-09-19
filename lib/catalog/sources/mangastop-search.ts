@@ -312,6 +312,73 @@ function rankCandidates(
     .slice(0, 5);
 }
 
+
+function sourceSlugQuery(profileUrl: string): string | null {
+  const url = new URL(profileUrl);
+  const slug = url.pathname.match(/^\/obra\/\d+\/([^/]+)\/?$/i)?.[1]
+    ?? url.pathname.match(/^\/manga\/([^/]+)\/?$/i)?.[1]
+    ?? null;
+
+  if (!slug) return null;
+
+  return decodeURIComponent(slug)
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function collectVisibleTitles(html: string): string[] {
+  const titles = new Set<string>();
+  const patterns = [
+    /<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi,
+    /<img\b[^>]*alt=["']([^"']+)["'][^>]*>/gi,
+    /["'](?:title|name|titulo|nome)["']\s*:\s*["']([^"']+)["']/gi,
+  ];
+
+  for (const pattern of patterns) {
+    for (const match of html.matchAll(pattern)) {
+      const title = stripTags(match[1]);
+      if (title) titles.add(title);
+    }
+  }
+
+  return [...titles];
+}
+
+export async function resolveMangaStopTitleFromSourceUrl(profileUrl: string): Promise<string | null> {
+  const parsed = parseChapterSourceUrl(profileUrl);
+  const slugQuery = sourceSlugQuery(parsed.profileUrl);
+  if (!slugQuery) return null;
+
+  const candidateTitles = new Map<string, number>();
+  const surfaces = [
+    `/?s=${encodeURIComponent(slugQuery)}`,
+    `/?q=${encodeURIComponent(slugQuery)}`,
+    '/',
+  ];
+
+  for (const path of surfaces) {
+    let html: string;
+
+    try {
+      html = await fetchHtml(new URL(path, MANGASTOP_ORIGIN));
+    } catch {
+      continue;
+    }
+
+    for (const title of collectVisibleTitles(html)) {
+      const score = titleSimilarity(slugQuery, title);
+      if (score < 0.72) continue;
+
+      const previous = candidateTitles.get(title) ?? 0;
+      if (score > previous) candidateTitles.set(title, score);
+    }
+  }
+
+  const ranked = [...candidateTitles.entries()].sort((a, b) => b[1] - a[1]);
+  return ranked[0]?.[0] ?? null;
+}
+
 export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
   const cleanQuery = query.trim();
   if (!cleanQuery || cleanQuery.length > MAX_QUERY_LENGTH) return [];
