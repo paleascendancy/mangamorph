@@ -24,11 +24,59 @@ function validateChapterUrl(input: string): URL {
   return url;
 }
 
+function isPrivateHostname(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+
+  if (
+    host === 'localhost'
+    || host.endsWith('.localhost')
+    || host.endsWith('.local')
+    || host.endsWith('.internal')
+    || host === '::1'
+    || host.startsWith('fc')
+    || host.startsWith('fd')
+    || host.startsWith('fe80:')
+  ) {
+    return true;
+  }
+
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+
+  if (!ipv4) return false;
+
+  const octets = ipv4.slice(1).map(Number);
+  if (octets.some((value) => value > 255)) return true;
+
+  const [a, b] = octets;
+
+  return (
+    a === 10
+    || a === 127
+    || (a === 169 && b === 254)
+    || (a === 172 && b >= 16 && b <= 31)
+    || (a === 192 && b === 168)
+    || a === 0
+  );
+}
+
+function isSafeBrowserRequest(value: string): boolean {
+  try {
+    const url = new URL(value);
+
+    return (
+      ['https:', 'http:'].includes(url.protocol)
+      && !isPrivateHostname(url.hostname)
+    );
+  } catch {
+    return false;
+  }
+}
+
 function isUsableImageUrl(value: string): boolean {
   try {
     const url = new URL(value);
 
-    if (!['https:', 'http:'].includes(url.protocol)) return false;
+    if (url.protocol !== 'https:' || isPrivateHostname(url.hostname)) return false;
 
     const path = url.pathname.toLowerCase();
 
@@ -82,9 +130,15 @@ export async function scrapeMangaStopChapter(
 
     page.on('request', (request) => {
       const resourceType = request.resourceType();
+      const requestUrl = request.url();
+
+      if (!isSafeBrowserRequest(requestUrl)) {
+        request.abort().catch(() => undefined);
+        return;
+      }
 
       if (resourceType === 'image') {
-        requestedImageUrls.push(request.url());
+        requestedImageUrls.push(requestUrl);
         request.abort().catch(() => undefined);
         return;
       }
