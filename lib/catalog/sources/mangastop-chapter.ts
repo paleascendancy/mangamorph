@@ -151,9 +151,12 @@ export async function scrapeMangaStopChapter(
 
       try {
         const target = new URL(requestUrl);
-        const activeResource = ['document', 'script', 'xhr', 'fetch'].includes(resourceType);
+        const sourceBoundResource = ['document', 'xhr', 'fetch'].includes(resourceType);
 
-        if (activeResource && !isMangaStopHostname(target.hostname)) {
+        // O MangásTop depende de scripts hospedados em CDN para montar partes
+        // da página no cliente. Scripts HTTPS públicos podem carregar, mas
+        // navegação e chamadas de dados continuam presas ao domínio da fonte.
+        if (sourceBoundResource && !isMangaStopHostname(target.hostname)) {
           request.abort().catch(() => undefined);
           return;
         }
