@@ -42,12 +42,11 @@ function WorkSection({ id, eyebrow, title, works }: WorkSectionProps) {
   );
 }
 
-// Sem dados de demonstração. Estas listas só recebem obras cadastradas de verdade.
+// As seções de ranking continuam ocultas até existirem métricas reais.
 const favoriteWorks: HomeWork[] = [];
 const mostReadWorks: HomeWork[] = [];
-const newWorks: HomeWork[] = [];
 
-export function HomeSections() {
+export function HomeSections({ newWorks }: { newWorks: HomeWork[] }) {
   return (
     <div className="home-sections">
       <WorkSection id="mais-favoritadas" eyebrow="Preferidas" title="Mais favoritadas" works={favoriteWorks} />
