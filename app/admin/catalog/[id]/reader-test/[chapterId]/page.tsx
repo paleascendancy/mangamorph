@@ -13,11 +13,16 @@ export default async function ReaderDiagnosticPage({ params }: PageProps) {
   const { id, chapterId } = await params;
   const supabase = await createClient();
 
-  const [{ data: work }, { data: chapter }] = await Promise.all([
+  const [{ data: work }, { data: source }, { data: chapter }] = await Promise.all([
     supabase
       .from('catalog_works')
       .select('id,title')
       .eq('id', id)
+      .maybeSingle(),
+    supabase
+      .from('catalog_work_sources')
+      .select('profile_url,external_work_id')
+      .eq('work_id', id)
       .maybeSingle(),
     supabase
       .from('catalog_chapters')
@@ -34,7 +39,11 @@ export default async function ReaderDiagnosticPage({ params }: PageProps) {
   let error: string | null = null;
 
   try {
-    const snapshot = await getChapterReaderSnapshot(chapter.source_url);
+    const snapshot = await getChapterReaderSnapshot(
+      chapter.source_url,
+      source?.profile_url ?? null,
+      chapter.external_id,
+    );
     imageCount = snapshot.images.length;
     hosts = [...new Set(
       snapshot.images
