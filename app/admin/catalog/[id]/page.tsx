@@ -237,16 +237,14 @@ export default async function CatalogWorkAdminPage({ params }: PageProps) {
               {(chapters ?? []).map((chapter) => (
                 <a
                   className="admin-result-item"
-                  href={chapter.source_url}
-                  target="_blank"
-                  rel="noreferrer"
+                  href={`/admin/catalog/${work.id}/reader-test/${chapter.id}`}
                   key={chapter.id}
                 >
                   <span>
                     <strong>{chapter.title}</strong>
                     <small>ID da fonte: {chapter.external_id}</small>
                   </span>
-                  <span className="admin-result-action">Fonte</span>
+                  <span className="admin-result-action">Testar leitor</span>
                 </a>
               ))}
             </div>
