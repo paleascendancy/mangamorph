@@ -1,5 +1,8 @@
+import Image from 'next/image';
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { normalizeTitle } from '../../../../lib/catalog/title-resolver';
+import { translateGenresPtBr } from '../../../../lib/catalog/translation';
+import { createClient } from '../../../../lib/supabase/server';
 import { saveCatalogWork } from './actions';
 import { SaveWorkButton } from './SaveWorkButton';
 export const maxDuration = 60;
@@ -78,6 +81,33 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
     : [];
 
   const visibleChapters = matchingChapters.slice(0, 20);
+
+  let existingWorkId: string | null = null;
+
+  if (inspection) {
+    const supabase = await createClient();
+    const { data: existingSource } = await supabase
+      .from('catalog_work_sources')
+      .select('work_id')
+      .eq('source_kind', 'mangastop')
+      .eq('external_work_id', inspection.source.externalWorkId)
+      .maybeSingle();
+
+    existingWorkId = existingSource?.work_id ?? null;
+  }
+
+  const matchedMetadata = inspection?.metadata.status === 'matched'
+    ? inspection.metadata.candidate
+    : null;
+
+  const previewSynopsis = matchedMetadata?.description
+    ?.replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .trim() ?? null;
+
+  const previewGenres = matchedMetadata
+    ? translateGenresPtBr(matchedMetadata.genres)
+    : [];
 
   return (
     <section className="admin-page">
@@ -207,11 +237,83 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
             </dl>
 
             {inspection.metadata.status === 'matched' && (
-              <div className="admin-match-card">
-                <span className="admin-card-label">AniList</span>
-                <strong>{inspection.metadata.candidate.matchedTitle ?? inspection.metadata.candidate.titles[0]}</strong>
-                <small>Similaridade: {Math.round(inspection.metadata.candidate.score * 100)}%</small>
-              </div>
+              <>
+                <div className="admin-match-card">
+                  <span className="admin-card-label">
+                    {inspection.metadata.candidate.provider === 'anilist' ? 'AniList' : 'Kitsu'}
+                  </span>
+                  <strong>
+                    {inspection.metadata.candidate.matchedTitle ?? inspection.metadata.candidate.titles[0]}
+                  </strong>
+                  <small>Similaridade: {Math.round(inspection.metadata.candidate.score * 100)}%</small>
+                </div>
+
+                <section className="admin-metadata-preview" aria-labelledby="metadata-preview-title">
+                  <div className="admin-metadata-preview-cover">
+                    {matchedMetadata?.coverUrl ? (
+                      <Image
+                        src={matchedMetadata.coverUrl}
+                        alt={`Capa de ${inspection.source.title}`}
+                        fill
+                        sizes="(max-width: 560px) 34vw, 180px"
+                      />
+                    ) : null}
+                  </div>
+
+                  <div className="admin-metadata-preview-copy">
+                    <span className="admin-card-label">Prévia antes de publicar</span>
+                    <h3 id="metadata-preview-title">
+                      {matchedMetadata?.matchedTitle ?? matchedMetadata?.titles[0] ?? inspection.source.title}
+                    </h3>
+
+                    {previewGenres.length > 0 && (
+                      <div className="admin-metadata-preview-tags">
+                        {previewGenres.map((genre) => (
+                          <span key={genre}>{genre}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {previewSynopsis && (
+                      <p className="admin-metadata-preview-synopsis">{previewSynopsis}</p>
+                    )}
+
+                    <dl className="admin-metadata-preview-list">
+                      {matchedMetadata?.authors.length ? (
+                        <div>
+                          <dt>Autor</dt>
+                          <dd>{matchedMetadata.authors.join(', ')}</dd>
+                        </div>
+                      ) : null}
+
+                      {matchedMetadata?.artists.length ? (
+                        <div>
+                          <dt>Artista</dt>
+                          <dd>{matchedMetadata.artists.join(', ')}</dd>
+                        </div>
+                      ) : null}
+
+                      {matchedMetadata?.status ? (
+                        <div>
+                          <dt>Status</dt>
+                          <dd>{matchedMetadata.status}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+
+                    {matchedMetadata?.profileUrl ? (
+                      <a
+                        className="admin-secondary-action admin-metadata-preview-link"
+                        href={matchedMetadata.profileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Abrir no {matchedMetadata.provider === 'anilist' ? 'AniList' : 'Kitsu'}
+                      </a>
+                    ) : null}
+                  </div>
+                </section>
+              </>
             )}
 
             {inspection.metadata.status === 'review' && (
@@ -220,31 +322,46 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
               </div>
             )}
 
-            <form action={saveCatalogWork} className="admin-save-work">
-              <input type="hidden" name="source" value={inspection.source.profileUrl} />
-              <input type="hidden" name="titleHint" value={inspection.source.title} />
-
-              <div>
-                <span className="admin-card-label">Sincronização</span>
-                <h3>Salvar obra no MangaMorph</h3>
-                <p>
-                  Ao salvar, entra primeiro o capítulo inicial disponível. Enquanto o catálogo estiver sendo alcançado,
-                  a sincronização começa em 3 minutos e desacelera automaticamente conforme o progresso.
-                </p>
+            {existingWorkId ? (
+              <div className="admin-save-work">
+                <div>
+                  <span className="admin-card-label">Já cadastrada</span>
+                  <h3>Esta obra já está no MangaMorph</h3>
+                  <p>
+                    Use o painel da obra para acompanhar a sincronização e editar as informações.
+                  </p>
+                </div>
+                <a className="admin-primary-action" href={`/admin/catalog/${existingWorkId}`}>
+                  Abrir obra cadastrada
+                </a>
               </div>
+            ) : (
+              <form action={saveCatalogWork} className="admin-save-work">
+                <input type="hidden" name="source" value={inspection.source.profileUrl} />
+                <input type="hidden" name="titleHint" value={inspection.source.title} />
 
-              <label htmlFor="syncMode">
-                Depois de alcançar a fonte
-                <select id="syncMode" name="syncMode" defaultValue="1h">
-                  <option value="5m">A cada 5 minutos</option>
-                  <option value="30m">A cada 30 minutos</option>
-                  <option value="1h">A cada 1 hora</option>
-                  <option value="7d">A cada 7 dias</option>
-                </select>
-              </label>
+                <div>
+                  <span className="admin-card-label">Publicação</span>
+                  <h3>Publicar obra no MangaMorph</h3>
+                  <p>
+                    Revise a capa e as informações acima. Ao publicar, entra primeiro o capítulo inicial disponível e
+                    a sincronização começa em 3 minutos, desacelerando automaticamente conforme o progresso.
+                  </p>
+                </div>
 
-              <SaveWorkButton />
-            </form>
+                <label htmlFor="syncMode">
+                  Depois de alcançar a fonte
+                  <select id="syncMode" name="syncMode" defaultValue="1h">
+                    <option value="5m">A cada 5 minutos</option>
+                    <option value="30m">A cada 30 minutos</option>
+                    <option value="1h">A cada 1 hora</option>
+                    <option value="7d">A cada 7 dias</option>
+                  </select>
+                </label>
+
+                <SaveWorkButton />
+              </form>
+            )}
 
             <div className="admin-chapter-search">
               <div>
