@@ -10,6 +10,7 @@ type PageProps = {
     source?: string;
     title?: string;
     chapter?: string;
+    titleHint?: string;
   }>;
 };
 
@@ -18,6 +19,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
   const sourceUrl = typeof params.source === 'string' ? params.source.trim() : '';
   const titleQuery = typeof params.title === 'string' ? params.title.trim() : '';
   const chapterQuery = typeof params.chapter === 'string' ? params.chapter.trim() : '';
+  const titleHint = typeof params.titleHint === 'string' ? params.titleHint.trim() : '';
 
   let inspection: Awaited<ReturnType<typeof inspectCatalogSource>> | null = null;
   let inspectionError: string | null = null;
@@ -34,7 +36,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
 
   if (sourceUrl) {
     try {
-      inspection = await inspectCatalogSource(sourceUrl);
+      inspection = await inspectCatalogSource(sourceUrl, titleHint || undefined);
     } catch (error) {
       inspectionError = error instanceof Error
         ? error.message
@@ -102,7 +104,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
                   {sourceMatches.map((match) => (
                     <a
                       className="admin-result-item"
-                      href={`/admin/catalog/new?source=${encodeURIComponent(match.url)}`}
+                      href={`/admin/catalog/new?source=${encodeURIComponent(match.url)}&titleHint=${encodeURIComponent(match.title)}`}
                       key={match.url}
                     >
                       <span>
@@ -190,6 +192,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
 
               <form action="/admin/catalog/new" method="get">
                 <input type="hidden" name="source" value={sourceUrl} />
+                {titleHint && <input type="hidden" name="titleHint" value={titleHint} />}
                 <input
                   name="chapter"
                   type="search"
