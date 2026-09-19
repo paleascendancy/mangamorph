@@ -109,7 +109,123 @@ function isUsableImageUrl(value: string): boolean {
   }
 }
 
-export async function scrapeMangaStopChapter(
+type MangaStopApiWork = {
+  capitulos?: Array<{
+    id?: number | string;
+    numero?: number | string;
+  }>;
+};
+
+type MangaStopApiReader = {
+  imagens?: Array<{
+    url?: string;
+  }>;
+};
+
+function normalizeChapterNumber(value: string | number | null | undefined): string {
+  return String(value ?? '')
+    .replace(',', '.')
+    .replace(/^0+(?=\d)/, '')
+    .trim();
+}
+
+function externalWorkIdFromProfile(profileUrl: string): string | null {
+  try {
+    const url = validateChapterUrl(profileUrl);
+    return url.pathname.match(/^\/obra\/(\d+)(?:\/|$)/i)?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchMangaStopJson<T>(path: string): Promise<T> {
+  const url = new URL(path, 'https://mangastop.net');
+
+  if (!isMangaStopHostname(url.hostname) || url.protocol !== 'https:') {
+    throw new Error('Endpoint da fonte não permitido.');
+  }
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: 'application/json',
+      'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    throw new Error(`MangásTop API respondeu com status ${response.status}.`);
+  }
+
+  const contentType = response.headers.get('content-type') ?? '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('MangásTop API não retornou JSON.');
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function fetchMangaStopChapterFromApi(
+  chapterUrl: string,
+  profileUrl: string,
+  externalChapterId: string,
+): Promise<MangaStopChapterSnapshot | null> {
+  const sourceUrl = validateChapterUrl(chapterUrl);
+  const externalWorkId = externalWorkIdFromProfile(profileUrl);
+
+  if (!externalWorkId) return null;
+
+  const work = await fetchMangaStopJson<MangaStopApiWork>(
+    `/wp-json/mangastop/v1/obra/${encodeURIComponent(externalWorkId)}`,
+  );
+
+  const targetNumber = normalizeChapterNumber(externalChapterId);
+  const chapter = work.capitulos?.find((item) =>
+    normalizeChapterNumber(item.numero) === targetNumber,
+  );
+
+  if (!chapter?.id) {
+    console.warn('[MangaMorph reader] chapter id not found in MangaStop API', {
+      externalWorkId,
+      externalChapterId,
+    });
+    return null;
+  }
+
+  const reader = await fetchMangaStopJson<MangaStopApiReader>(
+    `/wp-json/mangastop/v1/leitor/${encodeURIComponent(String(chapter.id))}`,
+  );
+
+  const images = [...new Set(
+    (reader.imagens ?? [])
+      .map((image) => {
+        try {
+          return new URL(image.url ?? '', 'https://mangastop.net').href;
+        } catch {
+          return null;
+        }
+      })
+      .filter((url): url is string => Boolean(url) && isUsableImageUrl(url)),
+  )].slice(0, MAX_READER_IMAGES);
+
+  console.info('[MangaMorph reader] MangaStop API resolved chapter', {
+    externalWorkId,
+    externalChapterId,
+    sourceChapterId: String(chapter.id),
+    imageCount: images.length,
+  });
+
+  if (images.length === 0) return null;
+
+  return {
+    title: `Capítulo ${externalChapterId}`,
+    images,
+    finalUrl: sourceUrl.href,
+  };
+}
+
+async function scrapeMangaStopChapterWithBrowser(
   chapterUrl: string,
 ): Promise<MangaStopChapterSnapshot> {
   const sourceUrl = validateChapterUrl(chapterUrl);
@@ -151,9 +267,12 @@ export async function scrapeMangaStopChapter(
 
       try {
         const target = new URL(requestUrl);
-        const activeResource = ['document', 'script', 'xhr', 'fetch'].includes(resourceType);
+        const sourceBoundResource = ['document', 'xhr', 'fetch'].includes(resourceType);
 
-        if (activeResource && !isMangaStopHostname(target.hostname)) {
+        // O MangásTop depende de scripts hospedados em CDN para montar partes
+        // da página no cliente. Scripts HTTPS públicos podem carregar, mas
+        // navegação e chamadas de dados continuam presas ao domínio da fonte.
+        if (sourceBoundResource && !isMangaStopHostname(target.hostname)) {
           request.abort().catch(() => undefined);
           return;
         }
@@ -369,4 +488,29 @@ export async function scrapeMangaStopChapter(
   } finally {
     await browser.close();
   }
+}
+
+
+export async function scrapeMangaStopChapter(
+  chapterUrl: string,
+  profileUrl?: string | null,
+  externalChapterId?: string | null,
+): Promise<MangaStopChapterSnapshot> {
+  if (profileUrl && externalChapterId) {
+    try {
+      const apiSnapshot = await fetchMangaStopChapterFromApi(
+        chapterUrl,
+        profileUrl,
+        externalChapterId,
+      );
+
+      if (apiSnapshot) return apiSnapshot;
+    } catch (error) {
+      console.warn('[MangaMorph reader] MangaStop API failed, using browser fallback', {
+        message: error instanceof Error ? error.message : 'unknown',
+      });
+    }
+  }
+
+  return scrapeMangaStopChapterWithBrowser(chapterUrl);
 }
