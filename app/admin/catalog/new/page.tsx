@@ -1,5 +1,7 @@
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { normalizeTitle } from '../../../../lib/catalog/title-resolver';
+export const maxDuration = 30;
+
 import {
   searchMangaStopWorks,
   type MangaStopSearchResult,
