@@ -102,7 +102,17 @@ export function HeroCarousel({ works }: { works: HighlightWork[] }) {
       aria-label="Destaques"
       aria-roledescription="carrossel"
     >
-      <article className="hero-slide hero-slide-v2" key={activeWork.id}>
+      <article
+        className="hero-slide hero-slide-v2"
+        data-hero-background={
+          activeWork.backdropUrl
+            ? 'banner'
+            : activeWork.coverUrl
+              ? 'cover-reflection'
+              : 'none'
+        }
+        key={activeWork.id}
+      >
         {activeWork.backdropUrl ? (
           <Image
             className="hero-backdrop"
