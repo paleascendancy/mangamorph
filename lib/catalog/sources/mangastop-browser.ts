@@ -13,6 +13,12 @@ type BrowserScrapeResult = {
   finalUrl: string;
 };
 
+type NetworkChapterCandidate = {
+  externalId: string;
+  title: string;
+  url: string;
+};
+
 function slugQuery(profileUrl: string): string | null {
   const url = new URL(profileUrl);
   const slug = url.pathname.match(/^\/obra\/\d+\/([^/]+)\/?$/i)?.[1]
@@ -51,6 +57,145 @@ function pickBestTitle(candidates: string[], query: string | null): string | nul
   return best && best.score >= 0.55 ? best.title : null;
 }
 
+function chapterIdFromRecord(record: Record<string, unknown>): string | null {
+  const directKeys = [
+    'chapter',
+    'chapterNumber',
+    'chapter_number',
+    'number',
+    'numero',
+    'capitulo',
+  ];
+
+  for (const key of directKeys) {
+    const value = record[key];
+
+    if (
+      (typeof value === 'number' || typeof value === 'string')
+      && String(value).trim().match(/^[0-9]+(?:\.[0-9]+)?$/)
+    ) {
+      return String(value).trim();
+    }
+  }
+
+  const textKeys = ['title', 'name', 'label', 'chapterTitle', 'chapter_title'];
+
+  for (const key of textKeys) {
+    const value = record[key];
+    if (typeof value !== 'string') continue;
+
+    const match = value.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
+    if (match) return match[1];
+  }
+
+  return null;
+}
+
+function chapterUrlFromRecord(
+  record: Record<string, unknown>,
+  baseUrl: string,
+): string | null {
+  const preferredKeys = [
+    'url',
+    'href',
+    'link',
+    'path',
+    'permalink',
+    'chapterUrl',
+    'chapter_url',
+    'readerUrl',
+    'reader_url',
+  ];
+
+  const values: string[] = [];
+
+  for (const key of preferredKeys) {
+    const value = record[key];
+    if (typeof value === 'string') values.push(value);
+  }
+
+  for (const value of Object.values(record)) {
+    if (typeof value === 'string') values.push(value);
+  }
+
+  for (const value of values) {
+    const clean = value.replace(/\\\//g, '/').trim();
+
+    if (
+      !clean.match(/^https?:\/\//i)
+      && !clean.startsWith('/')
+    ) {
+      continue;
+    }
+
+    try {
+      const url = new URL(clean, baseUrl);
+
+      if (!['mangastop.net', 'www.mangastop.net'].includes(url.hostname.toLowerCase())) {
+        continue;
+      }
+
+      const path = decodeURIComponent(url.pathname).toLowerCase();
+
+      if (
+        path.includes('capitulo')
+        || path.includes('chapter')
+        || path.includes('leitor')
+        || path.includes('reader')
+        || path.includes('/ler/')
+      ) {
+        return url.href;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+function collectNetworkChapterCandidates(
+  payloads: unknown[],
+  baseUrl: string,
+): NetworkChapterCandidate[] {
+  const chapters = new Map<string, NetworkChapterCandidate>();
+  const visited = new Set<object>();
+
+  const visit = (value: unknown, depth: number) => {
+    if (depth > 12 || value === null || value === undefined) return;
+
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, depth + 1);
+      return;
+    }
+
+    if (typeof value !== 'object') return;
+
+    if (visited.has(value)) return;
+    visited.add(value);
+
+    const record = value as Record<string, unknown>;
+    const externalId = chapterIdFromRecord(record);
+    const url = chapterUrlFromRecord(record, baseUrl);
+
+    if (externalId && url) {
+      chapters.set(`${url}::${externalId}`, {
+        externalId,
+        title: `Capítulo ${externalId}`,
+        url,
+      });
+    }
+
+    for (const nested of Object.values(record)) {
+      visit(nested, depth + 1);
+    }
+  };
+
+  for (const payload of payloads) visit(payload, 0);
+
+  return [...chapters.values()];
+}
+
 export async function scrapeMangaStopWithBrowser(
   profileUrl: string,
   titleHint?: string,
@@ -76,6 +221,39 @@ export async function scrapeMangaStopWithBrowser(
 
   try {
     const page = await browser.newPage();
+    const networkPayloads: unknown[] = [];
+    const pendingNetworkReads = new Set<Promise<void>>();
+
+    page.on('response', (response) => {
+      const task = (async () => {
+        try {
+          const request = response.request();
+          const resourceType = request.resourceType();
+
+          if (!['fetch', 'xhr'].includes(resourceType)) return;
+
+          const responseUrl = new URL(response.url());
+
+          if (!['mangastop.net', 'www.mangastop.net'].includes(responseUrl.hostname.toLowerCase())) {
+            return;
+          }
+
+          const contentType = response.headers()['content-type'] ?? '';
+          if (!contentType.includes('application/json')) return;
+
+          const text = await response.text();
+          if (!text || text.length > 2_000_000) return;
+
+          const payload = JSON.parse(text) as unknown;
+          networkPayloads.push(payload);
+        } catch {
+          // Respostas auxiliares podem não ser JSON válido.
+        }
+      })();
+
+      pendingNetworkReads.add(task);
+      task.finally(() => pendingNetworkReads.delete(task)).catch(() => undefined);
+    });
 
     await page.setUserAgent(
       'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36',
@@ -132,11 +310,11 @@ export async function scrapeMangaStopWithBrowser(
     await page.evaluate(async () => {
       let previousHeight = 0;
 
-      for (let index = 0; index < 8; index += 1) {
+      for (let index = 0; index < 12; index += 1) {
         const currentHeight = document.body.scrollHeight;
 
         window.scrollTo({ top: currentHeight, behavior: 'auto' });
-        await new Promise((resolve) => setTimeout(resolve, 350));
+        await new Promise((resolve) => setTimeout(resolve, 450));
 
         if (currentHeight === previousHeight) break;
         previousHeight = currentHeight;
@@ -144,6 +322,9 @@ export async function scrapeMangaStopWithBrowser(
 
       window.scrollTo({ top: 0, behavior: 'auto' });
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    await Promise.allSettled([...pendingNetworkReads]);
 
     const finalUrl = page.url();
     const final = new URL(finalUrl);
@@ -219,21 +400,45 @@ export async function scrapeMangaStopWithBrowser(
         addChapter(anchor, label);
       }
 
-      // 2) Fallback para interfaces em que o texto fica fora do <a>, mas ainda
-      // pertence a uma única linha. Ignoramos containers que agregam vários capítulos.
+      // 2) Fallback para interfaces em que o texto fica fora do <a>.
       for (const element of Array.from(
-        document.querySelectorAll<HTMLElement>('li,[role="listitem"],tr,article,section,div'),
+        document.querySelectorAll<HTMLElement>('li,[role="listitem"],tr,article,section,div,button,[role="button"]'),
       )) {
         const label = (element.textContent ?? '').replace(/\s+/g, ' ').trim();
         const occurrences = label.match(/cap(?:[íi]tulo|\.)?\s*[0-9]+(?:\.[0-9]+)?/gi) ?? [];
 
         if (occurrences.length !== 1 || label.length > 220) continue;
 
-        const anchor = element.closest('a[href]') as HTMLAnchorElement | null
-          ?? element.querySelector('a[href]') as HTMLAnchorElement | null;
+        const externalId = label.match(chapterPattern)?.[1];
+        if (!externalId) continue;
 
-        if (!anchor?.href) continue;
-        addChapter(anchor, label);
+        const clickable = element.closest<HTMLElement>('a[href],[data-href],[data-url],[data-link],[role="link"]')
+          ?? element.querySelector<HTMLElement>('a[href],[data-href],[data-url],[data-link],[role="link"]');
+
+        const rawUrl = clickable instanceof HTMLAnchorElement
+          ? clickable.href
+          : clickable?.getAttribute('data-href')
+            ?? clickable?.getAttribute('data-url')
+            ?? clickable?.getAttribute('data-link')
+            ?? null;
+
+        if (!rawUrl) continue;
+
+        try {
+          const url = new URL(rawUrl, window.location.href);
+          const key = `${url.href}::${externalId}`;
+
+          if (!seen.has(key)) {
+            seen.add(key);
+            chapterCandidates.push({
+              externalId,
+              title: `Capítulo ${externalId}`,
+              url: url.href,
+            });
+          }
+        } catch {
+          continue;
+        }
       }
 
       const chapters = chapterCandidates;
@@ -248,8 +453,9 @@ export async function scrapeMangaStopWithBrowser(
         .filter((value) => value && value !== title && value.length <= 140),
     )].slice(0, 6);
     const chapters = new Map<string, SourceChapter>();
+    const networkChapters = collectNetworkChapterCandidates(networkPayloads, finalUrl);
 
-    for (const chapter of snapshot.chapters) {
+    for (const chapter of [...snapshot.chapters, ...networkChapters]) {
       try {
         const url = new URL(chapter.url);
 
@@ -266,6 +472,8 @@ export async function scrapeMangaStopWithBrowser(
       finalPath: final.pathname,
       titleFound: Boolean(title),
       chapterCount: chapters.size,
+      networkPayloadCount: networkPayloads.length,
+      networkChapterCount: networkChapters.length,
     });
 
     return {
