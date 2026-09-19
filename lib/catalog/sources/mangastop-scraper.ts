@@ -417,11 +417,12 @@ export async function scrapeMangaStopSearch(query: string): Promise<ScrapedManga
 export async function scrapeMangaStopWork(
   profileUrl: string,
   titleHint?: string,
-): Promise<{ title: string | null; chapters: SourceChapter[]; canonicalUrl: string }> {
+): Promise<{ title: string | null; alternativeTitles: string[]; chapters: SourceChapter[]; canonicalUrl: string }> {
   const source = parseChapterSourceUrl(profileUrl);
   const { html, finalUrl } = await fetchHtml(source.profileUrl);
 
   let title = extractDirectTitle(html);
+  let alternativeTitles: string[] = [];
   let chapters = extractDirectChapters(html, finalUrl);
 
   const query = cleanText(titleHint ?? '') || slugQuery(source.profileUrl);
@@ -464,6 +465,7 @@ export async function scrapeMangaStopWork(
       const browserResult = await scrapeMangaStopWithBrowser(source.profileUrl, titleHint);
 
       title = title ?? browserResult.title;
+      alternativeTitles = browserResult.alternativeTitles;
 
       if (chapters.length === 0 && browserResult.chapters.length > 0) {
         chapters = browserResult.chapters;
@@ -480,6 +482,7 @@ export async function scrapeMangaStopWork(
 
   return {
     title,
+    alternativeTitles,
     chapters,
     canonicalUrl,
   };
