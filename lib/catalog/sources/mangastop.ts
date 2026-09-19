@@ -81,8 +81,33 @@ function extractChapters(html: string, baseUrl: string) {
   return [...chapters.values()];
 }
 
+function getSourceSlug(profileUrl: string): string | null {
+  const url = new URL(profileUrl);
+
+  return url.pathname.match(/^\/obra\/\d+\/([^/]+)\/?$/i)?.[1]
+    ?? url.pathname.match(/^\/manga\/([^/]+)\/?$/i)?.[1]
+    ?? null;
+}
+
+function isSafeWorkRedirect(
+  original: ReturnType<typeof parseChapterSourceUrl>,
+  next: ReturnType<typeof parseChapterSourceUrl>,
+): boolean {
+  if (original.externalWorkId === next.externalWorkId) return true;
+
+  const originalSlug = getSourceSlug(original.profileUrl);
+  const nextSlug = getSourceSlug(next.profileUrl);
+
+  return Boolean(
+    originalSlug
+    && nextSlug
+    && decodeURIComponent(originalSlug).toLowerCase() === decodeURIComponent(nextSlug).toLowerCase(),
+  );
+}
+
 export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWorkSnapshot> {
   const source = parseChapterSourceUrl(profileUrl);
+  let resolvedSource = source;
 
   let currentUrl = source.profileUrl;
   let response: Response | null = null;
@@ -108,10 +133,11 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
     const nextUrl = new URL(location, currentUrl);
     const nextSource = parseChapterSourceUrl(nextUrl.href);
 
-    if (nextSource.externalWorkId !== source.externalWorkId) {
+    if (!isSafeWorkRedirect(resolvedSource, nextSource)) {
       throw new Error('A fonte tentou redirecionar para outra obra.');
     }
 
+    resolvedSource = nextSource;
     currentUrl = nextSource.profileUrl;
   }
 
@@ -135,10 +161,9 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
   }
 
   let title = extractTitle(html);
-  let chapters = extractChapters(html, source.profileUrl);
+  let chapters = extractChapters(html, currentUrl);
 
-  const sourceUrl = new URL(source.profileUrl);
-  const slug = sourceUrl.pathname.match(/^\/obra\/\d+\/([^/]+)\/?$/i)?.[1] ?? null;
+  const slug = getSourceSlug(resolvedSource.profileUrl);
 
   // A rota nova de obra pode devolver apenas o shell genérico no HTML do servidor.
   // Quando isso acontece, a página pública de categoria da mesma obra é usada
@@ -183,7 +208,7 @@ export async function fetchMangasTopWork(profileUrl: string): Promise<SourceWork
   }
 
   return {
-    ...source,
+    ...resolvedSource,
     title,
     chapters,
   };
