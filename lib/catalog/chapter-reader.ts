@@ -5,8 +5,16 @@ import {
 } from './sources/mangastop-chapter';
 
 const getCachedChapterSnapshot = unstable_cache(
-  async (chapterUrl: string): Promise<MangaStopChapterSnapshot> => {
-    const snapshot = await scrapeMangaStopChapter(chapterUrl);
+  async (
+    chapterUrl: string,
+    profileUrl: string | null,
+    externalChapterId: string | null,
+  ): Promise<MangaStopChapterSnapshot> => {
+    const snapshot = await scrapeMangaStopChapter(
+      chapterUrl,
+      profileUrl,
+      externalChapterId,
+    );
 
     if (snapshot.images.length === 0) {
       throw new Error('A fonte não expôs páginas válidas para este capítulo.');
@@ -22,6 +30,8 @@ const getCachedChapterSnapshot = unstable_cache(
 
 export async function getChapterReaderSnapshot(
   chapterUrl: string,
+  profileUrl: string | null,
+  externalChapterId: string | null,
 ): Promise<MangaStopChapterSnapshot> {
-  return getCachedChapterSnapshot(chapterUrl);
+  return getCachedChapterSnapshot(chapterUrl, profileUrl, externalChapterId);
 }
