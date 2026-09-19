@@ -69,9 +69,11 @@ function extractChapters(html: string, baseUrl: string) {
     if (!['mangastop.net', 'www.mangastop.net'].includes(url.hostname.toLowerCase())) continue;
 
     const externalId = chapterMatch[1];
+    const chapterTitle = label || `Capítulo ${externalId}`;
+
     chapters.set(url.href, {
       externalId,
-      title: `Capítulo ${externalId}`,
+      title: chapterTitle,
       url: url.href,
     });
   }
