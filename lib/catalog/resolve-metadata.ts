@@ -168,6 +168,36 @@ export async function resolveMetadata(
     return strictDecision;
   }
 
+  // Alguns títulos traduzidos mantêm apenas um nome próprio distintivo
+  // (ex.: Baskerville). Nesse caso, consultamos o AniList diretamente
+  // pelo token e só aceitamos quando há um candidato único com esse termo.
+  const anchorQueries = distinctiveTokens(queries);
+  const aniListAnchorCandidates = await collectProviderCandidates(
+    anchorQueries,
+    searchAniListMetadata,
+    3,
+  );
+  const aniListAnchor = pickUniqueAnchorCandidate(
+    queries,
+    aniListAnchorCandidates,
+  );
+
+  if (aniListAnchor) {
+    const anchoredTitle = aniListAnchor.titles.find((title) => {
+      const normalized = normalizeTitle(title);
+      return anchorQueries.some((token) => normalized.split(' ').includes(token));
+    }) ?? aniListAnchor.titles[0] ?? null;
+
+    return {
+      status: 'matched',
+      candidate: {
+        ...aniListAnchor,
+        score: 1,
+        matchedTitle: anchoredTitle,
+      },
+    };
+  }
+
   // Fallback multilíngue: procura no catálogo do MyAnimeList/Jikan por
   // palavras distintivas do título. Só seguimos automaticamente quando
   // existe um candidato único e o AniList confirma o mesmo MAL ID.
