@@ -12,7 +12,7 @@ export function SaveWorkButton() {
       disabled={pending}
       aria-disabled={pending}
     >
-      {pending ? 'Salvando e iniciando...' : 'Salvar obra e iniciar sincronização'}
+      {pending ? 'Publicando e iniciando...' : 'Publicar obra e iniciar sincronização'}
     </button>
   );
 }
