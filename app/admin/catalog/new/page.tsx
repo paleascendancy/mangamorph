@@ -1,6 +1,7 @@
 import { inspectCatalogSource } from '../../../../lib/catalog';
 import { normalizeTitle } from '../../../../lib/catalog/title-resolver';
 import { saveCatalogWork } from './actions';
+import { SaveWorkButton } from './SaveWorkButton';
 export const maxDuration = 60;
 
 import {
@@ -242,9 +243,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
                 </select>
               </label>
 
-              <button className="admin-primary-action" type="submit">
-                Salvar obra e iniciar sincronização
-              </button>
+              <SaveWorkButton />
             </form>
 
             <div className="admin-chapter-search">
