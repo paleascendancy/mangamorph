@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { externalHtmlToPlainText } from '../../../lib/catalog/text';
 import { createClient } from '../../../lib/supabase/server';
 
 type PageProps = {
@@ -72,7 +73,7 @@ export default async function PublicWorkPage({ params }: PageProps) {
         {(work.synopsis_pt_br || work.synopsis_original) ? (
           <section className="work-profile-section">
             <h2>Sinopse</h2>
-            <p>{work.synopsis_pt_br ?? work.synopsis_original}</p>
+            <p>{externalHtmlToPlainText(work.synopsis_pt_br ?? work.synopsis_original)}</p>
           </section>
         ) : null}
 
