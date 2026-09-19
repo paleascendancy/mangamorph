@@ -1,5 +1,6 @@
 import { parseChapterSourceUrl } from '../source-url';
 import { normalizeTitle, titleSimilarity } from '../title-resolver';
+import type { SourceChapter } from '../types';
 
 const SEARCH_ENDPOINT = 'https://mangastop.net/';
 const REQUEST_TIMEOUT_MS = 8000;
@@ -32,11 +33,11 @@ function readAnchorTitle(anchor: string, body: string): string {
   return stripTags(titleAttr ?? ariaLabel ?? body);
 }
 
-export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
+async function fetchSearchHtml(query: string): Promise<string> {
   const cleanQuery = query.trim();
 
   if (!cleanQuery || cleanQuery.length > MAX_QUERY_LENGTH) {
-    return [];
+    return '';
   }
 
   const searchUrl = new URL(SEARCH_ENDPOINT);
@@ -70,6 +71,14 @@ export async function searchMangaStopWorks(query: string): Promise<MangaStopSear
   if (new TextEncoder().encode(html).byteLength > MAX_HTML_BYTES) {
     throw new Error('A página de busca excede o limite permitido.');
   }
+
+  return html;
+}
+
+export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
+  const cleanQuery = query.trim();
+  const html = await fetchSearchHtml(cleanQuery);
+  if (!html) return [];
 
   const candidates = new Map<string, MangaStopSearchResult>();
   const anchorPattern = /<a\b([^>]*)href=["']([^"']+)["']([^>]*)>([\s\S]*?)<\/a>/gi;
@@ -119,4 +128,58 @@ export async function searchMangaStopWorks(query: string): Promise<MangaStopSear
       return right.score - left.score;
     })
     .slice(0, 5);
+}
+
+export async function searchMangaStopChapters(workTitle: string): Promise<SourceChapter[]> {
+  const cleanTitle = workTitle.trim();
+  const html = await fetchSearchHtml(cleanTitle);
+  if (!html) return [];
+
+  const chapters = new Map<string, SourceChapter>();
+  const anchorPattern = /<a\b([^>]*)href=["']([^"']+)["']([^>]*)>([\s\S]*?)<\/a>/gi;
+  const normalizedWorkTitle = normalizeTitle(cleanTitle);
+
+  for (const match of html.matchAll(anchorPattern)) {
+    const attrs = `${match[1]} ${match[3]}`;
+    const href = decodeHtml(match[2]);
+    const label = readAnchorTitle(attrs, match[4]);
+
+    let absoluteUrl: URL;
+    try {
+      absoluteUrl = new URL(href, SEARCH_ENDPOINT);
+    } catch {
+      continue;
+    }
+
+    if (!['mangastop.net', 'www.mangastop.net'].includes(absoluteUrl.hostname.toLowerCase())) continue;
+
+    const urlText = decodeURIComponent(absoluteUrl.pathname.replace(/[-_]+/g, ' '));
+    const combinedText = `${label} ${urlText}`;
+    const chapterMatch = combinedText.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
+
+    if (!chapterMatch) continue;
+
+    const withoutChapter = combinedText
+      .replace(/cap(?:[íi]tulo|\.)?\s*[0-9]+(?:\.[0-9]+)?/ig, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const titleScore = titleSimilarity(cleanTitle, withoutChapter);
+    const normalizedCombined = normalizeTitle(combinedText);
+
+    if (titleScore < 0.55 && !normalizedCombined.includes(normalizedWorkTitle)) continue;
+
+    const externalId = chapterMatch[1];
+    chapters.set(absoluteUrl.href, {
+      externalId,
+      title: label || `Capítulo ${externalId}`,
+      url: absoluteUrl.href,
+    });
+  }
+
+  return [...chapters.values()].sort((left, right) => {
+    const a = Number(left.externalId);
+    const b = Number(right.externalId);
+    return Number.isFinite(a) && Number.isFinite(b) ? b - a : right.externalId.localeCompare(left.externalId);
+  });
 }
