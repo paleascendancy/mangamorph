@@ -1,7 +1,7 @@
 import { Hero } from '../components/home/Hero';
 import { HomeSections } from '../components/home/HomeSections';
 import { externalHtmlToPlainText } from '../lib/catalog/text';
-import { createClient } from '../lib/supabase/server';
+import { createPublicClient } from '../lib/supabase/public';
 
 function cleanHeroDescription(value: string | null) {
   const clean = externalHtmlToPlainText(value);
@@ -14,7 +14,7 @@ function cleanHeroDescription(value: string | null) {
 }
 
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Mantemos a consulta principal enxuta para o Home continuar renderizando
   // mesmo se algum campo complementar de metadados falhar.
