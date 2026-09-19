@@ -24,6 +24,11 @@ function validateChapterUrl(input: string): URL {
   return url;
 }
 
+function isMangaStopHostname(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return host === 'mangastop.net' || host.endsWith('.mangastop.net');
+}
+
 function isPrivateHostname(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
 
@@ -140,6 +145,19 @@ export async function scrapeMangaStopChapter(
       const requestUrl = request.url();
 
       if (!isSafeBrowserRequest(requestUrl)) {
+        request.abort().catch(() => undefined);
+        return;
+      }
+
+      try {
+        const target = new URL(requestUrl);
+        const activeResource = ['document', 'script', 'xhr', 'fetch'].includes(resourceType);
+
+        if (activeResource && !isMangaStopHostname(target.hostname)) {
+          request.abort().catch(() => undefined);
+          return;
+        }
+      } catch {
         request.abort().catch(() => undefined);
         return;
       }
