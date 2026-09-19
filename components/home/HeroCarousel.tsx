@@ -113,6 +113,16 @@ export function HeroCarousel({ works }: { works: HighlightWork[] }) {
             priority={activeIndex === 0}
             aria-hidden="true"
           />
+        ) : activeWork.coverUrl ? (
+          <Image
+            className="hero-backdrop hero-backdrop-fallback"
+            src={activeWork.coverUrl}
+            alt=""
+            fill
+            sizes="100vw"
+            priority={activeIndex === 0}
+            aria-hidden="true"
+          />
         ) : null}
 
         {activeWork.coverUrl ? (
