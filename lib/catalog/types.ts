@@ -11,6 +11,7 @@ export type SourceWorkSnapshot = {
   profileUrl: string;
   externalWorkId: string;
   title: string;
+  alternativeTitles: string[];
   chapters: SourceChapter[];
 };
 
