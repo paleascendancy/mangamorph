@@ -134,6 +134,38 @@ function collectAnchorCandidates(
   }
 }
 
+function findNearestWorkHref(html: string, position: number): string | null {
+  const start = Math.max(0, position - HEADING_LINK_WINDOW);
+  const end = Math.min(html.length, position + HEADING_LINK_WINDOW);
+  const neighborhood = html.slice(start, end);
+  const hrefPattern = /href=["']([^"']+)["']/gi;
+
+  let nearest: { href: string; distance: number } | null = null;
+
+  for (const hrefMatch of neighborhood.matchAll(hrefPattern)) {
+    if (hrefMatch.index === undefined) continue;
+
+    const href = hrefMatch[1];
+
+    let absoluteUrl: URL;
+    try {
+      absoluteUrl = new URL(decodeHtml(href), SEARCH_ENDPOINT);
+      parseChapterSourceUrl(absoluteUrl.href);
+    } catch {
+      continue;
+    }
+
+    const absoluteHrefPosition = start + hrefMatch.index;
+    const distance = Math.abs(absoluteHrefPosition - position);
+
+    if (!nearest || distance < nearest.distance) {
+      nearest = { href, distance };
+    }
+  }
+
+  return nearest?.href ?? null;
+}
+
 function collectHeadingCandidates(
   html: string,
   cleanQuery: string,
@@ -147,14 +179,8 @@ function collectHeadingCandidates(
 
     if (!title || score < 0.45 || heading.index === undefined) continue;
 
-    const start = Math.max(0, heading.index - HEADING_LINK_WINDOW);
-    const end = Math.min(html.length, heading.index + heading[0].length + HEADING_LINK_WINDOW);
-    const neighborhood = html.slice(start, end);
-    const hrefPattern = /href=["']([^"']+)["']/gi;
-
-    for (const hrefMatch of neighborhood.matchAll(hrefPattern)) {
-      addCandidate(candidates, cleanQuery, title, hrefMatch[1]);
-    }
+    const href = findNearestWorkHref(html, heading.index);
+    if (href) addCandidate(candidates, cleanQuery, title, href);
   }
 }
 
@@ -171,14 +197,8 @@ function collectImageCandidates(
 
     if (!title || score < 0.45 || image.index === undefined) continue;
 
-    const start = Math.max(0, image.index - HEADING_LINK_WINDOW);
-    const end = Math.min(html.length, image.index + image[0].length + HEADING_LINK_WINDOW);
-    const neighborhood = html.slice(start, end);
-    const hrefPattern = /href=["']([^"']+)["']/gi;
-
-    for (const hrefMatch of neighborhood.matchAll(hrefPattern)) {
-      addCandidate(candidates, cleanQuery, title, hrefMatch[1]);
-    }
+    const href = findNearestWorkHref(html, image.index);
+    if (href) addCandidate(candidates, cleanQuery, title, href);
   }
 }
 
@@ -201,24 +221,35 @@ function rankCandidates(
 
 export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
   const cleanQuery = query.trim();
-  const html = await fetchSearchHtml(cleanQuery);
-  if (!html) return [];
+  if (!cleanQuery || cleanQuery.length > MAX_QUERY_LENGTH) return [];
 
   const candidates = new Map<string, MangaStopSearchResult>();
+  const directUrls = [
+    `/?s=${encodeURIComponent(cleanQuery)}`,
+    `/?q=${encodeURIComponent(cleanQuery)}`,
+    `/titulos/?q=${encodeURIComponent(cleanQuery)}`,
+    `/biblioteca/?q=${encodeURIComponent(cleanQuery)}`,
+    '/',
+  ];
 
-  collectAnchorCandidates(html, cleanQuery, candidates);
-  collectHeadingCandidates(html, cleanQuery, candidates);
-  collectImageCandidates(html, cleanQuery, candidates);
+  for (const path of directUrls) {
+    let html: string;
 
-  const directResults = rankCandidates(cleanQuery, candidates);
-  if (directResults.length > 0) return directResults;
+    try {
+      html = await fetchHtml(new URL(path, MANGASTOP_ORIGIN));
+    } catch {
+      continue;
+    }
 
-  // Fallback direto no próprio catálogo do MangásTop. A Home contém cards de
-  // obras e é consultada sem usar Google, Bing ou qualquer serviço externo.
-  const homeHtml = await fetchHtml(new URL(MANGASTOP_ORIGIN));
-  collectAnchorCandidates(homeHtml, cleanQuery, candidates);
-  collectHeadingCandidates(homeHtml, cleanQuery, candidates);
-  collectImageCandidates(homeHtml, cleanQuery, candidates);
+    collectAnchorCandidates(html, cleanQuery, candidates);
+    collectHeadingCandidates(html, cleanQuery, candidates);
+    collectImageCandidates(html, cleanQuery, candidates);
+
+    const results = rankCandidates(cleanQuery, candidates);
+    if (results.some((result) => normalizeTitle(result.title) === normalizeTitle(cleanQuery))) {
+      return results;
+    }
+  }
 
   return rankCandidates(cleanQuery, candidates);
 }
