@@ -19,19 +19,31 @@ export function parseChapterSourceUrl(input: string): ChapterSource {
     throw new Error('Fonte ainda não suportada.');
   }
 
-  const match = url.pathname.match(/^\/obra\/(\d+)(?:\/([a-z0-9%_-]+))?\/?$/i);
+  const obraMatch = url.pathname.match(/^\/obra\/(\d+)(?:\/([a-z0-9%_-]+))?\/?$/i);
 
-  if (!match) {
-    throw new Error('URL de obra do MangásTop inválida.');
+  if (obraMatch) {
+    const pathname = obraMatch[2]
+      ? `/obra/${obraMatch[1]}/${obraMatch[2]}`
+      : `/obra/${obraMatch[1]}`;
+
+    return {
+      source: 'mangastop',
+      profileUrl: `https://mangastop.net${pathname}`,
+      externalWorkId: obraMatch[1],
+    };
   }
 
-  const pathname = match[2]
-    ? `/obra/${match[1]}/${match[2]}`
-    : `/obra/${match[1]}`;
+  const mangaMatch = url.pathname.match(/^\/manga\/([a-z0-9%_-]+)\/?$/i);
 
-  return {
-    source: 'mangastop',
-    profileUrl: `https://mangastop.net${pathname}`,
-    externalWorkId: match[1],
-  };
+  if (mangaMatch) {
+    const slug = mangaMatch[1].toLowerCase();
+
+    return {
+      source: 'mangastop',
+      profileUrl: `https://mangastop.net/manga/${slug}/`,
+      externalWorkId: `manga:${slug}`,
+    };
+  }
+
+  throw new Error('URL de obra do MangásTop inválida.');
 }
