@@ -20,7 +20,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
   const chapterQuery = typeof params.chapter === 'string' ? params.chapter.trim() : '';
 
   let inspection: Awaited<ReturnType<typeof inspectCatalogSource>> | null = null;
-  let inspectionFailed = false;
+  let inspectionError: string | null = null;
   let sourceMatches: MangaStopSearchResult[] = [];
   let sourceSearchFailed = false;
 
@@ -35,8 +35,10 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
   if (sourceUrl) {
     try {
       inspection = await inspectCatalogSource(sourceUrl);
-    } catch {
-      inspectionFailed = true;
+    } catch (error) {
+      inspectionError = error instanceof Error
+        ? error.message
+        : 'Não foi possível analisar essa URL.';
     }
   }
 
@@ -133,9 +135,10 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
           </form>
         </div>
 
-        {inspectionFailed && (
+        {inspectionError && (
           <div className="admin-feedback" role="status">
-            Não foi possível analisar essa URL. Verifique se é uma página de obra válida da fonte configurada.
+            <strong>Não foi possível analisar a obra.</strong>
+            <span>{inspectionError}</span>
           </div>
         )}
 
