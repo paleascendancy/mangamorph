@@ -34,3 +34,10 @@ export async function signInWithGoogle() {
   if (error || !data.url) redirect('/auth?error=google');
   redirect(data.url);
 }
+
+
+export async function signOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect('/');
+}
