@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { resolveMetadata } from '../../../../lib/catalog/resolve-metadata';
 import { fetchMangasTopWork } from '../../../../lib/catalog/sources/mangastop';
 import { translateSynopsisPtBr } from '../../../../lib/catalog/translate-description';
-import { translateGenresPtBr } from '../../../../lib/catalog/translation';
+import { translateGenresPtBr, translateStatusPtBr } from '../../../../lib/catalog/translation';
 
 export const maxDuration = 60;
 
@@ -73,15 +73,23 @@ export async function POST(request: Request) {
 
     if (metadataDecision.status === 'matched') {
       const metadata = metadataDecision.candidate;
-      let synopsisPtBr: string | null = null;
 
-      try {
+      const { data: currentWork } = await supabase
+        .from('catalog_works')
+        .select('synopsis_original,synopsis_pt_br,locked_fields')
+        .eq('id', job.work_id)
+        .maybeSingle();
+
+      const lockedFields = Array.isArray(currentWork?.locked_fields)
+        ? currentWork.locked_fields
+        : [];
+      const synopsisLocked = lockedFields.includes('synopsis');
+      const synopsisChanged = currentWork?.synopsis_original !== metadata.description;
+
+      let synopsisPtBr = currentWork?.synopsis_pt_br ?? null;
+
+      if (!synopsisLocked && metadata.description && (!synopsisPtBr || synopsisChanged)) {
         synopsisPtBr = await translateSynopsisPtBr(metadata.description);
-      } catch (error) {
-        console.warn('[MangaMorph sync] synopsis translation failed', {
-          sourceId: job.source_id,
-          message: error instanceof Error ? error.message : 'unknown',
-        });
       }
 
       const { error: metadataError } = await supabase.rpc(
@@ -97,7 +105,7 @@ export async function POST(request: Request) {
           p_genres_pt_br: translateGenresPtBr(metadata.genres),
           p_authors: metadata.authors,
           p_artists: metadata.artists,
-          p_status: metadata.status,
+          p_status: translateStatusPtBr(metadata.status),
           p_country_origin: metadata.countryOfOrigin,
           p_cover_url: metadata.coverUrl,
           p_banner_url: metadata.bannerUrl,
