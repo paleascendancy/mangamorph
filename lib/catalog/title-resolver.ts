@@ -1,6 +1,6 @@
 import type { MatchCandidate, MatchDecision, MetadataCandidate } from './types';
 
-function normalizeTitle(value: string): string {
+export function normalizeTitle(value: string): string {
   return value
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -26,7 +26,7 @@ function bigrams(value: string): Set<string> {
   return result;
 }
 
-function similarity(left: string, right: string): number {
+export function titleSimilarity(left: string, right: string): number {
   const a = normalizeTitle(left);
   const b = normalizeTitle(right);
 
@@ -51,7 +51,7 @@ export function rankMetadataCandidates(sourceTitle: string, candidates: Metadata
       let matchedTitle: string | null = null;
 
       for (const title of candidate.titles) {
-        const score = similarity(sourceTitle, title);
+        const score = titleSimilarity(sourceTitle, title);
         if (score > bestScore) {
           bestScore = score;
           matchedTitle = title;
