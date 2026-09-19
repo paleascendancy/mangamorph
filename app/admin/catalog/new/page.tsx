@@ -139,6 +139,7 @@ export default async function NewCatalogWorkPage({ searchParams }: PageProps) {
           <div className="admin-form-divider"><span>ou</span></div>
 
           <form className="admin-source-form" action="/admin/catalog/new" method="get">
+            {titleQuery && <input type="hidden" name="titleHint" value={titleQuery} />}
             <label htmlFor="source">
               URL da obra
               <input
