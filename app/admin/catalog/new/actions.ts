@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '../../../../lib/admin/require-admin';
 import { inspectCatalogSource } from '../../../../lib/catalog';
+import { translateSynopsisPtBr } from '../../../../lib/catalog/translate-description';
 import { translateGenresPtBr } from '../../../../lib/catalog/translation';
 import type { SourceChapter } from '../../../../lib/catalog/types';
 import { createClient } from '../../../../lib/supabase/server';
@@ -56,6 +57,16 @@ export async function saveCatalogWork(formData: FormData) {
     ? inspection.metadata.candidate
     : null;
 
+  let synopsisPtBr: string | null = null;
+
+  if (matchedMetadata?.description) {
+    try {
+      synopsisPtBr = await translateSynopsisPtBr(matchedMetadata.description);
+    } catch {
+      synopsisPtBr = null;
+    }
+  }
+
   const payload = {
     title: inspection.source.title,
     sourceProfileUrl: inspection.source.profileUrl,
@@ -75,7 +86,7 @@ export async function saveCatalogWork(formData: FormData) {
           externalId: matchedMetadata.externalId,
           profileUrl: matchedMetadata.profileUrl,
           synopsisOriginal: matchedMetadata.description,
-          synopsisPtBr: null,
+          synopsisPtBr,
           genresOriginal: matchedMetadata.genres,
           genresPtBr: translateGenresPtBr(matchedMetadata.genres),
           authors: matchedMetadata.authors,
