@@ -1,6 +1,6 @@
 import type { SourceWorkSnapshot } from '../types';
 import { parseChapterSourceUrl } from '../source-url';
-import { searchMangaStopChapters } from './mangastop-search';
+import { resolveMangaStopTitleFromSourceUrl, searchMangaStopChapters } from './mangastop-search';
 
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_HTML_BYTES = 2_000_000;
@@ -166,6 +166,14 @@ export async function fetchMangasTopWork(profileUrl: string, titleHint?: string)
 
   if ((!title || isGenericSiteTitle(title)) && titleHint?.trim()) {
     title = titleHint.trim();
+  }
+
+  if (!title || isGenericSiteTitle(title)) {
+    try {
+      title = await resolveMangaStopTitleFromSourceUrl(resolvedSource.profileUrl);
+    } catch {
+      // Continua para os fallbacks seguintes.
+    }
   }
 
   const slug = getSourceSlug(resolvedSource.profileUrl);
