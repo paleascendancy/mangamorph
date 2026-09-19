@@ -148,6 +148,13 @@ export default async function CatalogWorkAdminPage({ params }: PageProps) {
                 </a>
               ))}
             </div>
+
+            <form action={syncCatalogNow}>
+              <input type="hidden" name="workId" value={work.id} />
+              <button className="admin-secondary-action" type="submit">
+                {work.metadata_provider === 'anilist' ? 'Atualizar com AniList' : 'Atualizar metadados'}
+              </button>
+            </form>
           </article>
         </div>
 
