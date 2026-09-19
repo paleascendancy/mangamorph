@@ -52,6 +52,7 @@ export async function fetchMangasTopWork(
   return {
     ...canonicalSource,
     title,
+    alternativeTitles: scraped.alternativeTitles,
     chapters: scraped.chapters,
   };
 }
