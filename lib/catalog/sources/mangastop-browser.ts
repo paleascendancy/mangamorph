@@ -8,6 +8,7 @@ const REQUEST_TIMEOUT_MS = 20_000;
 
 type BrowserScrapeResult = {
   title: string | null;
+  alternativeTitles: string[];
   chapters: SourceChapter[];
   finalUrl: string;
 };
@@ -155,10 +156,28 @@ export async function scrapeMangaStopWithBrowser(
       const textOf = (element: Element | null) =>
         element?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
+      const primaryHeading = document.querySelector('main h1, article h1, h1');
+      const structuralAliases: string[] = [];
+
+      if (primaryHeading) {
+        let sibling = primaryHeading.nextElementSibling;
+
+        for (let index = 0; sibling && index < 4; index += 1, sibling = sibling.nextElementSibling) {
+          const value = textOf(sibling);
+
+          if (
+            value.length >= 3
+            && value.length <= 140
+            && !/^(escolher status|cap[ií]tulos|coment[aá]rios|arte|relacionados?)$/i.test(value)
+          ) {
+            structuralAliases.push(value);
+          }
+        }
+      }
+
       const titleCandidates = [
-        ...Array.from(document.querySelectorAll('main h1, article h1, h1, h2, h3'))
-          .map((element) => textOf(element))
-          .filter(Boolean),
+        textOf(primaryHeading),
+        ...structuralAliases,
         document.querySelector('meta[property="og:title"]')?.getAttribute('content') ?? '',
         document.querySelector('meta[name="twitter:title"]')?.getAttribute('content') ?? '',
         document.title,
@@ -223,6 +242,11 @@ export async function scrapeMangaStopWithBrowser(
     });
 
     const title = pickBestTitle(snapshot.titleCandidates, query);
+    const alternativeTitles = [...new Set(
+      snapshot.titleCandidates
+        .map((value) => value.replace(/\s+/g, ' ').trim())
+        .filter((value) => value && value !== title && value.length <= 140),
+    )].slice(0, 6);
     const chapters = new Map<string, SourceChapter>();
 
     for (const chapter of snapshot.chapters) {
@@ -246,6 +270,7 @@ export async function scrapeMangaStopWithBrowser(
 
     return {
       title,
+      alternativeTitles,
       chapters: [...chapters.values()],
       finalUrl,
     };
