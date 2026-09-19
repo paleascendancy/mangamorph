@@ -33,6 +33,12 @@ function isStaff(member) {
   return member?.roles?.cache?.some((role) => STAFF_NAMES.has(normalize(role.name))) || false;
 }
 
+function userIdentity(user, member = null) {
+  const displayName = member?.displayName || user.globalName || user.username;
+  const username = user.username ? `@${user.username}` : 'sem username';
+  return `${displayName} (${username}) • ID: ${user.id}`;
+}
+
 async function createPaleTicket(interaction, reasonKey) {
   const labels = {
     suporte: ['Suporte geral', '🛟'],
@@ -111,11 +117,11 @@ async function createPaleTicket(interaction, reasonKey) {
     .setAuthor({ name: 'Pale Ascendancy • Atendimento' })
     .setTitle(`${emoji} ${label}`)
     .setDescription(
-      `Olá, ${interaction.user}. Seu atendimento foi aberto.\n\n` +
+      `Olá, ${interaction.member?.displayName || interaction.user.globalName || interaction.user.username}. Seu atendimento foi aberto.\n\n` +
       'Explique o que você precisa com o máximo de contexto possível. A equipe responderá por aqui.'
     )
     .addFields(
-      { name: 'Solicitante', value: `${interaction.user}`, inline: true },
+      { name: 'Solicitante', value: userIdentity(interaction.user, interaction.member), inline: false },
       { name: 'Categoria', value: label, inline: true }
     )
     .setFooter({ text: 'Pale Ascendancy • Suporte privado' })
@@ -194,7 +200,7 @@ export async function handlePaleMemberAdd(member) {
       .setAuthor({ name: 'Pale Ascendancy • Comunidade Criativa' })
       .setTitle('✨ Bem-vindo à Pale Ascendancy')
       .setDescription(
-        `Olá, ${member}. Bem-vindo à comunidade.\n\n` +
+        `Olá, ${member.displayName || member.user.globalName || member.user.username}. Bem-vindo à comunidade.\n\n` +
         'Explore recursos, compartilhe seus trabalhos, converse com outros criadores e evolua junto com a comunidade.'
       )
       .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
