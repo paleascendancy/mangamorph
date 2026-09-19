@@ -1,5 +1,6 @@
 import { Hero } from '../components/home/Hero';
 import { HomeSections } from '../components/home/HomeSections';
+import { externalHtmlToPlainText } from '../lib/catalog/text';
 import { createClient } from '../lib/supabase/server';
 
 export default async function Home() {
@@ -17,7 +18,7 @@ export default async function Home() {
   const highlightWorks = realWorks.slice(0, 5).map((work) => ({
     id: work.id,
     title: work.title,
-    description: work.synopsis_pt_br ?? work.synopsis_original ?? undefined,
+    description: externalHtmlToPlainText(work.synopsis_pt_br ?? work.synopsis_original) ?? undefined,
     coverUrl: work.cover_url ?? undefined,
     backdropUrl: work.banner_url ?? undefined,
   }));
