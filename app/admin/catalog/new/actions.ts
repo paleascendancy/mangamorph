@@ -106,12 +106,24 @@ export async function saveCatalogWork(formData: FormData) {
   });
 
   if (error || !workId) {
+    console.error('[MangaMorph catalog] save failed', {
+      sourceUrl,
+      message: error?.message ?? 'missing-work-id',
+    });
+
     const reason = error?.message.includes('already registered') ? 'already-exists' : 'save-failed';
 
     redirect(
       `/admin/catalog/new?source=${encodeURIComponent(sourceUrl)}&error=${reason}`,
     );
   }
+
+  console.info('[MangaMorph catalog] save completed', {
+    workId,
+    sourceUrl,
+    syncMode,
+    remoteChapterCount: inspection.source.chapters.length,
+  });
 
   revalidatePath('/');
   revalidatePath('/admin');
