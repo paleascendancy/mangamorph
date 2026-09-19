@@ -66,7 +66,7 @@ button, input { font: inherit; } button, a { color: inherit; } button { -webkit-
 /* PROFILE */
 .guest-profile { display:flex; align-items:center; gap:14px; margin-top:32px; } .guest-avatar { width:52px; height:52px; flex:0 0 52px; border:1px solid rgba(88,151,221,.22); border-radius:50%; background:var(--bg-elevated); display:grid; place-items:center; color:var(--blue-100); }
 .guest-avatar svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.55; stroke-linecap:round; } .guest-profile strong { display:block; font-family:var(--font-display); font-size:17px; font-weight:600; } .guest-profile p { margin:5px 0 0; color:var(--text-muted); font-size:13px; }
-.guest-auth-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; } .profile-primary-action,.profile-secondary-action { height:43px; border-radius:12px; font-family:var(--font-display); font-size:13px; font-weight:600; cursor:pointer; }
+.guest-auth-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; } .profile-primary-action,.profile-secondary-action { height:43px; text-decoration:none; display:flex; align-items:center; justify-content:center; border-radius:12px; font-family:var(--font-display); font-size:13px; font-weight:600; cursor:pointer; }
 .profile-primary-action { border:1px solid var(--brand-primary); background:var(--brand-primary); color:#fff; } .profile-secondary-action { border:1px solid var(--border-subtle); background:var(--bg-elevated); color:var(--text-primary); }
 .profile-panel-divider { height:1px; margin:27px 0 12px; background:var(--border-subtle); } .profile-options { display:grid; gap:5px; }
 .profile-option { width:100%; min-height:54px; padding:0 12px; border:0; border-radius:13px; background:transparent; color:var(--text-secondary); display:flex; align-items:center; gap:12px; text-align:left; cursor:pointer; } .profile-option:hover { background:rgba(88,151,221,.07); color:var(--text-primary); }
@@ -125,3 +125,22 @@ button, input { font: inherit; } button, a { color: inherit; } button { -webkit-
   .work-card-cover { transition:none; }
   .panel-close-button,.menu-panel,.profile-panel,.panel-overlay,body { transition:none; }
 }
+
+/* AUTH */
+.auth-page { min-height:calc(100dvh - var(--header-height)); padding:64px 20px; display:grid; place-items:center; }
+.auth-card { width:min(440px,100%); padding:32px; border:1px solid var(--border-subtle); border-radius:24px; background:var(--bg-surface); }
+.auth-heading h1 { margin:6px 0 8px; font-family:var(--font-display); font-size:30px; letter-spacing:-.03em; }
+.auth-heading p,.auth-switch { color:var(--text-secondary); }
+.auth-eyebrow { color:var(--blue-100); font-family:var(--font-display); font-size:13px; font-weight:600; }
+.auth-feedback { padding:11px 12px; border:1px solid rgba(88,151,221,.22); border-radius:10px; background:rgba(66,134,203,.08); color:var(--text-secondary); font-size:13px; }
+.auth-form { display:grid; gap:15px; margin-top:25px; }
+.auth-form label { display:grid; gap:7px; color:var(--text-secondary); font-size:13px; font-weight:500; }
+.auth-form input { height:44px; padding:0 13px; border:1px solid var(--border-subtle); border-radius:12px; outline:none; background:var(--bg-base); color:var(--text-primary); }
+.auth-form input:focus-visible { border-color:var(--brand-primary); box-shadow:0 0 0 3px rgba(66,134,203,.22); }
+.auth-primary,.auth-google { width:100%; height:44px; border-radius:12px; font-family:var(--font-display); font-weight:700; cursor:pointer; }
+.auth-primary { border:1px solid var(--brand-primary); background:var(--brand-primary); color:#fff; }
+.auth-google { border:1px solid var(--border-subtle); background:var(--bg-elevated); color:var(--text-primary); }
+.auth-divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--text-muted); font-size:12px; }
+.auth-divider::before,.auth-divider::after { content:''; height:1px; flex:1; background:var(--border-subtle); }
+.auth-switch { margin:22px 0 0; text-align:center; font-size:13px; }
+.auth-switch a { color:var(--blue-100); font-weight:600; }
