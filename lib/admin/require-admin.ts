@@ -1,7 +1,20 @@
 import { redirect } from 'next/navigation';
+import { createClient } from '../supabase/server';
 
-// Autenticação administrativa ainda não foi conectada.
-// Fail closed: nenhuma página administrativa é exibida até existir uma sessão real.
-export async function requireAdmin(): Promise<never> {
-  redirect('/');
+export async function requireAdmin() {
+  const supabase = await createClient();
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+
+  const userId = claimsData?.claims?.sub;
+  if (claimsError || !userId) redirect('/auth');
+
+  const { data: role, error: roleError } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (roleError || role?.role !== 'admin') redirect('/');
+
+  return { userId };
 }
