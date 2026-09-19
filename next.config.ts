@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/admin/catalog/new': chromiumFiles,
     '/api/internal/catalog-sync': chromiumFiles,
+    '/obra/[id]/capitulo/[chapterId]': chromiumFiles,
   },
   images: {
     remotePatterns: [
