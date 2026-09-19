@@ -36,6 +36,99 @@ function readAnchorTitle(anchor: string, body: string): string {
   return stripTags(titleAttr ?? ariaLabel ?? imageAlt ?? body);
 }
 
+function collectRawRouteCandidates(
+  html: string,
+  cleanQuery: string,
+  candidates: Map<string, MangaStopSearchResult>,
+) {
+  const normalizedQuery = normalizeTitle(cleanQuery);
+  if (!normalizedQuery) return;
+
+  const textPatterns = [
+    /<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi,
+    /<img\b[^>]*alt=["']([^"']+)["'][^>]*>/gi,
+    /["'](?:title|name|titulo|nome)["']\s*:\s*["']([^"']+)["']/gi,
+  ];
+
+  for (const pattern of textPatterns) {
+    for (const match of html.matchAll(pattern)) {
+      if (match.index === undefined) continue;
+
+      const title = stripTags(match[1]);
+      if (!title || normalizeTitle(title) !== normalizedQuery) continue;
+
+      const start = Math.max(0, match.index - 5000);
+      const end = Math.min(html.length, match.index + match[0].length + 5000);
+      const neighborhood = decodeHtml(html.slice(start, end));
+
+      const routePatterns = [
+        /https:\/\/mangastop\.net\/(obra\/\d+(?:\/[a-z0-9%_-]+)?|manga\/[a-z0-9%_-]+)\/?/gi,
+        /(?:["'(=:]|\s)(\/(?:obra\/\d+(?:\/[a-z0-9%_-]+)?|manga\/[a-z0-9%_-]+)\/?)\b/gi,
+      ];
+
+      let best: { href: string; distance: number } | null = null;
+
+      for (const routePattern of routePatterns) {
+        for (const routeMatch of neighborhood.matchAll(routePattern)) {
+          if (routeMatch.index === undefined) continue;
+
+          const raw = routeMatch[1] ?? routeMatch[0];
+          const href = raw.startsWith('http')
+            ? raw
+            : raw.startsWith('/')
+              ? new URL(raw, MANGASTOP_ORIGIN).href
+              : new URL(`/${raw}`, MANGASTOP_ORIGIN).href;
+
+          try {
+            parseChapterSourceUrl(href);
+          } catch {
+            continue;
+          }
+
+          const absolutePosition = start + routeMatch.index;
+          const distance = Math.abs(absolutePosition - match.index);
+
+          if (!best || distance < best.distance) {
+            best = { href, distance };
+          }
+        }
+      }
+
+      if (best) {
+        addCandidate(candidates, cleanQuery, title, best.href);
+        continue;
+      }
+
+      const idPatterns = [
+        /["'](?:obra[_-]?id|work[_-]?id|manga[_-]?id|id)["']\s*:\s*["']?(\d{3,})["']?/gi,
+        /\b(?:obra[_-]?id|work[_-]?id|manga[_-]?id)\s*[=:]\s*["']?(\d{3,})["']?/gi,
+      ];
+
+      let nearestId: { id: string; distance: number } | null = null;
+
+      for (const idPattern of idPatterns) {
+        for (const idMatch of neighborhood.matchAll(idPattern)) {
+          if (idMatch.index === undefined) continue;
+          const distance = Math.abs((start + idMatch.index) - match.index);
+
+          if (!nearestId || distance < nearestId.distance) {
+            nearestId = { id: idMatch[1], distance };
+          }
+        }
+      }
+
+      if (nearestId && nearestId.distance <= 1600) {
+        addCandidate(
+          candidates,
+          cleanQuery,
+          title,
+          `${MANGASTOP_ORIGIN}/obra/${nearestId.id}`,
+        );
+      }
+    }
+  }
+}
+
 async function fetchHtml(url: URL): Promise<string> {
   const response = await fetch(url, {
     headers: {
@@ -244,6 +337,7 @@ export async function searchMangaStopWorks(query: string): Promise<MangaStopSear
     collectAnchorCandidates(html, cleanQuery, candidates);
     collectHeadingCandidates(html, cleanQuery, candidates);
     collectImageCandidates(html, cleanQuery, candidates);
+    collectRawRouteCandidates(html, cleanQuery, candidates);
 
     const results = rankCandidates(cleanQuery, candidates);
     if (results.some((result) => normalizeTitle(result.title) === normalizeTitle(cleanQuery))) {
