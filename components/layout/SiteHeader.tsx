@@ -98,7 +98,7 @@ export function SiteHeader() {
       <aside className={`profile-panel${isProfileOpen ? ' is-open' : ''}`} aria-hidden={!isProfileOpen}>
         <div className="panel-topbar"><span className="panel-label">Perfil</span><button className="panel-close-button" type="button" aria-label="Fechar perfil" onClick={closePanels}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button></div>
         <div className="guest-profile"><div className="guest-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c.8-4 3.2-6 7-6s6.2 2 7 6" /></svg></div><div><strong>Perfil convidado</strong><p>Entre para salvar suas obras</p></div></div>
-        <div className="guest-auth-actions"><button type="button" className="profile-primary-action">Entrar</button><button type="button" className="profile-secondary-action">Cadastrar</button></div>
+        <div className="guest-auth-actions"><a href="/auth" className="profile-primary-action">Entrar</a><a href="/auth?mode=signup" className="profile-secondary-action">Cadastrar</a></div>
         <div className="profile-panel-divider" />
         <div className="profile-options">
           <button className="profile-option" type="button"><span className="profile-option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1A8 8 0 0 0 15 6.2L14.7 4h-4L10.4 6.2a8 8 0 0 0-1.5.9l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.5.9l.3 2.2h4l.3-2.2a8 8 0 0 0 1.5-.9l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z" /></svg></span><span>Configuração</span><svg className="profile-option-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
