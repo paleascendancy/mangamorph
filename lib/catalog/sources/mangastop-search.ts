@@ -2,10 +2,12 @@ import { parseChapterSourceUrl } from '../source-url';
 import { normalizeTitle, titleSimilarity } from '../title-resolver';
 import type { SourceChapter } from '../types';
 
-const SEARCH_ENDPOINT = 'https://mangastop.net/';
+const MANGASTOP_ORIGIN = 'https://mangastop.net';
+const SEARCH_ENDPOINT = `${MANGASTOP_ORIGIN}/`;
 const REQUEST_TIMEOUT_MS = 8000;
 const MAX_HTML_BYTES = 2_000_000;
 const MAX_QUERY_LENGTH = 140;
+const HEADING_LINK_WINDOW = 2600;
 
 export type MangaStopSearchResult = {
   title: string;
@@ -30,20 +32,12 @@ function stripTags(value: string): string {
 function readAnchorTitle(anchor: string, body: string): string {
   const titleAttr = anchor.match(/\btitle=["']([^"']+)["']/i)?.[1];
   const ariaLabel = anchor.match(/\baria-label=["']([^"']+)["']/i)?.[1];
-  return stripTags(titleAttr ?? ariaLabel ?? body);
+  const imageAlt = body.match(/<img\b[^>]*alt=["']([^"']+)["']/i)?.[1];
+  return stripTags(titleAttr ?? ariaLabel ?? imageAlt ?? body);
 }
 
-async function fetchSearchHtml(query: string): Promise<string> {
-  const cleanQuery = query.trim();
-
-  if (!cleanQuery || cleanQuery.length > MAX_QUERY_LENGTH) {
-    return '';
-  }
-
-  const searchUrl = new URL(SEARCH_ENDPOINT);
-  searchUrl.searchParams.set('s', cleanQuery);
-
-  const response = await fetch(searchUrl, {
+async function fetchHtml(url: URL): Promise<string> {
+  const response = await fetch(url, {
     headers: {
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
@@ -75,49 +69,124 @@ async function fetchSearchHtml(query: string): Promise<string> {
   return html;
 }
 
-export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
+async function fetchSearchHtml(query: string): Promise<string> {
   const cleanQuery = query.trim();
-  const html = await fetchSearchHtml(cleanQuery);
-  if (!html) return [];
 
-  const candidates = new Map<string, MangaStopSearchResult>();
+  if (!cleanQuery || cleanQuery.length > MAX_QUERY_LENGTH) {
+    return '';
+  }
+
+  // A consulta é feita no próprio MangásTop. Mesmo quando a página pública
+  // devolve a Home, o parser abaixo procura os cards reais renderizados ali.
+  const searchUrl = new URL(SEARCH_ENDPOINT);
+  searchUrl.searchParams.set('s', cleanQuery);
+
+  return fetchHtml(searchUrl);
+}
+
+function addCandidate(
+  candidates: Map<string, MangaStopSearchResult>,
+  cleanQuery: string,
+  title: string,
+  href: string,
+) {
+  const cleanTitle = stripTags(title);
+  if (!cleanTitle) return;
+
+  let absoluteUrl: URL;
+  try {
+    absoluteUrl = new URL(decodeHtml(href), SEARCH_ENDPOINT);
+  } catch {
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = parseChapterSourceUrl(absoluteUrl.href);
+  } catch {
+    return;
+  }
+
+  const score = titleSimilarity(cleanQuery, cleanTitle);
+  if (score < 0.45) return;
+
+  const previous = candidates.get(parsed.profileUrl);
+  if (!previous || score > previous.score) {
+    candidates.set(parsed.profileUrl, {
+      title: cleanTitle,
+      url: parsed.profileUrl,
+      score,
+    });
+  }
+}
+
+function collectAnchorCandidates(
+  html: string,
+  cleanQuery: string,
+  candidates: Map<string, MangaStopSearchResult>,
+) {
   const anchorPattern = /<a\b([^>]*)href=["']([^"']+)["']([^>]*)>([\s\S]*?)<\/a>/gi;
 
   for (const match of html.matchAll(anchorPattern)) {
     const attrs = `${match[1]} ${match[3]}`;
-    const href = decodeHtml(match[2]);
     const title = readAnchorTitle(attrs, match[4]);
+    addCandidate(candidates, cleanQuery, title, match[2]);
+  }
+}
 
-    if (!title) continue;
+function collectHeadingCandidates(
+  html: string,
+  cleanQuery: string,
+  candidates: Map<string, MangaStopSearchResult>,
+) {
+  const headingPattern = /<h[1-4]\b[^>]*>([\s\S]*?)<\/h[1-4]>/gi;
 
-    let absoluteUrl: URL;
-    try {
-      absoluteUrl = new URL(href, SEARCH_ENDPOINT);
-    } catch {
-      continue;
-    }
-
-    let parsed;
-    try {
-      parsed = parseChapterSourceUrl(absoluteUrl.href);
-    } catch {
-      continue;
-    }
-
+  for (const heading of html.matchAll(headingPattern)) {
+    const title = stripTags(heading[1]);
     const score = titleSimilarity(cleanQuery, title);
-    if (score < 0.45) continue;
 
-    const previous = candidates.get(parsed.profileUrl);
-    if (!previous || score > previous.score) {
-      candidates.set(parsed.profileUrl, {
-        title,
-        url: parsed.profileUrl,
-        score,
-      });
+    if (!title || score < 0.45 || heading.index === undefined) continue;
+
+    const start = Math.max(0, heading.index - HEADING_LINK_WINDOW);
+    const end = Math.min(html.length, heading.index + heading[0].length + HEADING_LINK_WINDOW);
+    const neighborhood = html.slice(start, end);
+    const hrefPattern = /href=["']([^"']+)["']/gi;
+
+    for (const hrefMatch of neighborhood.matchAll(hrefPattern)) {
+      addCandidate(candidates, cleanQuery, title, hrefMatch[1]);
     }
   }
+}
 
-  const normalizedQuery = normalizeTitle(cleanQuery);
+function collectImageCandidates(
+  html: string,
+  cleanQuery: string,
+  candidates: Map<string, MangaStopSearchResult>,
+) {
+  const imagePattern = /<img\b[^>]*alt=["']([^"']+)["'][^>]*>/gi;
+
+  for (const image of html.matchAll(imagePattern)) {
+    const title = stripTags(image[1]);
+    const score = titleSimilarity(cleanQuery, title);
+
+    if (!title || score < 0.45 || image.index === undefined) continue;
+
+    const start = Math.max(0, image.index - HEADING_LINK_WINDOW);
+    const end = Math.min(html.length, image.index + image[0].length + HEADING_LINK_WINDOW);
+    const neighborhood = html.slice(start, end);
+    const hrefPattern = /href=["']([^"']+)["']/gi;
+
+    for (const hrefMatch of neighborhood.matchAll(hrefPattern)) {
+      addCandidate(candidates, cleanQuery, title, hrefMatch[1]);
+    }
+  }
+}
+
+function rankCandidates(
+  query: string,
+  candidates: Map<string, MangaStopSearchResult>,
+): MangaStopSearchResult[] {
+  const normalizedQuery = normalizeTitle(query);
 
   return [...candidates.values()]
     .sort((left, right) => {
@@ -128,6 +197,30 @@ export async function searchMangaStopWorks(query: string): Promise<MangaStopSear
       return right.score - left.score;
     })
     .slice(0, 5);
+}
+
+export async function searchMangaStopWorks(query: string): Promise<MangaStopSearchResult[]> {
+  const cleanQuery = query.trim();
+  const html = await fetchSearchHtml(cleanQuery);
+  if (!html) return [];
+
+  const candidates = new Map<string, MangaStopSearchResult>();
+
+  collectAnchorCandidates(html, cleanQuery, candidates);
+  collectHeadingCandidates(html, cleanQuery, candidates);
+  collectImageCandidates(html, cleanQuery, candidates);
+
+  const directResults = rankCandidates(cleanQuery, candidates);
+  if (directResults.length > 0) return directResults;
+
+  // Fallback direto no próprio catálogo do MangásTop. A Home contém cards de
+  // obras e é consultada sem usar Google, Bing ou qualquer serviço externo.
+  const homeHtml = await fetchHtml(new URL(MANGASTOP_ORIGIN));
+  collectAnchorCandidates(homeHtml, cleanQuery, candidates);
+  collectHeadingCandidates(homeHtml, cleanQuery, candidates);
+  collectImageCandidates(homeHtml, cleanQuery, candidates);
+
+  return rankCandidates(cleanQuery, candidates);
 }
 
 export async function searchMangaStopChapters(workTitle: string): Promise<SourceChapter[]> {
