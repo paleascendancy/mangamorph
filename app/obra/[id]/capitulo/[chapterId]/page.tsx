@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { scrapeMangaStopChapter } from '../../../../../lib/catalog/sources/mangastop-chapter';
+import { getChapterReaderSnapshot } from '../../../../../lib/catalog/chapter-reader';
 import { createClient } from '../../../../../lib/supabase/server';
 
 export const maxDuration = 60;
@@ -47,7 +47,7 @@ export default async function MangaMorphChapterPage({ params }: PageProps) {
   let readerError: string | null = null;
 
   try {
-    const snapshot = await scrapeMangaStopChapter(chapter.source_url);
+    const snapshot = await getChapterReaderSnapshot(chapter.source_url);
     pages = snapshot.images;
 
     if (pages.length === 0) {
