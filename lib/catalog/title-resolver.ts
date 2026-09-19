@@ -44,17 +44,35 @@ export function titleSimilarity(left: string, right: string): number {
   return (2 * intersection) / (aPairs.size + bPairs.size);
 }
 
-export function rankMetadataCandidates(sourceTitle: string, candidates: MetadataCandidate[]): MatchCandidate[] {
+function sourceTitleList(sourceTitles: string | string[]): string[] {
+  const values = Array.isArray(sourceTitles) ? sourceTitles : [sourceTitles];
+
+  return [...new Set(
+    values
+      .map((value) => value.trim())
+      .filter(Boolean),
+  )];
+}
+
+export function rankMetadataCandidates(
+  sourceTitles: string | string[],
+  candidates: MetadataCandidate[],
+): MatchCandidate[] {
+  const references = sourceTitleList(sourceTitles);
+
   return candidates
     .map((candidate) => {
       let bestScore = 0;
       let matchedTitle: string | null = null;
 
-      for (const title of candidate.titles) {
-        const score = titleSimilarity(sourceTitle, title);
-        if (score > bestScore) {
-          bestScore = score;
-          matchedTitle = title;
+      for (const reference of references) {
+        for (const title of candidate.titles) {
+          const score = titleSimilarity(reference, title);
+
+          if (score > bestScore) {
+            bestScore = score;
+            matchedTitle = title;
+          }
         }
       }
 
@@ -63,8 +81,11 @@ export function rankMetadataCandidates(sourceTitle: string, candidates: Metadata
     .sort((a, b) => b.score - a.score);
 }
 
-export function decideMetadataMatch(sourceTitle: string, candidates: MetadataCandidate[]): MatchDecision {
-  const ranked = rankMetadataCandidates(sourceTitle, candidates);
+export function decideMetadataMatch(
+  sourceTitles: string | string[],
+  candidates: MetadataCandidate[],
+): MatchDecision {
+  const ranked = rankMetadataCandidates(sourceTitles, candidates);
   const first = ranked[0];
   const second = ranked[1];
 
