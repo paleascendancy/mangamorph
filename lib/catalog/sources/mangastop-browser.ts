@@ -108,6 +108,32 @@ export async function scrapeMangaStopWithBrowser(
       { timeout: 7000 },
     ).catch(() => undefined);
 
+    // O MangásTop mantém a lista de capítulos dentro de uma aba renderizada
+    // no cliente. Abrimos essa aba antes de capturar o DOM.
+    await page.evaluate(() => {
+      const candidates = Array.from(
+        document.querySelectorAll<HTMLElement>('button,a,[role="button"]'),
+      );
+
+      const chapterTab = candidates.find((element) => {
+        const label = (element.textContent ?? '').replace(/\s+/g, ' ').trim();
+        return /^capítulos$/i.test(label) || /^capitulos$/i.test(label);
+      });
+
+      chapterTab?.click();
+    });
+
+    await page.waitForFunction(
+      () => /cap(?:[íi]tulo)?\s*\d+/i.test(document.body.innerText),
+      { timeout: 7000 },
+    ).catch(() => undefined);
+
+    await page.evaluate(async () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
     const finalUrl = page.url();
     const final = new URL(finalUrl);
 
@@ -128,25 +154,29 @@ export async function scrapeMangaStopWithBrowser(
         document.title,
       ].filter(Boolean);
 
-      const chapters = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[href]'))
-        .map((anchor) => {
-          const href = anchor.href;
+      const chapters = Array.from(document.querySelectorAll<HTMLElement>('a[href],button,[role="button"],li,div'))
+        .map((element) => {
           const label = (
-            anchor.textContent
-            || anchor.getAttribute('title')
-            || anchor.getAttribute('aria-label')
+            element.textContent
+            || element.getAttribute('title')
+            || element.getAttribute('aria-label')
             || ''
           ).replace(/\s+/g, ' ').trim();
 
-          const combined = `${label} ${decodeURIComponent(new URL(href).pathname).replace(/[-_]+/g, ' ')}`;
-          const match = combined.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
-
+          const match = label.match(/cap(?:[íi]tulo|\.)?\s*([0-9]+(?:\.[0-9]+)?)/i);
           if (!match) return null;
+
+          const anchor = element.matches('a[href]')
+            ? element as HTMLAnchorElement
+            : element.closest('a[href]') as HTMLAnchorElement | null
+              ?? element.querySelector('a[href]') as HTMLAnchorElement | null;
+
+          if (!anchor?.href) return null;
 
           return {
             externalId: match[1],
-            title: label || `Capítulo ${match[1]}`,
-            url: href,
+            title: label,
+            url: anchor.href,
           };
         })
         .filter((value): value is { externalId: string; title: string; url: string } => Boolean(value));
