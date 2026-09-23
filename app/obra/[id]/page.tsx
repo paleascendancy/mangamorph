@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { loadPublicWork } from '../../../lib/catalog/public-catalog';
 import { externalHtmlToPlainText } from '../../../lib/catalog/text';
-import { createClient } from '../../../lib/supabase/server';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -9,29 +9,11 @@ type PageProps = {
 
 export default async function PublicWorkPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const catalog = await loadPublicWork(id);
 
-  const [{ data: work }, { data: chapters }, { data: links }] = await Promise.all([
-    supabase
-      .from('catalog_works')
-      .select('*')
-      .eq('id', id)
-      .eq('is_published', true)
-      .maybeSingle(),
-    supabase
-      .from('catalog_chapters')
-      .select('id, external_id, chapter_number, title, source_url')
-      .eq('work_id', id)
-      .order('chapter_number', { ascending: false })
-      .limit(500),
-    supabase
-      .from('catalog_metadata_links')
-      .select('id, provider, external_id, profile_url, is_primary')
-      .eq('work_id', id)
-      .order('is_primary', { ascending: false }),
-  ]);
+  if (!catalog) notFound();
 
-  if (!work) notFound();
+  const { work, chapters, links } = catalog;
 
   return (
     <article className="work-profile-page">
@@ -61,7 +43,7 @@ export default async function PublicWorkPage({ params }: PageProps) {
             {work.status ? <p className="work-profile-status">{work.status}</p> : null}
 
             <div className="work-profile-links">
-              {(links ?? []).map((link) => (
+              {links.map((link) => (
                 <a href={link.profile_url} target="_blank" rel="noreferrer" key={link.id}>
                   {link.provider}
                 </a>
@@ -98,14 +80,14 @@ export default async function PublicWorkPage({ params }: PageProps) {
         <section className="work-profile-section">
           <div className="work-profile-section-heading">
             <h2>Capítulos</h2>
-            <span>{(chapters ?? []).length}</span>
+            <span>{chapters.length}</span>
           </div>
 
-          {(chapters ?? []).length === 0 ? (
+          {chapters.length === 0 ? (
             <p className="work-profile-muted">A sincronização ainda não adicionou capítulos.</p>
           ) : (
             <div className="work-profile-chapters">
-              {(chapters ?? []).map((chapter) => (
+              {chapters.map((chapter) => (
                 <a href={`/obra/${work.id}/capitulo/${chapter.id}`} key={chapter.id}>
                   <span>{chapter.title}</span>
                   <small>Ler no MangaMorph</small>

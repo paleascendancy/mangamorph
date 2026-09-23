@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getChapterReaderSnapshot } from '../../../../../lib/catalog/chapter-reader';
-import { createClient } from '../../../../../lib/supabase/server';
+import { loadPublicChapter } from '../../../../../lib/catalog/public-catalog';
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -11,37 +11,12 @@ type PageProps = {
 
 export default async function MangaMorphChapterPage({ params }: PageProps) {
   const { id, chapterId } = await params;
-  const supabase = await createClient();
+  const catalog = await loadPublicChapter(id, chapterId);
 
-  const [{ data: work }, { data: source }, { data: chapter }, { data: chapterList }] = await Promise.all([
-    supabase
-      .from('catalog_works')
-      .select('id,title,is_published')
-      .eq('id', id)
-      .eq('is_published', true)
-      .maybeSingle(),
-    supabase
-      .from('catalog_work_sources')
-      .select('profile_url,external_work_id')
-      .eq('work_id', id)
-      .maybeSingle(),
-    supabase
-      .from('catalog_chapters')
-      .select('id,work_id,external_id,chapter_number,title,source_url')
-      .eq('id', chapterId)
-      .eq('work_id', id)
-      .maybeSingle(),
-    supabase
-      .from('catalog_chapters')
-      .select('id,chapter_number,title')
-      .eq('work_id', id)
-      .order('chapter_number', { ascending: true })
-      .limit(500),
-  ]);
+  if (!catalog) notFound();
 
-  if (!work || !chapter) notFound();
-
-  const chapters = chapterList ?? [];
+  const { work, source, chapter, chapterList } = catalog;
+  const chapters = chapterList;
   const currentIndex = chapters.findIndex((item) => item.id === chapter.id);
   const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
   const nextChapter = currentIndex >= 0 && currentIndex < chapters.length - 1
