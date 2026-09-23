@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { ChapterCommunity } from '../../../../../components/reader/ChapterCommunity';
 import { getChapterReaderSnapshot } from '../../../../../lib/catalog/chapter-reader';
 import { loadPublicChapter } from '../../../../../lib/catalog/public-catalog';
 
@@ -131,6 +132,8 @@ export default async function MangaMorphChapterPage({ params }: PageProps) {
           <span />
         )}
       </nav>
+
+      <ChapterCommunity chapterId={chapter.id} chapterTitle={chapter.title} />
     </article>
   );
 }
