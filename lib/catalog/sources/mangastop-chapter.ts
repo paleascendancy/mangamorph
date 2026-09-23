@@ -1,7 +1,8 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
-const REQUEST_TIMEOUT_MS = 20_000;
+const API_TIMEOUT_MS = 10_000;
+const BROWSER_TIMEOUT_MS = 15_000;
 const MAX_READER_IMAGES = 220;
 
 export type MangaStopChapterSnapshot = {
@@ -151,7 +152,7 @@ async function fetchMangaStopJson<T>(path: string): Promise<T> {
       'User-Agent': 'MangaMorph/2.0 (+https://mangamorph-alpha.vercel.app)',
     },
     cache: 'no-store',
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -297,7 +298,7 @@ async function scrapeMangaStopChapterWithBrowser(
 
     await page.goto(sourceUrl.href, {
       waitUntil: 'domcontentloaded',
-      timeout: REQUEST_TIMEOUT_MS,
+      timeout: BROWSER_TIMEOUT_MS,
     });
 
     await page.waitForFunction(
@@ -491,6 +492,18 @@ async function scrapeMangaStopChapterWithBrowser(
 }
 
 
+function isSourceTimeout(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+
+  const message = error.message.toLowerCase();
+  return (
+    error.name === 'TimeoutError'
+    || error.name === 'AbortError'
+    || message.includes('timeout')
+    || message.includes('aborted')
+  );
+}
+
 export async function scrapeMangaStopChapter(
   chapterUrl: string,
   profileUrl?: string | null,
@@ -506,6 +519,13 @@ export async function scrapeMangaStopChapter(
 
       if (apiSnapshot) return apiSnapshot;
     } catch (error) {
+      if (isSourceTimeout(error)) {
+        console.warn('[MangaMorph reader] MangaStop API timed out; skipping slow browser fallback', {
+          message: error instanceof Error ? error.message : 'timeout',
+        });
+        throw new Error('A fonte demorou para responder. Tente recarregar o capítulo em alguns segundos.');
+      }
+
       console.warn('[MangaMorph reader] MangaStop API failed, using browser fallback', {
         message: error instanceof Error ? error.message : 'unknown',
       });
