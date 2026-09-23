@@ -181,7 +181,12 @@ export function ChapterCommunity({
   );
 
   async function handleReaction(reaction: ReactionKey) {
-    if (!data?.authenticated) {
+    if (!data?.available) {
+      setFeedback('As reações estão temporariamente indisponíveis.');
+      return;
+    }
+
+    if (!data.authenticated) {
       setFeedback('Entre na sua conta para reagir ao capítulo.');
       return;
     }
@@ -202,7 +207,12 @@ export function ChapterCommunity({
   async function handleComment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!data?.authenticated) {
+    if (!data?.available) {
+      setFeedback('Os comentários estão temporariamente indisponíveis.');
+      return;
+    }
+
+    if (!data.authenticated) {
       setFeedback('Entre na sua conta para participar dos comentários.');
       return;
     }
@@ -237,7 +247,12 @@ export function ChapterCommunity({
   }
 
   async function handleLike(comment: ChapterComment) {
-    if (!data?.authenticated) {
+    if (!data?.available) {
+      setFeedback('As curtidas estão temporariamente indisponíveis.');
+      return;
+    }
+
+    if (!data.authenticated) {
       setFeedback('Entre na sua conta para curtir comentários.');
       return;
     }
@@ -397,7 +412,7 @@ export function ChapterCommunity({
                 className={active ? 'is-active' : undefined}
                 type="button"
                 aria-pressed={active}
-                disabled={loading || busy?.startsWith('reaction:')}
+                disabled={loading || !data?.available || busy?.startsWith('reaction:')}
                 onClick={() => void handleReaction(key)}
                 key={key}
               >
@@ -418,7 +433,7 @@ export function ChapterCommunity({
           </p>
         ) : null}
 
-        {!loading && data && !data.authenticated ? (
+        {!loading && data?.available && !data.authenticated ? (
           <p className="community-signin-note">
             <a href="/auth">Entre na sua conta</a> para reagir e comentar.
           </p>
@@ -461,7 +476,7 @@ export function ChapterCommunity({
                 ? 'Compartilhe o que achou deste capítulo...'
                 : 'Entre na sua conta para participar da conversa.'
             }
-            disabled={!data?.authenticated || busy === 'comment'}
+            disabled={!data?.available || !data.authenticated || busy === 'comment'}
             maxLength={1500}
             rows={4}
           />
@@ -472,7 +487,7 @@ export function ChapterCommunity({
                 type="checkbox"
                 checked={spoiler}
                 onChange={(event) => setSpoiler(event.target.checked)}
-                disabled={!data?.authenticated}
+                disabled={!data?.available || !data.authenticated}
               />
               <span>Marcar como spoiler</span>
             </label>
@@ -481,7 +496,7 @@ export function ChapterCommunity({
               <span>{draft.length}/1500</span>
               <button
                 type="submit"
-                disabled={!data?.authenticated || !draft.trim() || busy === 'comment'}
+                disabled={!data?.available || !data.authenticated || !draft.trim() || busy === 'comment'}
               >
                 {busy === 'comment' ? 'Publicando...' : replyTo ? 'Responder' : 'Comentar'}
               </button>
@@ -511,6 +526,11 @@ export function ChapterCommunity({
             <span />
             <span />
             <span />
+          </div>
+        ) : data && !data.available ? (
+          <div className="community-empty">
+            <strong>Comunidade temporariamente indisponível.</strong>
+            <p>A leitura continua funcionando normalmente enquanto o serviço se recupera.</p>
           </div>
         ) : roots.length > 0 ? (
           <div className="community-comments-list">{roots.map((comment) => renderComment(comment))}</div>
